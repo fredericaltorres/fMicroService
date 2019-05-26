@@ -5,8 +5,7 @@ using System.Text;
 namespace Actio.Common.Commands
 {
     // Just a marker interface
-    public interface IAuthenticatedComand: ICommand
+    public interface IEvent
     {
-        Guid UserId { get; set; }
     }
 }

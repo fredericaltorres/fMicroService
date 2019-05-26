@@ -5,7 +5,7 @@ using System.Text;
 namespace Actio.Common.Commands
 {
     // Just a marker interface
-    interface ICommand
+    public interface ICommand
     {
     }
 }
