@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Actio.Common.Commands
+namespace Actio.Common.Events
 {
     public class UserCreated : IEvent
     {
