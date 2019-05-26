@@ -1,15 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA1AAFD7-4CF0-465F-95AC-CF25A98257CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actio.Common", "src\Actio.Common\Actio.Common.csproj", "{805F45B5-CF28-43D9-B384-7495B1B10E00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actio.Services.Activities", "src\Actio.Services.Activities\Actio.Services.Activities.csproj", "{168B175B-F7BD-4EEA-AB11-4A4485841AA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actio.Services.Activities", "src\Actio.Services.Activities\Actio.Services.Activities.csproj", "{168B175B-F7BD-4EEA-AB11-4A4485841AA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actio.Services.Identity", "src\Actio.Services.Identity\Actio.Services.Identity.csproj", "{28D95953-EB44-4936-B50A-F818F8F81160}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actio.Services.Identity", "src\Actio.Services.Identity\Actio.Services.Identity.csproj", "{28D95953-EB44-4936-B50A-F818F8F81160}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C29F28F8-A1BB-4512-9F33-4BEBA798B361}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,9 +24,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{805F45B5-CF28-43D9-B384-7495B1B10E00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -61,9 +63,15 @@ Global
 		{28D95953-EB44-4936-B50A-F818F8F81160}.Release|x86.ActiveCfg = Release|Any CPU
 		{28D95953-EB44-4936-B50A-F818F8F81160}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{805F45B5-CF28-43D9-B384-7495B1B10E00} = {BA1AAFD7-4CF0-465F-95AC-CF25A98257CD}
 		{168B175B-F7BD-4EEA-AB11-4A4485841AA7} = {BA1AAFD7-4CF0-465F-95AC-CF25A98257CD}
 		{28D95953-EB44-4936-B50A-F818F8F81160} = {BA1AAFD7-4CF0-465F-95AC-CF25A98257CD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {38D4A723-637B-48C9-A972-B828E586EEE5}
 	EndGlobalSection
 EndGlobal
