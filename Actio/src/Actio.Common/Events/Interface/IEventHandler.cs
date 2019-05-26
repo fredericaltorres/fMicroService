@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Actio.Common.Commands
+namespace Actio.Common.Events
 {
-    public interface ICommandHandler<in T> where T : ICommand
+    public interface IEventHandler<in T> where T : IEvent
     {
-        Task HandleAsync(T command);
+        Task HandleAsync(T @event);
     }
 }
