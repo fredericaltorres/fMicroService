@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Actio.Common.Commands;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Actio.Api.Controllers
@@ -14,7 +15,7 @@ namespace Actio.Api.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value222" };
         }
 
         // GET api/values/5
@@ -24,10 +25,18 @@ namespace Actio.Api.Controllers
             return "value";
         }
 
+        //// POST api/values
+        //[HttpPost]
+        //public void Post([FromBody] string value)
+        //{
+        //    Console.WriteLine($"Value post {value}");
+        //}
+
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody]CreateActivity2 command)
         {
+            Console.WriteLine($"Value post {command}");
         }
 
         // PUT api/values/5

@@ -13,4 +13,9 @@ namespace Actio.Common.Commands
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+    public class CreateActivity2
+    {
+        public string Category { get; set; }
+        public string Name { get; set; }
+    }
 }
