@@ -56,16 +56,24 @@ namespace Actio.Common.RabbitMq
             return $"{Assembly.GetEntryAssembly().GetName()}/{typeof(T).Name}";
         }
 
+        /// <summary>
+        /// https://rawrabbit.readthedocs.io/en/master/configuration.html
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
         public static void AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
         {
             var options = new RabbitMqOptions();
             var section = configuration.GetSection("rabbitmq");
+                                                 
             section.Bind(options);
-            var client = RawRabbitFactory.CreateSingleton(new RawRabbitOptions
-            {
-                ClientConfiguration = options
-            });
-            services.AddSingleton<IBusClient>(_ => client);
+            var client = RawRabbitFactory.CreateSingleton( // Only one instance manager the connection to RabbitMQ
+                new RawRabbitOptions
+                {
+                    ClientConfiguration = options
+                }
+            );
+            services.AddSingleton<IBusClient>( _ => client );
         }
     }
 }
