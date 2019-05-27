@@ -45,6 +45,7 @@ namespace Actio.Common.RabbitMq
                 }
             );
         }
+
         /// <summary>
         /// Everybody use the same queue, 2 queues one for event one for command
         /// </summary>
