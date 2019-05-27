@@ -23,11 +23,14 @@ namespace Actio.Common.Services
         public static HostBuilder Create<TStartup>(string[] args) where TStartup : class
         {
             Console.Title = typeof(TStartup).Namespace;
-            var config = new ConfigurationBuilder()
+
+            IConfigurationRoot config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
-                .AddCommandLine(args)
+                .AddCommandLine(args) // Allow to change parameter from the command line
                 .Build();
-            var webHostBuilder = WebHost.CreateDefaultBuilder(args)
+
+            IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder(args)
+                .UseDefaultServiceProvider(options => options.ValidateScopes = false)
                 .UseConfiguration(config)
                 .UseStartup<TStartup>();
 
@@ -84,11 +87,19 @@ namespace Actio.Common.Services
 
             public BusBuilder SubscribeToEvent<TEvent>() where TEvent : IEvent
             {
-                var handler = (IEventHandler<TEvent>)_webHost.Services
-                    .GetService(typeof(IEventHandler<TEvent>));
-                _bus.WithEventHandlerAsync(handler);
+                try
+                {
+                    var handler = (IEventHandler<TEvent>)_webHost.Services
+                        .GetService(typeof(IEventHandler<TEvent>));
+                    _bus.WithEventHandlerAsync(handler);
 
-                return this;
+                    return this;
+                }
+                catch(System.Exception ex)
+                {
+                    Console.WriteLine($"ServiceHost.cs.SubscribeToEvent cannot get service:\r\n${ex}");
+                    throw;
+                }
             }
 
             public override ServiceHost Build()
