@@ -57,20 +57,25 @@ namespace Actio.Api.Controllers
             return new string[] { "value1111", "value222", $"{DateTime.Now}" };
         }
 
-
-
-
         [HttpPost("")]
         public async Task<IActionResult> Post([FromBody]CreateActivity command)
         {
-            command.Id = Guid.NewGuid();
-            // command.UserId = Guid.Parse(User.Identity.Name);
-            command.CreatedAt = DateTime.UtcNow;
+            try
+            {
+                command.Id = Guid.NewGuid();
+                // command.UserId = Guid.Parse(User.Identity.Name);
+                command.CreatedAt = DateTime.UtcNow;
 
-            Console.WriteLine($"Publishing command Cat:{command.Category} name:{command.Name}");
-            await _busClient.PublishAsync(command);
+                Console.WriteLine($"Publishing command Cat:{command.Category} name:{command.Name}");
+                await _busClient.PublishAsync(command);
 
-            return Accepted($"activities/{command.Id}"); // return 202
+                return Accepted($"activities/{command.Id}"); // return 202
+            }
+            catch(System.Exception ex)
+            {
+                Console.WriteLine($"Post Command CreateActivity failed \r\n {ex}");
+                throw;
+            }
         }
     }
 }
