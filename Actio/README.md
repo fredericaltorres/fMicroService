@@ -27,3 +27,7 @@ curl -H "Content-Type: application/json; charset=utf-8" -X POST -d "{""Category"
 curl -X GET https://localhost:44354/activities
 curl -H "Content-Type: application/json; charset=utf-8" -X POST -d "{""Category"":""bar-category"",""Name"":""foo-name""}" https://localhost:44354/activities
 
+
+## Udemy Course
+- https://piotrgankiewicz.com/contact/
+- https://piotrgankiewicz.com/2016/10/31/net-core-rabbitmq-rawrabbit/

@@ -1,9 +1,11 @@
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Actio.Common.Commands;
 using Actio.Common.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 using RawRabbit;
 using RawRabbit.Instantiation;
 using RawRabbit.Pipe;
@@ -14,6 +16,7 @@ namespace Actio.Common.RabbitMq
     {
         public static Task WithCommandHandlerAsync<TCommand>(
             this IBusClient bus,
+
             ICommandHandler<TCommand> handler) where TCommand : ICommand
         {
             return bus.SubscribeAsync<TCommand>(
@@ -73,6 +76,9 @@ namespace Actio.Common.RabbitMq
                     ClientConfiguration = options
                 }
             );
+            Console.WriteLine($"RabbitMQ Folder {client.GetType().Assembly.Location}");
+            Console.WriteLine($" Newtonsoft.Json folder {(new JObject()).GetType().Assembly.Location}");
+            
             services.AddSingleton<IBusClient>( _ => client );
         }
     }
