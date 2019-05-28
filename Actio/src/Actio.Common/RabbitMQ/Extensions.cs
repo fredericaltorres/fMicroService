@@ -69,7 +69,7 @@ namespace Actio.Common.RabbitMq
             var options = new RabbitMqOptions();
             var section = configuration.GetSection("rabbitmq");
                                                  
-            section.Bind(options);
+            section.Bind(options);            
             var client = RawRabbitFactory.CreateSingleton( // Only one instance manager the connection to RabbitMQ
                 new RawRabbitOptions
                 {
@@ -77,7 +77,9 @@ namespace Actio.Common.RabbitMq
                 }
             );
             Console.WriteLine($"RabbitMQ Folder {client.GetType().Assembly.Location}");
-            Console.WriteLine($" Newtonsoft.Json folder {(new JObject()).GetType().Assembly.Location}");
+
+            var newtonsoftJsonAssembly = (new JObject()).GetType().Assembly;
+            Console.WriteLine($" Newtonsoft.Json folder {newtonsoftJsonAssembly.Location}");
             
             services.AddSingleton<IBusClient>( _ => client );
         }
