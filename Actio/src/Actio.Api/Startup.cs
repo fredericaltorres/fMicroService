@@ -29,8 +29,8 @@ namespace Actio.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            //services.AddRabbitMq(this.Configuration);
-            //services.AddScoped<IEventHandler<ActivityCreated>, ActivityCreateHandler>();
+            services.AddRabbitMq(this.Configuration);
+            services.AddScoped<IEventHandler<ActivityCreated>, ActivityCreateHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
