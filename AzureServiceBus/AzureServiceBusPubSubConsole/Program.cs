@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using fDotNetCoreContainerHelper;
 using Microsoft.Azure.ServiceBus;
 
 namespace AzureServiceBusPubSubConsole
@@ -31,9 +32,14 @@ AzureServiceBusPubSubConsole.exe publish | subscribe
             }
         }
 
-        const string ServiceBusConnectionString = "Endpoint=sb://fmicroservices.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/fit7G9QSeG/1yutghI=";
+        static string GetServiceBusConnectionString()
+        {
+            var s = RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
+            return s;
+        }
+
         const string TopicName = "myTopic";
-        const string SubscriptionName = "S4";
+        const string SubscriptionName = "S3";
 
         static bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber)
         {
@@ -43,7 +49,7 @@ AzureServiceBusPubSubConsole.exe publish | subscribe
 
         static async Task Subscribe()
         {
-            var sub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, ServiceBusConnectionString, TopicName, SubscriptionName);
+            var sub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, GetServiceBusConnectionString(), TopicName, SubscriptionName);
 
             Console.WriteLine("======================================================");
             Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
@@ -58,7 +64,7 @@ AzureServiceBusPubSubConsole.exe publish | subscribe
 
         static async Task Publish()
         {
-            var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, ServiceBusConnectionString, TopicName);
+            var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, GetServiceBusConnectionString(), TopicName);
             await pub.PublishAsync("Hello 1");
             await pub.PublishAsync("Hello 2");
         }

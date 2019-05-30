@@ -39,6 +39,7 @@ namespace AzureServiceBusPubSubConsole
             else if(type ==AzurePubSubManagerType.Subcribe)
             {
                 _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
+                
             }
         }
 
