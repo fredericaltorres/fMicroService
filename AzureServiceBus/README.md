@@ -5,6 +5,11 @@ Endpoint=sb://fmicroservices.servicebus.windows.net/;SharedAccessKeyName=RootMan
 
 [Get started with Service Bus topics](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-dotnet-how-to-use-topics-subscriptions)
 
+[Github Source](https://github.com/Azure/azure-service-bus/tree/master/samples/DotNet/Microsoft.Azure.ServiceBus)
+
+
+[Azure Service Bus and NodeJs](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-nodejs-how-to-use-topics-subscriptions)
+
 ## Azure Service BusE xplorer
 [ServiceBusExplorer](https://github.com/paolosalvatori/ServiceBusExplorer/)
 ```

@@ -33,10 +33,7 @@ AzureServiceBusPubSubConsole.exe publish | subscribe
 
         const string ServiceBusConnectionString = "Endpoint=sb://fmicroservices.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/fit7G9QSeG/1yutghI=";
         const string TopicName = "myTopic";
-        static ITopicClient topicClient;
-
-        const string SubscriptionName = "S1";
-        static ISubscriptionClient subscriptionClient;
+        const string SubscriptionName = "S4";
 
         static bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber)
         {

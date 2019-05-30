@@ -14,18 +14,16 @@ namespace AzureServiceBusPubSubConsole
     };
     public class AzurePubSubManager
     {
-        AzurePubSubManagerType _type;
-        string _connectionString;
-        string _topic;
-        string _subscriptionName;
+        private AzurePubSubManagerType _type;
+        private string _connectionString;
+        private string _topic;
+        private string _subscriptionName;
+        private ITopicClient _topicClient;
+        private ISubscriptionClient _subscriptionClient;
 
-        static ITopicClient topicClient;
-
-        static ISubscriptionClient subscriptionClient;
+        private OnMessageReceived _onMessageReceived;
 
         public delegate bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber);
-
-        OnMessageReceived _onMessageReceived;
 
         public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null)
         {
@@ -36,11 +34,11 @@ namespace AzureServiceBusPubSubConsole
 
             if(type == AzurePubSubManagerType.Publish)
             {
-                topicClient = new TopicClient(_connectionString, _topic);
+                _topicClient = new TopicClient(_connectionString, _topic);
             }
             else if(type ==AzurePubSubManagerType.Subcribe)
             {
-                subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
+                _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
             }
         }
 
@@ -48,10 +46,8 @@ namespace AzureServiceBusPubSubConsole
         {
             var message = new Message(Encoding.UTF8.GetBytes(messageBody));
             Console.WriteLine($"Publishing {messageBody}, messageId:{message.MessageId}");            
-            await topicClient.SendAsync(message);
+            await _topicClient.SendAsync(message);
         }
-
-        
 
         public void Subscribe(OnMessageReceived onMessageReceived)
         {
@@ -63,40 +59,41 @@ namespace AzureServiceBusPubSubConsole
                 // Maximum number of concurrent calls to the callback ProcessMessagesAsync(), set to 1 for simplicity.
                 // Set it according to how many messages the application wants to process in parallel.
                 MaxConcurrentCalls = 1,
-
+                
                 // Indicates whether the message pump should automatically complete the messages after returning from user callback.
                 // False below indicates the complete operation is handled by the user callback as in ProcessMessagesAsync().
                 AutoComplete = false
             };
-
+            
             // Register the function that processes messages.
-            subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            _subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
         }
 
         public async Task StopSubscribingAsync()
         {
-            await subscriptionClient.CloseAsync();
+            await _subscriptionClient.CloseAsync();
         }
-
 
         async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             // Process the message.
             var messageBody = Encoding.UTF8.GetString(message.Body);
             var sequenceNumber = message.SystemProperties.SequenceNumber;
-            Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{messageBody}");
+            var messageId = message.MessageId;
+
+            Console.WriteLine($"Received message: MessageId:{messageId}, SequenceNumber:{sequenceNumber} Body:{messageBody}");
 
             var r = _onMessageReceived(messageBody, message.MessageId, sequenceNumber);
             if(r)
             {
                 // Complete the message so that it is not received again.
                 // This can be done only if the subscriptionClient is created in ReceiveMode.PeekLock mode (which is the default).
-                await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+                await _subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);                
             }
             else
             {
                 // Release message so it can be processed again
-                await subscriptionClient.AbandonAsync(message.SystemProperties.LockToken);
+                await _subscriptionClient.AbandonAsync(message.SystemProperties.LockToken);
             }
             // Note: Use the cancellationToken passed as necessary to determine if the subscriptionClient has already been closed.
             // If subscriptionClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
