@@ -26,7 +26,13 @@ namespace AzureServiceBusPubSubConsole
         }
 
         const string TopicName = "myTopic";
-        const string SubscriptionName = "S1";
+        static string SubscriptionName
+        {
+            get
+            {
+                return Environment.MachineName;
+            }
+        }
 
         static bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber)
         {
@@ -53,7 +59,7 @@ namespace AzureServiceBusPubSubConsole
             else
             {
                 WaitOnWindows();
-                await sub.StopSubscribingAsync();
+                await sub.Close();
             }
         }
 

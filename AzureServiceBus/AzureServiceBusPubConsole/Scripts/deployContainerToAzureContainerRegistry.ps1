@@ -1,6 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
+	[Alias('a')]
     [string]$action = "deleteInstance", # build, push, instantiate, deleteInstance
     [Parameter(Mandatory=$false)]
     [string]$imageTag = "azureservicebuspubconsole",    
@@ -123,7 +124,7 @@ switch($action) {
 
         Write-Host-Color "About to stop container instance:$containeInstanceName"
         az container stop --resource-group $myResourceGroup --name $containeInstanceName
-		pause
+
         Write-Host-Color "About to delete container instance:$containeInstanceName"
         $jsonString = az container delete --resource-group $myResourceGroup --name $containeInstanceName --yes
     }

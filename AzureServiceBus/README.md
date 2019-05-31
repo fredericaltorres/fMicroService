@@ -7,6 +7,8 @@ Endpoint=sb://fmicroservices.servicebus.windows.net/;SharedAccessKeyName=RootMan
 
 [Github Source](https://github.com/Azure/azure-service-bus/tree/master/samples/DotNet/Microsoft.Azure.ServiceBus)
 
+[What messaging queue should I use in Azure?](https://www.todaysoftmag.com/article/1260/what-messaging-queue-should-i-use-in-azure)
+
 
 [Azure Service Bus and NodeJs](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-nodejs-how-to-use-topics-subscriptions)
 

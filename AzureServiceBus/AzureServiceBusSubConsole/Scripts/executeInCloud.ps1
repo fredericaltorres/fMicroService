@@ -1,6 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
+	[Alias('a')]
     [string]$action = "BuildPushInstantiate" # BuildPushInstantiate, deleteInstance
 )
 cls
