@@ -13,6 +13,7 @@ namespace AzureServiceBusPubSubConsole
        
         static void Main(string[] args)
         {
+            Console.WriteLine(RuntimeHelper.GetContextInformation());
             Publish().GetAwaiter().GetResult();
         }
 

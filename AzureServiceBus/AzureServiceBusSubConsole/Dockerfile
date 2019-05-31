@@ -14,7 +14,7 @@ MAINTAINER Frederic Torres
 #CMD ls
 
 # Set environment variable
-ENV Fred true
+#ENV Fred true
 
 # Run a bash command as part of the image building...
 # It is a Linux bash command
@@ -29,10 +29,10 @@ ENV Fred true
 
 COPY bin/Release/netcoreapp2.2/publish/ app/
 
-ENTRYPOINT ["dotnet", "app/AzureServiceBusPubConsole.dll"]
+ENTRYPOINT ["dotnet", "app/AzureServiceBusSubConsole.dll"]
 #ENTRYPOINT ["/bin/bash", ""]
 
 # Run the image locally
-# docker run azureservicebuspubconsole
+# docker run azureservicebussubconsole
 #
 

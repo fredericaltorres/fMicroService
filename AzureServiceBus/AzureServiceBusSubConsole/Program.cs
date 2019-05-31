@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Loader;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace AzureServiceBusPubSubConsole
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(RuntimeHelper.GetContextInformation());
             Subscribe().GetAwaiter().GetResult();
         }
 
@@ -32,13 +34,38 @@ namespace AzureServiceBusPubSubConsole
             return true;
         }
 
+        static AzurePubSubManager sub = null;
+
         static async Task Subscribe()
         {
-            var sub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, GetServiceBusConnectionString(), TopicName, SubscriptionName);
+            sub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, GetServiceBusConnectionString(), TopicName, SubscriptionName);
             sub.Subscribe(OnMessageReceived);
             Console.WriteLine("Waiting for messages");
 
-            while(true)
+            if (RuntimeHelper.IsRunningContainerMode())
+            {
+                AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+                while(true)
+                {
+                    Thread.Sleep(500);
+                }
+            }
+            else
+            {
+                WaitOnWindows();
+                await sub.StopSubscribingAsync();
+            }
+        }
+
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("CurrentDomain_ProcessExit");
+            sub.StopSubscribingAsync().GetAwaiter().GetResult();
+        }
+
+        private static void WaitOnWindows()
+        {
+            while (true)
             {
                 Console.WriteLine("Q)uit C)ls");
                 var k = Console.ReadKey();
@@ -47,8 +74,6 @@ namespace AzureServiceBusPubSubConsole
                 if (k.Key == ConsoleKey.C)
                     Console.Clear();
             }
-
-            await sub.StopSubscribingAsync();
         }
     }
 }
