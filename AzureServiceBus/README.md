@@ -11,7 +11,7 @@
 
 [Azure Service Bus and NodeJs](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-nodejs-how-to-use-topics-subscriptions)
 
-## Azure Service BusE xplorer
+## Azure Service Bus Explorer
 [ServiceBusExplorer](https://github.com/paolosalvatori/ServiceBusExplorer/)
 ```
 C:\>choco install ServiceBusExplorer
