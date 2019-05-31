@@ -15,6 +15,8 @@ namespace AzureServiceBusSubHelper
     };
     public class AzurePubSubManager
     {
+        const int MAX_SUBSCRIPTION_NAME_LENGTH = 50;
+
         private AzurePubSubManagerType _type;
         private string _connectionString;
         private string _topic;
@@ -32,7 +34,7 @@ namespace AzureServiceBusSubHelper
             _type = type;
             _connectionString = connectionString;
             _topic = topic;
-            _subscriptionName = subscriptionName;
+            _subscriptionName = subscriptionName.Substring(0, Math.Min(MAX_SUBSCRIPTION_NAME_LENGTH, subscriptionName.Length));
             _mustCreateDeleteSubscription = mustCreateSubscription;
 
             if (type == AzurePubSubManagerType.Publish)
