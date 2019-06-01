@@ -9,7 +9,8 @@ namespace Donation.Model
         Male = 1,
         Female = 2
     }
-    public class Donation
+
+    public class DonationUserData
     {
         public Guid Guid;
         public string FirstName;
@@ -18,10 +19,15 @@ namespace Donation.Model
         public Gender Gender;
         public string Phone;
         public string Country;
+    }
+
+    public class Donation : DonationUserData
+    {
         public string IpAddress;
         public string CreditCard;
         public string Amount; //$15.92
     }
+
     public class Donations : List<Donation>
     {
         public static Donations LoadFromJsonFile(string jsonFile)

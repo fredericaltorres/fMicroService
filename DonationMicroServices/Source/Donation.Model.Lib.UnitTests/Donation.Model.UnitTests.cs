@@ -3,9 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Donation.Model.Lib.UnitTests
 {
     [TestClass]
-    public class Donations_Model_UnitTest
+    public class Donations_Model_UnitTests
     {
-        private string DonationJsonFile
+        internal static string DonationJsonFile
         {
             get
             {
