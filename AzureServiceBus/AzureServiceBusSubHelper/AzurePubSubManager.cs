@@ -34,7 +34,7 @@ namespace AzureServiceBusSubHelper
             _type = type;
             _connectionString = connectionString;
             _topic = topic;
-            _subscriptionName = subscriptionName.Substring(0, Math.Min(MAX_SUBSCRIPTION_NAME_LENGTH, subscriptionName.Length));
+
             _mustCreateDeleteSubscription = mustCreateSubscription;
 
             if (type == AzurePubSubManagerType.Publish)
@@ -43,7 +43,8 @@ namespace AzureServiceBusSubHelper
             }
             else if(type ==AzurePubSubManagerType.Subcribe)
             {
-                if(mustCreateSubscription)
+                _subscriptionName = subscriptionName.Substring(0, Math.Min(MAX_SUBSCRIPTION_NAME_LENGTH, subscriptionName.Length));
+                if (mustCreateSubscription)
                 {
                     this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
                 }
@@ -89,7 +90,7 @@ namespace AzureServiceBusSubHelper
             {
                 // Maximum number of concurrent calls to the callback ProcessMessagesAsync(), set to 1 for simplicity.
                 // Set it according to how many messages the application wants to process in parallel.
-                MaxConcurrentCalls = 1,
+                MaxConcurrentCalls = 4,
                 
                 // Indicates whether the message pump should automatically complete the messages after returning from user callback.
                 // False below indicates the complete operation is handled by the user callback as in ProcessMessagesAsync().
@@ -112,7 +113,7 @@ namespace AzureServiceBusSubHelper
             var sequenceNumber = message.SystemProperties.SequenceNumber;
             var messageId = message.MessageId;
 
-            Console.WriteLine($"Received message: MessageId:{messageId}, SequenceNumber:{sequenceNumber} Body:{messageBody}");
+            // Console.WriteLine($"Received message: MessageId:{messageId}, SequenceNumber:{sequenceNumber} Body:{messageBody}");
 
             var r = _onMessageReceived(messageBody, message.MessageId, sequenceNumber);
             if(r)

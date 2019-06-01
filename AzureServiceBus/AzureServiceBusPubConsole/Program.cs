@@ -10,11 +10,15 @@ namespace AzureServiceBusPubSubConsole
 {
     class Program
     {
-       
         static void Main(string[] args)
         {
             Console.WriteLine(RuntimeHelper.GetContextInformation());
             Publish().GetAwaiter().GetResult();
+            Console.WriteLine("Job done waiting for ever");
+            while (true)
+            {
+                Thread.Sleep(10 * 1000);
+            }
         }
 
         static string GetServiceBusConnectionString()
@@ -25,23 +29,17 @@ namespace AzureServiceBusPubSubConsole
             return s;
         }
 
-        const string TopicName = "myTopic";
+        const string UserAccountCreatedTopic = "UserAccountCreatedTopic";
 
         static async Task Publish()
         {
-            while (true)
+            const int maxMessageToSend = 1000;
+            var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, GetServiceBusConnectionString(), UserAccountCreatedTopic);
+            for (var i = 0; i < maxMessageToSend; i++)
             {
-                var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, GetServiceBusConnectionString(), TopicName);
-                for (var i = 0; i < 100; i++)
-                {
-                    await pub.PublishAsync($"Hello {i} - {DateTime.Now}");
-                }
-                Thread.Sleep(30 * 1000);
-                //Console.WriteLine("Q)uit C)ontinue");
-                //var k = Console.ReadKey();
-                //if (k.Key == ConsoleKey.Q)
-                //    break;
+                await pub.PublishAsync($"Hello {i} - {DateTime.Now}");
             }
+            Console.WriteLine($"{maxMessageToSend} {UserAccountCreatedTopic} messages published");
         }
     }
 }

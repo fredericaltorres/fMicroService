@@ -25,7 +25,8 @@ namespace AzureServiceBusPubSubConsole
             return s;
         }
 
-        const string TopicName = "myTopic";
+        const string UserAccountCreatedTopic = "UserAccountCreatedTopic";
+
         static string SubscriptionName
         {
             get
@@ -34,9 +35,31 @@ namespace AzureServiceBusPubSubConsole
             }
         }
 
+        static long _messageProcessedCounter = 0;
+        static long _messageProcessedCounterPrevious = -1;
+
+        private static void DisplayMessageProcessed()
+        {
+            if(_messageProcessedCounter != _messageProcessedCounterPrevious)
+            {
+                if(_messageProcessedCounterPrevious != -1)
+                {
+                    var messageProcessedInTheLastSecond = _messageProcessedCounter - _messageProcessedCounterPrevious;
+                    Console.WriteLine($"{_messageProcessedCounter} Message Processed Total, {messageProcessedInTheLastSecond} / S");
+                }
+                else
+                {
+                    Console.WriteLine($"{_messageProcessedCounter} Message Processed Total");
+                }
+                
+                _messageProcessedCounterPrevious = _messageProcessedCounter;
+            }
+        }
+
         static bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber)
         {
-            Console.WriteLine($">>> [{messageId}, {sequenceNumber}] {messageBody}");
+            _messageProcessedCounter++;
+            // Console.WriteLine($">>> [{messageId}, {sequenceNumber}] {messageBody}");
             return true;
         }
 
@@ -44,7 +67,7 @@ namespace AzureServiceBusPubSubConsole
 
         static async Task Subscribe()
         {
-            sub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, GetServiceBusConnectionString(), TopicName, SubscriptionName);
+            sub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, GetServiceBusConnectionString(), UserAccountCreatedTopic, SubscriptionName);
             sub.Subscribe(OnMessageReceived);
             Console.WriteLine("Waiting for messages");
 
@@ -53,12 +76,27 @@ namespace AzureServiceBusPubSubConsole
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
                 while(true)
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
+                    DisplayMessageProcessed();
                 }
             }
             else
             {
-                WaitOnWindows();
+                Console.WriteLine("Q)uit C)ls");
+                while (true)
+                {
+                    if (Console.KeyAvailable)
+                    {
+                        var k = Console.ReadKey();
+                        if (k.Key == ConsoleKey.Q)
+                            break;
+                        if (k.Key == ConsoleKey.C)
+                            Console.Clear();
+                        Console.WriteLine("Q)uit C)ls");
+                    }
+                    Thread.Sleep(1000);
+                    DisplayMessageProcessed();
+                }
                 await sub.Close();
             }
         }
@@ -67,19 +105,6 @@ namespace AzureServiceBusPubSubConsole
         {
             Console.WriteLine("CurrentDomain_ProcessExit");
             sub.StopSubscribingAsync().GetAwaiter().GetResult();
-        }
-
-        private static void WaitOnWindows()
-        {
-            while (true)
-            {
-                Console.WriteLine("Q)uit C)ls");
-                var k = Console.ReadKey();
-                if (k.Key == ConsoleKey.Q)
-                    break;
-                if (k.Key == ConsoleKey.C)
-                    Console.Clear();
-            }
         }
     }
 }
