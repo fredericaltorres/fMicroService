@@ -51,21 +51,18 @@ namespace Donation.PersonSimulator.Console
                 System.Console.WriteLine($"JSON File {donationJsonFile} ");
             else
                 throw new InvalidDataException($"Cannot find file {donationJsonFile}");
+
             var donations = Donations.LoadFromJsonFile(donationJsonFile);
 
             var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, GetServiceBusConnectionString(), DonationSubmittedTopic);
-            var counter = 0;
-            var startTime = DateTime.UtcNow;
             foreach(var donation in donations)
             {
                 System.Console.WriteLine($"Pub Donation {donation.Guid} {donation.LastName} {donation.Amount}");
                 await pub.PublishAsync(donation.ToJSON(), donation.Guid.ToString());
-                counter++;
-                if(counter % 10 == 0)
+
+                if(pub.MessagePublishedCounter % 10 == 0)
                 {
-                    var duration = (DateTime.UtcNow - startTime).TotalSeconds;
-                    var messagePerSecond = counter / duration;
-                    System.Console.WriteLine($"{counter} / {donations.Count} messages published {duration:0.0} seconds, {messagePerSecond:0.0} message/S");
+                    System.Console.WriteLine(pub.GetSendInformation());
                 }                    
             }
 
