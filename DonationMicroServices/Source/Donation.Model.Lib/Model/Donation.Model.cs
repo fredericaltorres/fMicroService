@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.JSON;
 
@@ -43,8 +44,20 @@ namespace Donation.Model
     {
         public string IpAddress;
         public string Amount; //$15.92
-        public DateTime UTCCreationDate;
+        public DateTime UtcCreationDate;
+
+        [JsonIgnore]
         public DonationDataProcessState ProcessState = DonationDataProcessState.New;
+
+        public DonationDTO()
+        {
+            this.UtcCreationDate = DateTime.UtcNow;
+        }
+
+        public string ToJSON()
+        {
+            return JsonObject.Serialize(this);
+        }
     }
 
     public class Donations : List<DonationDTO>

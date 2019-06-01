@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fAzureCore", "fAzureCore", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Donation.Demo", "Donation.Demo", "{A230189C-BFF9-4536-9139-FB4045821F2C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Donation.PersonSimulator.Console", "..\DonationMicroServices\Source\Donation.PersonSimulator.Console\Donation.PersonSimulator.Console.csproj", "{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B} = {900C88F3-13F3-473E-8396-29211D1390BC}
 		{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA} = {900C88F3-13F3-473E-8396-29211D1390BC}
 		{3D3BFED0-A1ED-44EB-9847-3745E768EE15} = {900C88F3-13F3-473E-8396-29211D1390BC}
+		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1900646C-BBFC-41C8-B89A-04500597442D}

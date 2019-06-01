@@ -62,7 +62,6 @@ namespace Donation.Model.Lib.UnitTests
             }
         }
 
-
         [TestMethod]
         public void ValidateDonnationData_WithMissingRequiredProperty_ShouldReturnsErrores()
         {

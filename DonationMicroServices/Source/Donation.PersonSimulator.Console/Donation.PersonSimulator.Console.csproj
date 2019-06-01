@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+    <None Remove="appsettings.tpl.json" />
+    <None Remove="GeneratedData\donation.SmallSample.json" />
+    <None Remove="GeneratedData\donation0.json" />
+    <None Remove="GeneratedData\donation1.json" />
+    <None Remove="GeneratedData\donation2.json" />
+    <None Remove="GeneratedData\donation3.json" />
+    <None Remove="GeneratedData\donation4.json" />
+    <None Remove="GeneratedData\donation5.json" />
+    <None Remove="GeneratedData\donation6.json" />
+    <None Remove="GeneratedData\donation7.json" />
+    <None Remove="GeneratedData\donation8.json" />
+    <None Remove="GeneratedData\donation9.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.tpl.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\fAzureCore\AzureServiceBusSubHelper\AzureServiceBusSubHelper.csproj" />
+    <ProjectReference Include="..\..\..\..\..\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
+    <ProjectReference Include="..\..\..\..\..\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
+    <ProjectReference Include="..\Donation.Model.Lib\Donation.Model.Lib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="GeneratedData\donation.SmallSample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation0.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation3.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation4.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation5.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation6.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation7.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation8.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GeneratedData\donation9.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
