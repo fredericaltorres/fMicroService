@@ -1,0 +1,76 @@
+{
+  "id": 173907,
+  "num_rows": 100,
+  "file_format": "json",
+  "name": "User Donation",
+  "array": true,
+  "columns": [
+    {
+      "name": "Guid",
+      "null_percentage": 0,
+      "type": "GUID",
+      "formula": ""
+    },
+    {
+      "name": "FirstName",
+      "null_percentage": 0,
+      "type": "First Name",
+      "formula": ""
+    },
+    {
+      "name": "LastName",
+      "null_percentage": 0,
+      "type": "Last Name",
+      "formula": ""
+    },
+    {
+      "name": "Email",
+      "null_percentage": 0,
+      "type": "Email Address",
+      "formula": ""
+    },
+    {
+      "name": "Gender",
+      "null_percentage": 0,
+      "type": "Gender",
+      "formula": ""
+    },
+    {
+      "name": "Phone",
+      "null_percentage": 0,
+      "type": "Phone",
+      "format": "###-###-####",
+      "formula": ""
+    },
+    {
+      "name": "IpAddress",
+      "null_percentage": 0,
+      "type": "IP Address v4",
+      "formula": ""
+    },
+    {
+      "name": "Country",
+      "null_percentage": 0,
+      "type": "Country",
+      "countries": [
+
+      ],
+      "formula": ""
+    },
+    {
+      "name": "CreditCard",
+      "null_percentage": 0,
+      "type": "Credit Card #",
+      "formula": ""
+    },
+    {
+      "name": "Amount",
+      "null_percentage": 0,
+      "type": "Money",
+      "min": 0,
+      "max": 100,
+      "symbol": "$",
+      "formula": ""
+    }
+  ]
+}
