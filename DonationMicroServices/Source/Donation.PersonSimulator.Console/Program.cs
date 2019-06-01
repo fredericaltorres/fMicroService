@@ -10,16 +10,16 @@ namespace Donation.PersonSimulator.Console
 {
     class Program
     {
+        /// <summary>
+        /// Parameter -generationIndex is passed as an envrironment variable when running
+        /// as a container
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
 
-            if(args.Length == 0)
-            {
-                throw new InvalidDataException($"Command line parameter -generationIndex 0..9 required");
-            }
-
-            var generationIndex = int.Parse(args[1]);
+            var generationIndex = RuntimeHelper.GetCommandLineParameterInt("-generationIndex", args);
 
             Publish(generationIndex).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");

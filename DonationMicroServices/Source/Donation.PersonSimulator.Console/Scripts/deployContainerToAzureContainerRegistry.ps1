@@ -2,11 +2,15 @@
 param(
     [Parameter(Mandatory=$false)]
 	[Alias('a')]
-    [string]$action = "deleteInstance", # build, push, instantiate, deleteInstance
+    [string]$action = "deleteInstance", # build, push, instantiate, deleteInstance, getLog
+
+	[Parameter(Mandatory=$false)]
+    [string]$generationIndex = "5",
+	
     [Parameter(Mandatory=$false)]
-    [string]$imageTag = "azureservicebuspubconsole",    
+    [string]$imageTag = "donation.personsimulator.console",    
     [Parameter(Mandatory=$false)]
-    $containeInstanceName = "azureservicebuspubconsoleinstance0",
+    $containerInstanceName = "donation.personsimulator.console.instance0",
 
     # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -29,6 +33,8 @@ param(
     [Parameter(Mandatory=$false)] 
     [bool]$clearScreen = $true
 )
+
+$containerInstanceName = $containerInstanceName.replace(".", "-")
 
 function GetProjectName() {
 
@@ -71,7 +77,7 @@ Write-Host "deployContainerToAzureContainerRegistry -Action:$action" -Foreground
 Write-Host "Build project $(GetProjectName), version:$(GetProjectVersion)" -ForegroundColor DarkYellow
 
 $newTag = "$acrLoginServer/$imageTag`:$(GetProjectVersion)"
-$containeInstanceName = $containeInstanceName.toLower()
+$containerInstanceName = $containerInstanceName.toLower()
 
 switch($action) {
 
@@ -110,23 +116,30 @@ switch($action) {
     instantiate {
         
         $azureLoginName = $acrName        
-        $dnsLabel = "$($containeInstanceName)"
+        $dnsLabel = "$($containerInstanceName)"
 
-        Write-Host-Color "About to instantiate instance of container:$containeInstanceName from image:$newTag"
-        $jsonString = az container create --resource-group $myResourceGroup --name $containeInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel
-        
+        Write-Host-Color "About to instantiate instance of container:$containerInstanceName from image:$newTag"
+		Write-Host-Color "Start container with parameter: --environment-variables generationIndex=$generationIndex"
+        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$generationIndex
+		        
         $url = GetContainerInstanceIpFromJsonMetadata $jsonString
         Write-Host-Color "Container Instance URL:$url"
+    }
+
+    getLog {
+
+        Write-Host-Color "About to get the logs instance:$containerInstanceName"
+        az container logs --resource-group $myResourceGroup --name $containerInstanceName
     }
 
     # Stop and delete an instance of the container under a specific name and version
     deleteInstance {
 
-        Write-Host-Color "About to stop container instance:$containeInstanceName"
-        az container stop --resource-group $myResourceGroup --name $containeInstanceName
+        Write-Host-Color "About to stop container instance:$containerInstanceName"
+        az container stop --resource-group $myResourceGroup --name $containerInstanceName
 
-        Write-Host-Color "About to delete container instance:$containeInstanceName"
-        $jsonString = az container delete --resource-group $myResourceGroup --name $containeInstanceName --yes
+        Write-Host-Color "About to delete container instance:$containerInstanceName"
+        $jsonString = az container delete --resource-group $myResourceGroup --name $containerInstanceName --yes
     }
 }
 

@@ -15,6 +15,7 @@ switch($action) {
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action build -clearScreen $false
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action push -clearScreen $false
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action instantiate -clearScreen $false        
+		./Scripts/deployContainerToAzureContainerRegistry.ps1 -action getLog -clearScreen $false
 
         Write-Host "Container instance should be running in Azure, start by opening the resource group in the Azure portal" -ForegroundColor Yellow
     }
