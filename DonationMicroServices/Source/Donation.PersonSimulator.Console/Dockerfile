@@ -29,7 +29,7 @@ ENV Fred true
 
 COPY bin/Release/netcoreapp2.2/publish/ app/
 
-ENTRYPOINT ["dotnet", "app/AzureServiceBusPubConsole.dll"]
+ENTRYPOINT ["dotnet", "app/Donation.PersonSimulator.Console.dll"]
 #ENTRYPOINT ["/bin/bash", ""]
 
 # Run the image locally

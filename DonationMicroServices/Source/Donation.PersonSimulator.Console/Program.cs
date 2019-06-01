@@ -53,14 +53,23 @@ namespace Donation.PersonSimulator.Console
                 throw new InvalidDataException($"Cannot find file {donationJsonFile}");
             var donations = Donations.LoadFromJsonFile(donationJsonFile);
 
-            const int maxMessageToSend = 3;
             var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, GetServiceBusConnectionString(), DonationSubmittedTopic);
+            var counter = 0;
+            var startTime = DateTime.UtcNow;
             foreach(var donation in donations)
             {
-                await pub.PublishAsync(donation.ToJSON());
+                System.Console.WriteLine($"Pub Donation {donation.Guid} {donation.LastName} {donation.Amount}");
+                await pub.PublishAsync(donation.ToJSON(), donation.Guid.ToString());
+                counter++;
+                if(counter % 10 == 0)
+                {
+                    var duration = (DateTime.UtcNow - startTime).TotalSeconds;
+                    var messagePerSecond = counter / duration;
+                    System.Console.WriteLine($"{counter} / {donations.Count} messages published {duration:0.0} seconds, {messagePerSecond:0.0} message/S");
+                }                    
             }
 
-            System.Console.WriteLine($"{maxMessageToSend} {DonationSubmittedTopic} messages published");
+            System.Console.WriteLine($"{donations.Count} {DonationSubmittedTopic} messages published");
         }
     }
 }
