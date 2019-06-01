@@ -8,4 +8,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DynamicSugarCore">
+      <HintPath>..\..\..\..\..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
