@@ -23,6 +23,11 @@ namespace Donation.Service
             return v.GetType().Name == "String";
         }
 
+        private bool CanBeNull(string property)
+        {
+            return property == "ZipCode";
+        }
+
         public DonationDTOValidationErrors ValidateData()
         {
             var totalErrors = new DonationDTOValidationErrors();
@@ -32,7 +37,7 @@ namespace Donation.Service
                 var donnationDic = DynamicSugar.ReflectionHelper.GetDictionary(donation);
                 foreach(var e in donnationDic)
                 {
-                    if (e.Value == null)
+                    if (e.Value == null && !CanBeNull(e.Key))
                     {
                         donnationErrors.Add(new DonationDTOValidationError(donation.Guid, e.Key, VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL));
                     }

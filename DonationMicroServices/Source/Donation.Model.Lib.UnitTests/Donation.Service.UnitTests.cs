@@ -1,6 +1,7 @@
 using Donation.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 
 namespace Donation.Model.Lib.UnitTests
 {
@@ -10,7 +11,7 @@ namespace Donation.Model.Lib.UnitTests
         [TestMethod]
         public void SumDonations()
         {
-            var expectedSumAmount = 4853.01M;
+            var expectedSumAmount = 5191.75M;
             var donations = Donations.LoadFromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
             var donationsService = new DonationsService(donations);
             Assert.AreEqual(expectedSumAmount, donationsService.Sum());
@@ -39,7 +40,7 @@ namespace Donation.Model.Lib.UnitTests
         }
 
         [TestMethod]
-        public void ValidateDonnationData()
+        public void ValidateDonationSmallSampleData()
         {
             var donations = Donations.LoadFromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
             var donationsService = new DonationsService(donations);
@@ -47,10 +48,25 @@ namespace Donation.Model.Lib.UnitTests
             Assert.AreEqual(0, errors.Count);
         }
 
+        [TestMethod]
+        public void ValidateDonationAllDataFiles()
+        {
+            var path = Path.GetDirectoryName(Donations_Model_UnitTests.DonationJsonFile);
+            var jsonFiles = Directory.GetFiles(path, "donation*.json");
+            foreach(var jsonFile in jsonFiles)
+            {
+                var donations = Donations.LoadFromJsonFile(jsonFile);
+                var donationsService = new DonationsService(donations);
+                var errors = donationsService.ValidateData();
+                Assert.AreEqual(0, errors.Count);
+            }
+        }
+
 
         [TestMethod]
         public void ValidateDonnationData_WithMissingRequiredProperty_ShouldReturnsErrores()
         {
+            const int expectedValidationErrorCount = 7;
             var donations = new Donations() {
                 new DonationDTO() {
                     Guid = Guid.NewGuid(),
@@ -59,7 +75,7 @@ namespace Donation.Model.Lib.UnitTests
             };
             var donationsService = new DonationsService(donations);
             var errors = donationsService.ValidateData();
-            Assert.AreEqual(8, errors.Count);
+            Assert.AreEqual(expectedValidationErrorCount, errors.Count);
             Assert.IsTrue(donations[0].ProcessState == DonationDataProcessState.NotApprovedForSubmission);
         }
     }
