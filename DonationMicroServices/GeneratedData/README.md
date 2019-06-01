@@ -7,6 +7,7 @@ The row donation data was generated using [mockaroo.com](https://mockaroo.com)
 
 # How to generate 50 000 donations group in 10 files each containing 5 000 random generation
 ```
+curl "https://api.mockaroo.com/api/223f6d70?count=100&key=3adfa220" > donation.SmallSample.json
 curl "https://api.mockaroo.com/api/223f6d70?count=5000&key=3adfa220" > donation0.json
 curl "https://api.mockaroo.com/api/223f6d70?count=5000&key=3adfa220" > donation1.json
 curl "https://api.mockaroo.com/api/223f6d70?count=5000&key=3adfa220" > donation2.json
