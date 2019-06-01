@@ -58,18 +58,51 @@
       "formula": ""
     },
     {
-      "name": "CreditCard",
-      "null_percentage": 0,
-      "type": "Credit Card #",
-      "formula": ""
-    },
-    {
       "name": "Amount",
       "null_percentage": 0,
       "type": "Money",
       "min": 0,
       "max": 100,
       "symbol": "$",
+      "formula": ""
+    },
+    {
+      "name": "ZipCode",
+      "null_percentage": 0,
+      "type": "Postal Code",
+      "formula": ""
+    },
+    {
+      "name": "CC_Number",
+      "null_percentage": 0,
+      "type": "Credit Card #",
+      "formula": ""
+    },
+    {
+      "name": "CC_ExpMonth",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 1,
+      "max": 12,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "CC_ExpYear",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 2015,
+      "max": 2025,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "CC_SecCode",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 100,
+      "max": 999,
+      "decimals": 0,
       "formula": ""
     }
   ]
