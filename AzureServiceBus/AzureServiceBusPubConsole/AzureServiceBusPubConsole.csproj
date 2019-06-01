@@ -26,13 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzureServiceBusSubHelper\AzureServiceBusSubHelper.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="fDotNetCoreContainerHelper">
-      <HintPath>..\Reference\fDotNetCoreContainerHelper\bin\Debug\netcoreapp2.2\fDotNetCoreContainerHelper.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\..\fAzureCore\AzureServiceBusSubHelper\AzureServiceBusSubHelper.csproj" />
+    <ProjectReference Include="..\..\..\..\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
+    <ProjectReference Include="..\..\..\..\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
   </ItemGroup>
 
  
