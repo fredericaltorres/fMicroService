@@ -16,7 +16,7 @@ The powershell [generateData.ps1](./generateData.ps1) generate 10 files
 - I use the web site https://api.mockaroo.com
 - I use the free service, which can only return 5000 row per call and is limited to 200 call per day.
 
-# How to generate 50 000 donations group in 10 files each containing 5 000 random generation
+# How to generate data from the command line
 ```
 curl "https://api.mockaroo.com/api/223f6d70?count=100&key=3adfa220" > donation.SmallSample.json
 curl "https://api.mockaroo.com/api/223f6d70?count=5000&key=3adfa220" > donation0.json
