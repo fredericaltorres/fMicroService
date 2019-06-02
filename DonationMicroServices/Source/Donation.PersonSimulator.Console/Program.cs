@@ -1,7 +1,11 @@
 ﻿using AzureServiceBusSubHelper;
 using Donation.Model;
+using Donation.Queue.Lib;
+using DynamicSugar;
+using fAzureHelper;
 using fDotNetCoreContainerHelper;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,19 +58,28 @@ namespace Donation.PersonSimulator.Console
 
             var donations = Donations.LoadFromJsonFile(donationJsonFile);
 
-            var pub = new AzurePubSubManager(AzurePubSubManagerType.Publish, GetServiceBusConnectionString(), DonationSubmittedTopic);
-            foreach(var donation in donations)
+            var systemActivityNotificationManager = new SystemActivityNotificationManager(GetServiceBusConnectionString());
+
+            await systemActivityNotificationManager.NotifyAsync($"Start sending Donation from file {donationJsonFile}");
+
+            // Settings come frm the appsettings.json file
+            var donationQueue = new DonationQueue( RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey") );
+
+            foreach (var donation in donations)
             {
                 System.Console.WriteLine($"Pub Donation {donation.Guid} {donation.LastName} {donation.Amount}");
-                await pub.PublishAsync(donation.ToJSON(), donation.Guid.ToString());
 
-                if(pub.MessagePublishedCounter % 10 == 0)
+                await donationQueue.PushAsync(donation);
+                if (donationQueue.GetPerformanceTrackerCounter() % 32 == 0)
                 {
-                    System.Console.WriteLine(pub.GetSendInformation());
+                    await systemActivityNotificationManager.NotifyAsync(donationQueue.GetTrackedInformation("Donation pushed to queue"));
                 }                    
             }
 
-            System.Console.WriteLine($"{donations.Count} {DonationSubmittedTopic} messages published");
+            await systemActivityNotificationManager.NotifyAsync(DS.List(
+                $"{donations.Count} {DonationSubmittedTopic} messages published",
+                $"End sending Donation from file {donationJsonFile}"
+            ));
         }
     }
 }

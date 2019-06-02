@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.4</Version>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,6 +41,7 @@
     <ProjectReference Include="..\..\..\..\..\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
     <ProjectReference Include="..\..\..\..\..\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
     <ProjectReference Include="..\Donation.Model.Lib\Donation.Model.Lib.csproj" />
+    <ProjectReference Include="..\Donation.Queue.Lib\Donation.Queue.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

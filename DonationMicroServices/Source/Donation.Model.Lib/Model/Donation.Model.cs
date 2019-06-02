@@ -62,7 +62,6 @@ namespace Donation.Model
 
     public class Donations : List<DonationDTO>
     {
-      
         public static Donations LoadFromJsonFile(string jsonFile)
         {
             var json = System.IO.File.ReadAllText(jsonFile);
