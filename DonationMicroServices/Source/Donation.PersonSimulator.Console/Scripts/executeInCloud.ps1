@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory=$false)]
 	[Alias('a')]
-    [string]$action = "BuildPushInstantiate", # BuildPushInstantiate, deleteInstance
+    [string]$action = "BuildPushInstantiate", # BuildPushInstantiate, BuildPushInstantiateAll, deleteInstance, deleteInstanceAll, getLog, getLogAll
 	[Parameter(Mandatory=$false)]
     [int]$generationIndex = 0
 )
