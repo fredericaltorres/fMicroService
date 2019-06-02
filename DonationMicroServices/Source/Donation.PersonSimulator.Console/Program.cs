@@ -58,9 +58,9 @@ namespace Donation.PersonSimulator.Console
 
             var donations = Donations.LoadFromJsonFile(donationJsonFile);
 
-            var systemActivityNotificationManager = new SystemActivityNotificationManager(GetServiceBusConnectionString());
+            var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 
-            await systemActivityNotificationManager.NotifyAsync($"Start sending Donation from file {donationJsonFile}");
+            systemActivityNotificatior.Notify($"Start sending Donation from file {donationJsonFile}");
 
             // Settings come frm the appsettings.json file
             var donationQueue = new DonationQueue( RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey") );
@@ -70,13 +70,11 @@ namespace Donation.PersonSimulator.Console
                 System.Console.WriteLine($"Pub Donation {donation.Guid} {donation.LastName} {donation.Amount}");
 
                 await donationQueue.PushAsync(donation);
-                if (donationQueue.GetPerformanceTrackerCounter() % 32 == 0)
-                {
-                    await systemActivityNotificationManager.NotifyAsync(donationQueue.GetTrackedInformation("Donation pushed to queue"));
-                }                    
+                if (donationQueue.GetPerformanceTrackerCounter() % 100 == 0)
+                    systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
             }
 
-            await systemActivityNotificationManager.NotifyAsync(DS.List(
+            await systemActivityNotificatior.NotifyAsync(DS.List(
                 $"{donations.Count} {DonationSubmittedTopic} messages published",
                 $"End sending Donation from file {donationJsonFile}"
             ));

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.6</Version>
+    <Version>1.0.9</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -78,6 +78,12 @@
     <Content Include="GeneratedData\donation9.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DynamicSugarCore">
+      <HintPath>..\..\..\..\..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
