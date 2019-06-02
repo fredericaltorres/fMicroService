@@ -1,6 +1,7 @@
 ﻿using AzureServiceBusSubHelper;
 using Donation.Model;
 using Donation.Queue.Lib;
+using Donation.Service;
 using DynamicSugar;
 using fAzureHelper;
 using fDotNetCoreContainerHelper;
@@ -40,10 +41,7 @@ namespace Donation.PersonSimulator.Console
 
         static string GetServiceBusConnectionString()
         {
-            var s = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
-            if (string.IsNullOrEmpty(s))
-                s = RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
-            return s;
+            return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
         const string DonationSubmittedTopic = "DonationSubmittedTopic";
@@ -56,7 +54,7 @@ namespace Donation.PersonSimulator.Console
             else
                 throw new InvalidDataException($"Cannot find file {donationJsonFile}");
 
-            var donations = Donations.LoadFromJsonFile(donationJsonFile);
+            var donations = DonationDTOs.LoadFromJsonFile(donationJsonFile);
 
             var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 
@@ -69,7 +67,7 @@ namespace Donation.PersonSimulator.Console
             {
                 System.Console.WriteLine($"Pub Donation {donation.Guid} {donation.LastName} {donation.Amount}");
 
-                await donationQueue.PushAsync(donation);
+                await donationQueue.EnqueueAsync(donation);
                 if (donationQueue.GetPerformanceTrackerCounter() % 100 == 0)
                     systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
             }

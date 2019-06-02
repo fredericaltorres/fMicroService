@@ -7,8 +7,14 @@ namespace Donation.Service
 {
     public class DonationsService
     {
-        Donations _donations;
-        public DonationsService(Donations donations)
+        DonationDTOs _donations;
+
+        public DonationsService(DonationDTO donation)
+        {
+            _donations = new DonationDTOs() { donation };
+        }
+
+        public DonationsService(DonationDTOs donations)
         {
             _donations = donations;
         }

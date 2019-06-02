@@ -58,14 +58,20 @@ namespace Donation.Model
         {
             return JsonObject.Serialize(this);
         }
+
+        public static DonationDTO FromJSON(string json)
+        {
+            var d = JsonObject.Deserialize<DonationDTO>(json);
+            return d;
+        }
     }
 
-    public class Donations : List<DonationDTO>
+    public class DonationDTOs : List<DonationDTO>
     {
-        public static Donations LoadFromJsonFile(string jsonFile)
+        public static DonationDTOs LoadFromJsonFile(string jsonFile)
         {
             var json = System.IO.File.ReadAllText(jsonFile);
-            var donations = JsonObject.Deserialize<Donations>(json);
+            var donations = JsonObject.Deserialize<DonationDTOs>(json);
             return donations;
         }
     }

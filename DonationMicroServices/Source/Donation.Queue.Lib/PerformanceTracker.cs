@@ -14,6 +14,12 @@ namespace Donation.Queue.Lib
 
             _trackingCounter++;
         }
+
+        public void ResetTrackedInformation()
+        {
+            _trackingCounter = 0;
+        }
+
         public string GetTrackedInformation(string action)
         {
             var duration = (DateTime.UtcNow - StartTimeStamp).TotalSeconds;
