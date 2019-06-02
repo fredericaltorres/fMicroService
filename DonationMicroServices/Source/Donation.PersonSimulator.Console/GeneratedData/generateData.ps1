@@ -12,21 +12,21 @@ function generateOneSetOf5000Donation() {
 function generateDonationIndex($index) {
 
     Write-Host "Generate data for donation $index"
+    $outputJsonFile = "./donation$($index).json"
+    if(Test-Path $outputJsonFile -PathType Leaf) {
+        Remove-Item $outputJsonFile
+    }
 
     $JsonBlock = New-Object Collections.Generic.List[String]
 
     for($i=0; $i -lt 10; $i++) {
 
         Write-Host "Downloading data for donation $index / $i"
-
         $JsonBlock.Add((generateOneSetOf5000Donation))
     }
-
     $FinalJson = $JsonBlock -join " `r`n,`r`n"
     $FinalJson = "[`r`n $FinalJson `r`n]"
-
-    $FinalJson | Set-Content "./donation$($index).json"
-
+    $FinalJson | Set-Content  $outputJsonFile
 }
 
 
@@ -34,7 +34,7 @@ cls
 
 "Donation Data Generation"
 
-for($index=0; $index -lt 10; $index++) {
+for($index=6; $index -lt 10; $index++) {
 
     generateDonationIndex $index
 }
