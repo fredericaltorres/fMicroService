@@ -24,10 +24,11 @@ function startInstanceOfContainer([int]$genIndex) {
 	invoke-expression "cmd /c start powershell -Command { ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action instantiate -generationIndex $genIndex }"
 }
 
+$donationGenerationFile = @(0,1,2,3) #,4,5,6,7,8,9
+
 switch($action) {
 
     BuildPushInstantiate { 
-        
         Write-Host "About to build, publish and execute this .NET Core project as a Azure Container" -ForegroundColor Yellow
 
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action build -clearScreen $false
@@ -39,15 +40,14 @@ switch($action) {
     }
 
 	BuildPushInstantiateAll {
-        
         Write-Host "About to build, publish and execute this .NET Core project as a Azure Container" -ForegroundColor Yellow
 
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action build -clearScreen $false
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action push -clearScreen $false
-		
-		startInstanceOfContainer 0
-		startInstanceOfContainer 1
-		startInstanceOfContainer 2       
+
+		$donationGenerationFile | ForEach-Object -Process { 
+			startInstanceOfContainer $_
+		}
 
         Write-Host "Container instances should be running in Azure" -ForegroundColor Yellow
     }
@@ -57,17 +57,18 @@ switch($action) {
     }
 
 	deleteInstanceAll {
-		deleteInstanceContainer 0
-		deleteInstanceContainer 1
-		deleteInstanceContainer 2
+		$donationGenerationFile | ForEach-Object -Process { 
+			deleteInstanceContainer  $_
+		}
     }
 
 	getLog {
         getLogFromContainer $generationIndex
     }
 	getLogAll {
-        getLogFromContainer 0
-		getLogFromContainer 1
-		getLogFromContainer 2
+		
+		$donationGenerationFile | ForEach-Object -Process { 
+			getLogFromContainer  $_
+		}
     }
 }
