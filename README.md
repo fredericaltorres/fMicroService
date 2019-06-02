@@ -1,5 +1,5 @@
 # fMicroService
-Experiments building back end with microservices with .NET Core, Docker
+Experiments building back end with microservices with .NET Core, Docker, Kubernetes on Azure
 
 ## AzureServiceBus
 This folder contains experimentation with the Azure Service Bus Pub / Sub feature
