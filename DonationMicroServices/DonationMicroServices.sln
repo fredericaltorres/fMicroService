@@ -23,9 +23,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Donation.Demo", "Donation.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.PersonSimulator.Console", "Source\Donation.PersonSimulator.Console\Donation.PersonSimulator.Console.csproj", "{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Donation.Queue.Lib", "Source\Donation.Queue.Lib\Donation.Queue.Lib.csproj", "{D31E05CB-2232-498B-86D2-04CAC9B46E6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Queue.Lib", "Source\Donation.Queue.Lib\Donation.Queue.Lib.csproj", "{D31E05CB-2232-498B-86D2-04CAC9B46E6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.QueueProcessor.Console", "Source\Donation.QueueProcessor.Console\Donation.QueueProcessor.Console.csproj", "{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Donation.Table.Lib", "Source\Donation.Table.Lib\Donation.Table.Lib.csproj", "{ECD46937-6232-47B0-80D6-998C3EBCCCCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECD46937-6232-47B0-80D6-998C3EBCCCCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECD46937-6232-47B0-80D6-998C3EBCCCCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECD46937-6232-47B0-80D6-998C3EBCCCCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECD46937-6232-47B0-80D6-998C3EBCCCCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{D31E05CB-2232-498B-86D2-04CAC9B46E6B} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F} = {A230189C-BFF9-4536-9139-FB4045821F2C}
+		{ECD46937-6232-47B0-80D6-998C3EBCCCCB} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1900646C-BBFC-41C8-B89A-04500597442D}

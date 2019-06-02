@@ -9,7 +9,7 @@ namespace Donation.Model.Lib.UnitTests
         {
             get
             {
-                return @"C:\DVT\microservices\fMicroService\DonationMicroServices\GeneratedData\donation.SmallSample.json";
+                return @"C:\DVT\microservices\fMicroService\DonationMicroServices\Source\Donation.PersonSimulator.Console\GeneratedData\donation.SmallSample.json";
             }
         }
         [TestMethod]

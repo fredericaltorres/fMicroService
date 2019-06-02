@@ -2,6 +2,7 @@
 using Donation.Model;
 using Donation.Queue.Lib;
 using Donation.Service;
+using Donation.Table.Lib;
 using DynamicSugar;
 using fAzureHelper;
 using fDotNetCoreContainerHelper;
@@ -32,7 +33,6 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
-
         static async Task ProcessDonationQueue(int generationIndex)
         {
             var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
@@ -41,23 +41,46 @@ namespace Donation.PersonSimulator.Console
             {
                 // Settings come frm the appsettings.json file
                 var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationTableManager = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+
                 while (true)
                 {
-                    var result = await donationQueue.DequeueAsync();
-                    if (result.donationDTO == null)
+                    (DonationDTO donationDTO, string messageId) = await donationQueue.DequeueAsync();
+                    if (donationDTO == null)
                     {
                         Thread.Sleep(2 * 1000);
                     }
                     else
                     {
-                        var donationsService = new DonationsService(result.donationDTO);
-                        if (donationsService.ValidateData().Count == 0)
+                        var donationsService = new DonationsService(donationDTO);
+                        var validationErrors = donationsService.ValidateData();
+                        if (validationErrors.Count == 0)
                         {
-                            await donationQueue.DeleteAsync(result.messageId);
+                            var donationTableRecord = new DonationAzureTableRecord();
+                            var convertionErrors = donationTableRecord.Set(donationDTO);
+                            if(convertionErrors.Count == 0)
+                            {
+                                var insertErrors = await donationTableManager.InsertAsync(donationTableRecord);
+                                if(insertErrors.Count == 0)
+                                {
+                                    await donationQueue.DeleteAsync(messageId);
+                                }
+                                else
+                                {
+                                    systemActivityNotificatior.Notify(insertErrors.ToString(), TraceLevel.Error);
+                                    donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
+                                }
+                            }
+                            else
+                            {
+                                systemActivityNotificatior.Notify(convertionErrors.ToString(), TraceLevel.Error);
+                                donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
+                            }
                         }
                         else
                         {
-                            systemActivityNotificatior.Notify($"Error validating JSON Donation:{result.donationDTO.ToJSON()}", TraceLevel.Error);
+                            systemActivityNotificatior.Notify(validationErrors.ToString(), TraceLevel.Error);
+                            systemActivityNotificatior.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", TraceLevel.Error);
                         }
                         if (donationQueue.GetPerformanceTrackerCounter() % 100 == 0)
                             systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donations popped from queue"));

@@ -38,5 +38,9 @@ namespace Donation.Queue.Lib
         {
             await _queueManager.DeleteAsync(id);
         }
+
+        public void Release(string id)
+        {
+        }
     }
 }
