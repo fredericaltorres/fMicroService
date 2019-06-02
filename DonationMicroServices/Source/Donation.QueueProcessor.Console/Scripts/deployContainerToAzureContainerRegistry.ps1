@@ -4,8 +4,8 @@ param(
 	[Alias('a')]
     [string]$action = "", # build, push, instantiate, deleteInstance, getLog
 
-	[Parameter(Mandatory=$false)]
-    [string]$generationIndex = "5",
+	#[Parameter(Mandatory=$false)]
+    #[string]$generationIndex = "5",
 	
     [Parameter(Mandatory=$false)]
     [string]$imageTag = "donation.queueprocessor.console",    
@@ -119,8 +119,8 @@ switch($action) {
         $dnsLabel = "$($containerInstanceName)"
 
         Write-Host-Color "About to instantiate instance of container:$containerInstanceName from image:$newTag"
-		Write-Host-Color "Start container with parameter: --environment-variables generationIndex=$generationIndex"
-        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$generationIndex
+		#Write-Host-Color "Start container with parameter: --environment-variables generationIndex=$generationIndex"
+        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel # --environment-variables generationIndex=$generationIndex
 		        
         $url = GetContainerInstanceIpFromJsonMetadata $jsonString
         Write-Host-Color "Container Instance URL:$url"

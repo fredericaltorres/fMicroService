@@ -24,4 +24,8 @@ switch($action) {
 
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action deleteInstance -clearScreen $false
     }
+	getLog {
+
+        ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action getLog -clearScreen $false
+    }
 }

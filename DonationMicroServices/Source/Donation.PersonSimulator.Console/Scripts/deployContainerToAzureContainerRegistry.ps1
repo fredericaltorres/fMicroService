@@ -5,12 +5,12 @@ param(
     [string]$action = "", # build, push, instantiate, deleteInstance, getLog
 
 	[Parameter(Mandatory=$false)]
-    [string]$generationIndex = "5",
+    [int]$generationIndex = 0,
 	
     [Parameter(Mandatory=$false)]
     [string]$imageTag = "donation.personsimulator.console",    
     [Parameter(Mandatory=$false)]
-    $containerInstanceName = "donation.personsimulator.console.instance0",
+    $containerInstanceName = "donation.personsimulator.console.instance",
 
     # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -33,7 +33,7 @@ param(
     [Parameter(Mandatory=$false)] 
     [bool]$clearScreen = $true
 )
-
+$containerInstanceName += "$generationIndex"
 $containerInstanceName = $containerInstanceName.replace(".", "-")
 
 function GetProjectName() {
@@ -62,7 +62,7 @@ function GetContainerInstanceIpFromJsonMetadata($jsonString) {
 }
 
 function Write-Host-Color([string]$message, $color = "Cyan") {
-    Write-Host ""
+
     Write-Host $message -ForegroundColor $color
 }
 

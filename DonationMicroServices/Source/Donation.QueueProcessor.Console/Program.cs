@@ -32,7 +32,6 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
-        const string DonationSubmittedTopic = "DonationSubmittedTopic";
 
         static async Task ProcessDonationQueue(int generationIndex)
         {
