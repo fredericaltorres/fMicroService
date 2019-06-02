@@ -2,7 +2,7 @@
 
 The row donation data was generated using [mockaroo.com](https://mockaroo.com)
 
-- [User Donation Schema Generator](https://mockaroo.com/schemas/173907)
+- [User Donation Schema Generator UI](https://mockaroo.com/schemas/173907)
 - [mockaroo.UserDonations.schema.json file](./mockaroo.UserDonations.schema.json)
 
 # Generate data
