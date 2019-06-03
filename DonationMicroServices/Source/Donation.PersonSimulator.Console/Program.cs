@@ -44,8 +44,6 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
-        const string DonationSubmittedTopic = "DonationSubmittedTopic";
-
         static async Task Publish(int generationIndex)
         {
             var donationJsonFile = GetGeneratedDonationDataFile(generationIndex);
@@ -55,7 +53,6 @@ namespace Donation.PersonSimulator.Console
                 throw new InvalidDataException($"Cannot find file {donationJsonFile}");
 
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
-
             var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 
             systemActivityNotificatior.Notify($"Start sending Donation from file {donationJsonFile}");
@@ -65,15 +62,13 @@ namespace Donation.PersonSimulator.Console
 
             foreach (var donation in donations)
             {
-                System.Console.WriteLine($"Pub Donation {donation.Guid} {donation.LastName} {donation.Amount}");
-
                 await donationQueue.EnqueueAsync(donation);
-                if (donationQueue.GetPerformanceTrackerCounter() % 100 == 0)
+                if (donationQueue.GetPerformanceTrackerCounter() % 300 == 0)
                     systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
             }
 
             await systemActivityNotificatior.NotifyAsync(DS.List(
-                $"{donations.Count} {DonationSubmittedTopic} messages published",
+                $"{donations.Count} messages published",
                 $"End sending Donation from file {donationJsonFile}"
             ));
         }

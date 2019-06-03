@@ -24,7 +24,6 @@ namespace Donation.PersonSimulator.Console
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
-
             ProcessDonationQueue(1).GetAwaiter().GetResult();
         }
 
@@ -82,14 +81,14 @@ namespace Donation.PersonSimulator.Console
                             systemActivityNotificatior.Notify(validationErrors.ToString(), TraceLevel.Error);
                             systemActivityNotificatior.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", TraceLevel.Error);
                         }
-                        if (donationQueue.GetPerformanceTrackerCounter() % 100 == 0)
+                        if (donationQueue.GetPerformanceTrackerCounter() % 300 == 0)
                             systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donations popped from queue"));
                     }
                 }
             }
             catch(System.Exception ex)
             {
-                systemActivityNotificatior.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}", TraceLevel.Error);
+                systemActivityNotificatior.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", TraceLevel.Error);
             }
         }
     }

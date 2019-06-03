@@ -9,5 +9,4 @@ MAINTAINER Frederic Torres
 
 COPY bin/Release/netcoreapp2.2/publish/ app/
 
-ENTRYPOINT ["dotnet", "app/Donation.PersonSimulator.Console.dll"]
-
+ENTRYPOINT ["dotnet", "app/Donation.Monitor.Console.dll"]

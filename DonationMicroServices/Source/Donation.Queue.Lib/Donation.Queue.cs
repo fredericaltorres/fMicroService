@@ -6,7 +6,7 @@ namespace Donation.Queue.Lib
 {
     public class DonationQueue : PerformanceTracker
     {
-        public const string QueueName = "DonationQueue";
+        public string QueueName = "DonationQueue";
         QueueManager _queueManager;
 
         public DonationQueue(string storageAccountName, string storageAccessKey )
@@ -17,6 +17,11 @@ namespace Donation.Queue.Lib
         {
             base.TrackNewItem();
             await _queueManager.EnqueueAsync(donationDTO.ToJSON());
+        }
+
+        public async Task<int> ApproximateMessageCountAsync()
+        {
+            return await _queueManager.ApproximateMessageCountAsync();
         }
 
         public async Task<(DonationDTO donationDTO, string messageId)> DequeueAsync()
