@@ -34,8 +34,8 @@ namespace Donation.PersonSimulator.Console
 
         static async Task ProcessDonationQueue(int generationIndex)
         {
-            var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
-            systemActivityNotificatior.Notify($"Donation.QueueProcessor.Console Running");
+            var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
+            saNotification.Notify($"Donation.QueueProcessor.Console Running");
             try
             {
                 // Settings come frm the appsettings.json file
@@ -66,29 +66,29 @@ namespace Donation.PersonSimulator.Console
                                 }
                                 else
                                 {
-                                    systemActivityNotificatior.Notify(insertErrors.ToString(), TraceLevel.Error);
+                                    saNotification.Notify(insertErrors.ToString(), TraceLevel.Error);
                                     donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
                             }
                             else
                             {
-                                systemActivityNotificatior.Notify(convertionErrors.ToString(), TraceLevel.Error);
+                                saNotification.Notify(convertionErrors.ToString(), TraceLevel.Error);
                                 donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
                             }
                         }
                         else
                         {
-                            systemActivityNotificatior.Notify(validationErrors.ToString(), TraceLevel.Error);
-                            systemActivityNotificatior.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", TraceLevel.Error);
+                            saNotification.Notify(validationErrors.ToString(), TraceLevel.Error);
+                            saNotification.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", TraceLevel.Error);
                         }
-                        if (donationQueue.GetPerformanceTrackerCounter() % 300 == 0)
-                            systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donations popped from queue"));
+                        if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
+                            saNotification.Notify(donationQueue.GetTrackedInformation("Donations popped from queue"));
                     }
                 }
             }
             catch(System.Exception ex)
             {
-                systemActivityNotificatior.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", TraceLevel.Error);
+                saNotification.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", TraceLevel.Error);
             }
         }
     }

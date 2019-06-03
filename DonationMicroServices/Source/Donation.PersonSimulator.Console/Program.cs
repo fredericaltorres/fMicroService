@@ -53,9 +53,9 @@ namespace Donation.PersonSimulator.Console
                 throw new InvalidDataException($"Cannot find file {donationJsonFile}");
 
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
-            var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
+            var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 
-            systemActivityNotificatior.Notify($"Start sending Donation from file {donationJsonFile}");
+            saNotification.Notify($"Start sending Donation from file {donationJsonFile}");
 
             // Settings come frm the appsettings.json file
             var donationQueue = new DonationQueue( RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey") );
@@ -63,11 +63,11 @@ namespace Donation.PersonSimulator.Console
             foreach (var donation in donations)
             {
                 await donationQueue.EnqueueAsync(donation);
-                if (donationQueue.GetPerformanceTrackerCounter() % 300 == 0)
-                    systemActivityNotificatior.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
+                if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
+                    saNotification.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
             }
 
-            await systemActivityNotificatior.NotifyAsync(DS.List(
+            await saNotification.NotifyAsync(DS.List(
                 $"{donations.Count} messages published",
                 $"End sending Donation from file {donationJsonFile}"
             ));
