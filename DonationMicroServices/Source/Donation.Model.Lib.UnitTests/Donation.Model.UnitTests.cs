@@ -15,7 +15,7 @@ namespace Donation.Model.Lib.UnitTests
         [TestMethod]
         public void LoadDonationJsonFile()
         {
-            var donations = DonationDTOs.LoadFromJsonFile(DonationJsonFile);
+            var donations = DonationDTOs.FromJsonFile(DonationJsonFile);
             Assert.AreEqual(donations.Count, 100);
         }
     }

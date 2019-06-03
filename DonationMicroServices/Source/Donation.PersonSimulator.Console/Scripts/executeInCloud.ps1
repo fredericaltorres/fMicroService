@@ -1,30 +1,36 @@
 ﻿[CmdletBinding()]
 param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$true)]
 	[Alias('a')]
-    [string]$action = "BuildPushInstantiate", # BuildPushInstantiate, BuildPushInstantiateAll, deleteInstance, deleteInstanceAll, getLog, getLogAll
+	[ValidateSet('buildPushInstantiate', 'buildPushInstantiateAll', 'deleteInstance', 'deleteInstanceAll', 'getLog', 'getLogAll')]
+    [string]$action = "BuildPushInstantiate",
 	[Parameter(Mandatory=$false)]
-    [int]$generationIndex = 0
+    [int]$containerInstanceIndex = 0
 )
 cls
 
-function deleteInstanceContainer([int]$generationIndex) {
+function deleteInstanceContainer([int]$containerInstanceIndex) {
 	
-	./Scripts/deployContainerToAzureContainerRegistry.ps1 -action deleteInstance -clearScreen $false -generationIndex $generationIndex
+	./Scripts/deployContainerToAzureContainerRegistry.ps1 -action deleteInstance -clearScreen $false -containerInstanceIndex $containerInstanceIndex
 }
 
-function getLogFromContainer([int]$generationIndex) {
+function getLogFromContainer([int]$containerInstanceIndex) {
 
-	./Scripts/deployContainerToAzureContainerRegistry.ps1 -action getLog -clearScreen $false -generationIndex $generationIndex
+	./Scripts/deployContainerToAzureContainerRegistry.ps1 -action getLog -clearScreen $false -containerInstanceIndex $containerInstanceIndex
 }
 
-function startInstanceOfContainer([int]$genIndex) {
+function startInstanceOfContainer([int]$genIndex, [bool]$synchronous) {
 
-	#./Scripts/deployContainerToAzureContainerRegistry.ps1 -action instantiate -clearScreen $false -generationIndex $generationIndex
-	invoke-expression "cmd /c start powershell -Command { ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action instantiate -generationIndex $genIndex }"
+	if($synchronous) {
+		./Scripts/deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerInstanceIndex $genIndex
+	}
+	else {
+		invoke-expression "cmd /c start powershell -Command { ./Scripts/deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerInstanceIndex $genIndex }"
+	}
+	
 }
 
-$donationGenerationFile = @(0,1,2,3) #,4,5,6,7,8,9
+$donationGenerationFile = @(0,1) #,2,3,4,5,6,7,8,9
 
 switch($action) {
 
@@ -34,7 +40,7 @@ switch($action) {
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action build -clearScreen $false
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action push -clearScreen $false
 		
-		startInstanceOfContainer $generationIndex
+		startInstanceOfContainer $containerInstanceIndex $true
 
         Write-Host "Container instance should be running in Azure" -ForegroundColor Yellow
     }
@@ -46,14 +52,14 @@ switch($action) {
         ./Scripts/deployContainerToAzureContainerRegistry.ps1 -action push -clearScreen $false
 
 		$donationGenerationFile | ForEach-Object -Process { 
-			startInstanceOfContainer $_
+			startInstanceOfContainer $_ $false
 		}
 
         Write-Host "Container instances should be running in Azure" -ForegroundColor Yellow
     }
  
     deleteInstance {
-		deleteInstanceContainer $generationIndex
+		deleteInstanceContainer $containerInstanceIndex
     }
 
 	deleteInstanceAll {
@@ -63,7 +69,7 @@ switch($action) {
     }
 
 	getLog {
-        getLogFromContainer $generationIndex
+        getLogFromContainer $containerInstanceIndex
     }
 	getLogAll {
 		

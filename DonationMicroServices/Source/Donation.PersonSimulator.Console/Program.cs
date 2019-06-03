@@ -54,7 +54,7 @@ namespace Donation.PersonSimulator.Console
             else
                 throw new InvalidDataException($"Cannot find file {donationJsonFile}");
 
-            var donations = DonationDTOs.LoadFromJsonFile(donationJsonFile);
+            var donations = DonationDTOs.FromJsonFile(donationJsonFile);
 
             var systemActivityNotificatior = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 

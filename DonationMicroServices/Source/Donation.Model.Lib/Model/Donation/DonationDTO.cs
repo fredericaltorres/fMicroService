@@ -25,8 +25,7 @@ namespace Donation.Model
 
         public static DonationDTO FromJSON(string json)
         {
-            var d = JsonObject.Deserialize<DonationDTO>(json);
-            return d;
+            return JsonObject.Deserialize<DonationDTO>(json);            
         }
     }
 }

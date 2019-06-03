@@ -1,40 +1,39 @@
 ﻿[CmdletBinding()]
 param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$true)]
 	[Alias('a')]
+	[ValidateSet('build', 'push', 'instantiate', 'deleteInstance', 'getLog')]
     [string]$action = "", # build, push, instantiate, deleteInstance, getLog
 
 	[Parameter(Mandatory=$false)]
-    [int]$generationIndex = 0,
+    [int]$containerInstanceIndex = 0,
 	
     [Parameter(Mandatory=$false)]
     [string]$imageTag = "donation.personsimulator.console",    
     [Parameter(Mandatory=$false)]
-    $containerInstanceName = "donation.personsimulator.console.instance",
+    $containerInstanceName = "",
 
-    # Fred Azure Container Registry Information
+    # Azure Container Registry Information
     [Parameter(Mandatory=$false)]
     [string]$acrName = "FredContainerRegistry", # Consider that the Azure Container `FredContainerRegistry` already exist
     [Parameter(Mandatory=$false)]
     [string]$myResourceGroup = "FredContainerRegistryResourceGroup",
     [Parameter(Mandatory=$false)] # The full login server name for your Azure container registry.  az acr show --name $acrName --query loginServer --output table
     [string]$acrLoginServer = "fredcontainerregistry.azurecr.io",
+    [Parameter(Mandatory=$false)]  # The Azure Container Registry has default username which is the name of the registry, but there is a password required when pushing a image
+	[string]$azureContainerRegistryPassword = $env:azureContainerRegistryPassword,
 
-    [Parameter(Mandatory=$false)] # The Azure Container Registry has default username which is the name of the registry, but there is a password required when pushing a image
-    [string]$azureContainerRegistryPassword = $env:azureContainerRegistryPassword,
-
-    [Parameter(Mandatory=$false)] 
-    [int]$containerInstanceCpu = 1,
-    [Parameter(Mandatory=$false)] 
-    [int]$containerInstanceMemory = 1,
-    [Parameter(Mandatory=$false)] 
-    [int]$containerInstancePort = 8080,
-
-    [Parameter(Mandatory=$false)] 
-    [bool]$clearScreen = $true
+    [Parameter(Mandatory=$false)] [int]$containerInstanceCpu	= 1,
+	[Parameter(Mandatory=$false)] [int]$containerInstanceMemory = 1,
+    [Parameter(Mandatory=$false)] [int]$containerInstancePort	= 8080,
+    [Parameter(Mandatory=$false)] [bool]$clearScreen			= $true
 )
-$containerInstanceName += "$generationIndex"
-$containerInstanceName = $containerInstanceName.replace(".", "-")
+
+if($containerInstanceName -eq "") {
+	$containerInstanceName = $imageTag + ".instance"
+}
+$containerInstanceName += "$containerInstanceIndex"
+$containerInstanceName = $containerInstanceName.replace(".", "-").toLower()
 
 function GetProjectName() {
 
@@ -75,9 +74,7 @@ else {
 
 Write-Host "deployContainerToAzureContainerRegistry -Action:$action" -ForegroundColor Yellow
 Write-Host "Build project $(GetProjectName), version:$(GetProjectVersion)" -ForegroundColor DarkYellow
-
 $newTag = "$acrLoginServer/$imageTag`:$(GetProjectVersion)"
-$containerInstanceName = $containerInstanceName.toLower()
 
 switch($action) {
 
@@ -115,12 +112,14 @@ switch($action) {
     # To find the Azure Container Instance from the portal click on the Resource Group here named 'FredContainerRegistryResourceGroup'
     instantiate {
         
-        $azureLoginName = $acrName        
+        $azureLoginName = $acrName
         $dnsLabel = "$($containerInstanceName)"
 
-        Write-Host-Color "About to instantiate instance of container:$containerInstanceName from image:$newTag"
-		Write-Host-Color "Start container with parameter: --environment-variables generationIndex=$generationIndex"
-        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$generationIndex
+        Write-Host-Color "About to instantiate instance of container:$containerInstanceName"
+		Write-Host-Color "From image:$newTag"
+		Write-Host-Color "Start container with parameter: --environment-variables generationIndex=$containerInstanceIndex"
+
+        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$containerInstanceIndex
 		        
         $url = GetContainerInstanceIpFromJsonMetadata $jsonString
         Write-Host-Color "Container Instance URL:$url"

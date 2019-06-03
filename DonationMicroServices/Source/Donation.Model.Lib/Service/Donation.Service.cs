@@ -19,8 +19,8 @@ namespace Donation.Service
             _donations = donations;
         }
 
-        const string VALIDATION_ERROR_PROPERTY_IS_REQUIRED = "Property is required";
-        const string VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL = "Property cannot be null";
+        const string VALIDATION_ERROR_PROPERTY_IS_REQUIRED = "Property is required ";
+        const string VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL = "Property cannot be null ";
 
         private bool IsOfTypeString(object v)
         {
@@ -34,22 +34,22 @@ namespace Donation.Service
             return property == "ZipCode";
         }
 
-        public DonationDTOValidationErrors ValidateData()
+        public Errors ValidateData()
         {
-            var totalErrors = new DonationDTOValidationErrors();
+            var totalErrors = new Errors();
             foreach (var donation in _donations)
             {
-                var donnationErrors = new DonationDTOValidationErrors();
+                var donnationErrors = new Errors();
                 var donnationDic = DynamicSugar.ReflectionHelper.GetDictionary(donation);
                 foreach(var e in donnationDic)
                 {
                     if (e.Value == null && !CanBeNull(e.Key))
                     {
-                        donnationErrors.Add(new DonationDTOValidationError(donation.Guid, e.Key, VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL));
+                        donnationErrors.Add(new Error(VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL + e.Key));
                     }
                     else if (IsOfTypeString(e.Value) && string.IsNullOrEmpty(e.Value.ToString()))
                     {
-                        donnationErrors.Add(new DonationDTOValidationError(donation.Guid, e.Key, VALIDATION_ERROR_PROPERTY_IS_REQUIRED));
+                        donnationErrors.Add(new Error(VALIDATION_ERROR_PROPERTY_IS_REQUIRED+ e.Key));
                     }
                 }
                 donation.ProcessState = donnationErrors.Count == 0 ? DonationDataProcessState.ApprovedForSubmission : DonationDataProcessState.NotApprovedForSubmission;

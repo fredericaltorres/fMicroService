@@ -12,7 +12,7 @@ namespace Donation.Model.Lib.UnitTests
         public void SumDonations()
         {
             var expectedSumAmount = 5191.75M;
-            var donations = DonationDTOs.LoadFromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
+            var donations = DonationDTOs.FromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
             var donationsService = new DonationsService(donations);
             Assert.AreEqual(expectedSumAmount, donationsService.Sum());
         }
@@ -42,7 +42,7 @@ namespace Donation.Model.Lib.UnitTests
         [TestMethod]
         public void ValidateDonationSmallSampleData()
         {
-            var donations = DonationDTOs.LoadFromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
+            var donations = DonationDTOs.FromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
             var donationsService = new DonationsService(donations);
             var errors = donationsService.ValidateData();
             Assert.AreEqual(0, errors.Count);
@@ -55,7 +55,7 @@ namespace Donation.Model.Lib.UnitTests
             var jsonFiles = Directory.GetFiles(path, "donation*.json");
             foreach(var jsonFile in jsonFiles)
             {
-                var donations = DonationDTOs.LoadFromJsonFile(jsonFile);
+                var donations = DonationDTOs.FromJsonFile(jsonFile);
                 var donationsService = new DonationsService(donations);
                 var errors = donationsService.ValidateData();
                 Assert.AreEqual(0, errors.Count);
