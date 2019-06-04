@@ -32,6 +32,7 @@ param(
 	[bool]$clearScreen = $true
 )
 
+$containerImage = $containerImage.toLower()
 if($containerInstanceName -eq "") {
 	$containerInstanceName = $containerImage + ".instance"
 }
@@ -104,7 +105,8 @@ switch($action) {
         docker tag $containerImage $newTag 
         docker images
 
-        Write-Host-Color "About to push container $containerImage tagged $newTag to azure registry $acrName"
+        Write-Host-Color "About to push container $containerImage"
+        Write-Host-Color "Tagged $newTag to azure registry $acrName"
         docker push $newTag # Push tagged image from docker into the azure registry logged in
 
         Write-Host-Color "All version in azure registry for container $containerImage"

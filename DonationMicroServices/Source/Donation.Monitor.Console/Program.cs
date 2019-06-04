@@ -36,30 +36,38 @@ namespace Donation.PersonSimulator.Console
 
         private static void SystemActivityNotificationSubscriber_OnMessageReveived(SystemActivity sa)
         {
-            ConsoleEx.WriteLineAutoColor($"[{sa.Type}] Host:{sa.MachineName}, {sa.UtcDateTime.ToShortTimeString()}, {sa.Message}", sa.MachineName);
+            ConsoleEx.WriteLineAutoColor($"[{sa.Type}] Host:{sa.MachineName}\r\n      {sa.UtcDateTime.ToShortTimeString()}, {sa.Message}", sa.MachineName);
         }
 
         static async Task Monitor(int generationIndex)
         {
             var systemActivityNotificationSubscriber = new SystemActivityNotificationManager(GetServiceBusConnectionString(), Environment.MachineName);
-            systemActivityNotificationSubscriber.OnMessageReveived += SystemActivityNotificationSubscriber_OnMessageReveived;
+            systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;
             
             int previousQueueCount = -1;
             try
             {
                 var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
                 var donationTableManager = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                System.Console.Title = $"Donation.Monitor.Console Q)uit C)ls";
+                System.Console.Title = $"Donation.Monitor.Console Q)uit C)ls P)ause";
                 var goOn = true;
+                var pausedMode = false;
                 while (goOn)
                 {
                     Thread.Sleep(4 * 1000);
                     if(System.Console.KeyAvailable)
                     {
-                        switch(System.Console.ReadKey().Key)
+                        switch(System.Console.ReadKey(true).Key)
                         {
                             case ConsoleKey.Q: goOn = false;  break;
                             case ConsoleKey.C: System.Console.Clear(); break;
+                            case ConsoleKey.P: {
+                                systemActivityNotificationSubscriber.PauseOnMessageReceived = true;
+                                System.Console.WriteLine("Monitoring paused - hit any key to continue");
+                                System.Console.ReadKey();
+                                systemActivityNotificationSubscriber.PauseOnMessageReceived = false;
+                            }
+                            break;
                         }
                     }
                     var queueCount = await donationQueue.ApproximateMessageCountAsync();

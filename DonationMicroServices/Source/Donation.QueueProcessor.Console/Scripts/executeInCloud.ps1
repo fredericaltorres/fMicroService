@@ -29,7 +29,7 @@ function startInstanceOfContainer([int]$genIndex, [bool]$synchronous) {
 		../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex -cls $false 
 	}
 	else {
-		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerInstanceIndex $genIndex -cls $false }"
+		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex }"
 	}
 }
 

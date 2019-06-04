@@ -9,7 +9,7 @@ param(
     [int]$containerInstanceIndex = 0,
 
 	[Parameter(Mandatory=$false)]
-    [string]$containerImage = "donation.queueprocessor.console"
+    [string]$containerImage = "Donation.PersonSimulator.Console"
 )
 cls
 
@@ -31,7 +31,7 @@ function startInstanceOfContainer([int]$genIndex, [bool]$synchronous) {
 		../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex -cls $false 
 	}
 	else {
-		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex -cls $false }"
+		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex }"
 	}
 }
 
