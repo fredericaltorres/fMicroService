@@ -4,7 +4,7 @@ param(
 	[Alias('a')]
     [string]$action = "deleteInstance", # build, push, instantiate, deleteInstance
     [Parameter(Mandatory=$false)]
-    [string]$imageTag = "azureservicebussubconsole",    
+    [string]$containerImage = "azureservicebussubconsole",    
     [Parameter(Mandatory=$false)]
     $containeInstanceName = "azureservicebussubconsoleinstance0",
 
@@ -70,7 +70,7 @@ else {
 Write-Host "deployContainerToAzureContainerRegistry -Action:$action" -ForegroundColor Yellow
 Write-Host "Build project $(GetProjectName), version:$(GetProjectVersion)" -ForegroundColor DarkYellow
 
-$newTag = "$acrLoginServer/$imageTag`:$(GetProjectVersion)"
+$newTag = "$acrLoginServer/$containerImage`:$(GetProjectVersion)"
 $containeInstanceName = $containeInstanceName.toLower()
 
 switch($action) {
@@ -81,9 +81,9 @@ switch($action) {
         Write-Host-Color "Building .NET project"
         dotnet publish -c Release
 
-        Write-Host-Color "Build container imageTag:$imageTag"
-        docker build -t $imageTag .
-        $exp = "docker images --filter=""reference=$imageTag`:latest"""
+        Write-Host-Color "Build container containerImage:$containerImage"
+        docker build -t $containerImage .
+        $exp = "docker images --filter=""reference=$containerImage`:latest"""
         Invoke-Expression $exp        
     }
 
@@ -94,15 +94,15 @@ switch($action) {
         az acr login --name $acrName # Log in to container registry
 
         # Tag image with the loginServer of your container registry. 
-        Write-Host-Color  "About to tag container $imageTag with tag:$newTag"
-        docker tag $imageTag $newTag 
+        Write-Host-Color  "About to tag container $containerImage with tag:$newTag"
+        docker tag $containerImage $newTag 
         docker images
 
-        Write-Host-Color "About to push container $imageTag tagged $newTag to azure registry $acrName"
+        Write-Host-Color "About to push container $containerImage tagged $newTag to azure registry $acrName"
         docker push $newTag # Push tagged image from docker into the azure registry logged in
 
-        Write-Host-Color "All version in azure registry for container $imageTag"
-        az acr repository show-tags --name $acrName --repository $imageTag --output table
+        Write-Host-Color "All version in azure registry for container $containerImage"
+        az acr repository show-tags --name $acrName --repository $containerImage --output table
     }
 
     # Using the versioned image in the Azure Container Registry, instanciate an instance of the container under a specific name
