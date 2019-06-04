@@ -26,10 +26,10 @@ function getLogFromContainer([int]$containerInstanceIndex) {
 function startInstanceOfContainer([int]$genIndex, [bool]$synchronous) {
 
 	if($synchronous) {
-		../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex
+		../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex -cls $false 
 	}
 	else {
-		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerInstanceIndex $genIndex }"
+		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerInstanceIndex $genIndex -cls $false }"
 	}
 }
 

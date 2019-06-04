@@ -1,5 +1,6 @@
 ﻿using AzureServiceBusSubHelper;
 using Donation.Model;
+using Donation.Model.Lib.Util;
 using Donation.Queue.Lib;
 using Donation.Service;
 using Donation.Table.Lib;
@@ -33,9 +34,16 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
+        private static void SystemActivityNotificationSubscriber_OnMessageReveived(SystemActivity sa)
+        {
+            ConsoleEx.WriteLineAutoColor($"[{sa.Type}] Host:{sa.MachineName}, {sa.UtcDateTime.ToShortTimeString()}, {sa.Message}", sa.MachineName);
+        }
+
         static async Task Monitor(int generationIndex)
         {
             var systemActivityNotificationSubscriber = new SystemActivityNotificationManager(GetServiceBusConnectionString(), Environment.MachineName);
+            systemActivityNotificationSubscriber.OnMessageReveived += SystemActivityNotificationSubscriber_OnMessageReveived;
+            
             int previousQueueCount = -1;
             try
             {
@@ -67,5 +75,7 @@ namespace Donation.PersonSimulator.Console
                 System.Console.WriteLine(ex);
             }
         }
+
+
     }
 }
