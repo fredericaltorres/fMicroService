@@ -82,7 +82,7 @@ namespace Donation.PersonSimulator.Console
                             saNotification.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", TraceLevel.Error);
                         }
                         if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
-                            saNotification.Notify(donationQueue.GetTrackedInformation("Donations popped from queue"));
+                            saNotification.Notify(donationQueue.GetTrackedInformation("Donations processed from queue"));
                     }
                 }
             }
