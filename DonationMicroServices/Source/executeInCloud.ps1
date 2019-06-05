@@ -1,17 +1,45 @@
-﻿[CmdletBinding()]
+﻿<#
+    .SYNOPSIS
+		Facilitate building, ingpush container image, instanciating container, getting log and deleting container instance
+		from this current .NET core project.
+		Support maniplating 1 or up to 10 container instance
+    .DESCRIPTION
+    .NOTES
+        Frederic Torres 2019
+#>
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
 	[Alias('a')]
-	[ValidateSet('buildPushInstantiate', 'buildPushInstantiateAll', 'deleteInstance', 'deleteInstanceAll', 'getLog', 'getLogAll')]
+	[ValidateSet(
+		'buildPushInstantiate', 
+		'buildPushInstantiateAll', 
+		'deleteInstance', 
+		'deleteInstanceAll', 
+		'getLog', 
+		'getLogAll')]
     [string]$action,
 
 	[Parameter(Mandatory=$false)]
     [int]$containerInstanceIndex = 0,
 
 	[Parameter(Mandatory=$false)]
-    [string]$containerImage = "donation.queueprocessor.console"
+    [string]$containerImage = ""
 )
 cls
+
+function GetProjectName() {
+<#
+	.Synopsis
+		Returns the name of the .NET Core project name from the current folder
+#>
+	$project = gci -path . -rec -Include *.csproj # Assume there is only one csproj in the current directory
+	return $project.Name
+}
+
+if($containerImage -eq "") {
+	$containerImage = "Donation.PersonSimulator.Console"
+}
 
 function deleteInstanceContainer([int]$containerInstanceIndex) {
 	
@@ -32,6 +60,8 @@ function startInstanceOfContainer([int]$genIndex, [bool]$synchronous) {
 		invoke-expression "cmd /c start powershell -Command { ../deployContainerToAzureContainerRegistry.ps1 -a instantiate -containerImage $containerImage -containerInstanceIndex $genIndex }"
 	}
 }
+
+Write-Host "executeInCloud containerImage:$containerImage" -ForegroundColor Yellow
 
 $donationGenerationFile = @(0,1) #,2,3,4,5,6,7,8,9
 
@@ -74,6 +104,7 @@ switch($action) {
 	getLog {
         getLogFromContainer $containerInstanceIndex
     }
+
 	getLogAll {
 		
 		$donationGenerationFile | ForEach-Object -Process { 
