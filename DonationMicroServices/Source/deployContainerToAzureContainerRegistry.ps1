@@ -25,7 +25,7 @@ param(
     [string]$action,
 
     # Ths action 'instantiate', 'deleteInstance', 'getLog' may apply to a specific container instance.    
-    # The container instance is name using the $containerInstanceName + $containerInstanceIndex.
+    # The container instance is named using the $containerInstanceName + $containerInstanceIndex.
     # This way the script can instanciate and delete more than one container instance.
     [Parameter(Mandatory=$false)]
     [int]$containerInstanceIndex = 0,
@@ -65,7 +65,7 @@ $containerImage = $containerImage.toLower()
 if($containerInstanceName -eq "") { # If container name instance is empty use the name of the container image + ".instance"
     $containerInstanceName = $containerImage + ".instance"
 }
-$containerInstanceName += "$containerInstanceIndex" # always post fix the container instance name with an index to allow to handle multiple container instance
+$containerInstanceName += "-$containerInstanceIndex" # always post fix the container instance name with an index to allow to handle multiple container instance
 $containerInstanceName = $containerInstanceName.replace(".", "-").toLower() # Required by Azure
 
 if($azureContainerRegistryPassword -eq $null -or $azureContainerRegistryPassword.Length -eq 0) {
