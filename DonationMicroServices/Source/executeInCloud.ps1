@@ -38,7 +38,9 @@ function GetProjectName() {
 }
 
 if($containerImage -eq "") {
-	$containerImage = "Donation.PersonSimulator.Console"
+
+	$containerImage = [System.IO.Path]::GetFileNameWithoutExtension((GetProjectName))
+	# Write-Host "Deduct containerImage:'$containerImage' from .NET Core project file name" -ForegroundColor Green
 }
 
 function deleteInstanceContainer([int]$containerInstanceIndex) {

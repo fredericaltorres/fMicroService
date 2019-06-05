@@ -7,25 +7,25 @@ namespace Donation.Table.Lib
 {
     public class DonationAzureTableRecord : TableRecordManager
     {
-        public Guid Guid;
-        public string FirstName;
-        public string LastName;
-        public string Email;
-        public Gender Gender;
-        public string Phone;
-        public string Country;
-        public string ZipCode;
+        public Guid Guid { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public Gender Gender { get; set; }
+        public string Phone { get; set; }
+        public string Country { get; set; }
+        public string ZipCode { get; set; }
 
-        public string CC_Number;
-        public int CC_ExpMonth;
-        public int CC_ExpYear;
-        public int CC_SecCode;
+        public string CC_Number { get; set; }
+        public int CC_ExpMonth { get; set; }
+        public int CC_ExpYear { get; set; }
+        public int CC_SecCode { get; set; }
 
-        public string IpAddress;
-        public string Amount; //$15.92
-        public DateTime UtcCreationDate;
+        public string IpAddress { get; set; }
+        public string Amount { get; set; }
+        public DateTime UtcCreationDate { get; set; }
 
-        public DonationDataProcessState ProcessState = DonationDataProcessState.New;
+        public DonationDataProcessState ProcessState { get; set; } = DonationDataProcessState.New;
 
         public Errors Set(DonationDTO fromDonationDTO)
         {

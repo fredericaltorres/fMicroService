@@ -68,6 +68,10 @@ if($containerInstanceName -eq "") { # If container name instance is empty use th
 $containerInstanceName += "$containerInstanceIndex" # always post fix the container instance name with an index to allow to handle multiple container instance
 $containerInstanceName = $containerInstanceName.replace(".", "-").toLower() # Required by Azure
 
+if($azureContainerRegistryPassword -eq $null -or $azureContainerRegistryPassword.Length -eq 0) {
+    throw "Parameter `$azureContainerRegistryPassword is required"
+}
+
 function GetProjectName() {
 <#
     .Synopsis

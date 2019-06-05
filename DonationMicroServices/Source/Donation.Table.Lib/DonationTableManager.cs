@@ -1,5 +1,6 @@
 ﻿using Donation.Model;
 using fAzureHelper;
+using Microsoft.WindowsAzure.Storage.Table;
 using System.Threading.Tasks;
 
 namespace Donation.Table.Lib
