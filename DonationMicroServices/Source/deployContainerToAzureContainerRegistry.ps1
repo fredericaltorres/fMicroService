@@ -1,6 +1,6 @@
 ﻿<#
     .SYNOPSIS
-        Handle building .NET Core application and executing it as a Docker container in Azire
+        Handle building .NET Core application and executing it as a Docker container in Azure
     .DESCRIPTION
         Build .NET project, 
         Create docker container image, 
