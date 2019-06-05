@@ -49,6 +49,12 @@ namespace Donation.Model.Lib.Util
             WriteLine(text, c);
         }
 
+        public static void Pause(string message = "Hit any key to continue")
+        {
+            Console.WriteLine(message);
+            var k = Console.ReadKey(true);
+        }
+
         public static void WriteLine(string text, ConsoleColor color)
         {
             var bu = Console.ForegroundColor;
