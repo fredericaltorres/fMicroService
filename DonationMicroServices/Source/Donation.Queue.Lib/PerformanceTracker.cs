@@ -4,31 +4,46 @@ namespace Donation.Queue.Lib
 {
     public class PerformanceTracker
     {
-        private long _trackingCounter = 0;
+        public int ItemCount = 0;
         private DateTime StartTimeStamp;
 
-        public void TrackNewItem()
+        public void TrackNewItem(int count = 1)
         {
-            if (_trackingCounter == 0) // Set MessageSentTimeStamp on the first message that we send
+            if (ItemCount == 0) // Set MessageSentTimeStamp on the first message that we send
                 StartTimeStamp = DateTime.UtcNow;
 
-            _trackingCounter++;
+            ItemCount += count;
         }
 
         public void ResetTrackedInformation()
         {
-            _trackingCounter = 0;
+            ItemCount = 0;
+        }
+
+        public int Duration
+        {
+            get
+            {
+                return (int)(DateTime.UtcNow - StartTimeStamp).TotalSeconds;
+            }
+        }
+        public int ItemPerSecond
+        {
+            get
+            {
+                return ItemCount / this.Duration;
+            }
         }
 
         public string GetTrackedInformation(string action)
         {
-            var duration = (DateTime.UtcNow - StartTimeStamp).TotalSeconds;
-            var messagePerSecond = _trackingCounter / duration;
-            return $"{_trackingCounter} {action} - {duration:0.0} seconds, {messagePerSecond:0.0} message/S";
+            var duration = this.Duration;
+            var messagePerSecond = this.ItemPerSecond;
+            return $"{ItemCount} {action} - {duration:0.0} seconds, {messagePerSecond:0.0} message/S";
         }
         public long GetPerformanceTrackerCounter()
         {
-            return _trackingCounter;
+            return ItemCount;
         }
     }
 }

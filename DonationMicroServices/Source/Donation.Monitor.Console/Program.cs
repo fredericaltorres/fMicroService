@@ -39,9 +39,9 @@ namespace Donation.PersonSimulator.Console
             ConsoleEx.WriteLineAutoColor($"[{sa.Type}] Host:{sa.MachineName}\r\n      {sa.UtcDateTime.ToShortTimeString()}, {sa.Message}", sa.MachineName);
         }
 
-        static void Wait()
+        static void Wait(int waitMaxSecond)
         {
-            for(var i=0; i<4; i++)
+            for(var i=0; i< waitMaxSecond; i++)
             {
                 if (System.Console.KeyAvailable)
                     break;
@@ -53,7 +53,7 @@ namespace Donation.PersonSimulator.Console
         {
             var systemActivityNotificationSubscriber = new SystemActivityNotificationManager(GetServiceBusConnectionString(), Environment.MachineName);
             systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;
-            
+            const int waitSeconds = 4;
             int previousQueueCount = -1;
             try
             {
@@ -64,7 +64,7 @@ namespace Donation.PersonSimulator.Console
                 var pausedMode = false;
                 while (goOn)
                 {
-                    Wait();
+                    Wait(waitSeconds);
                     if(System.Console.KeyAvailable)
                     {
                         switch(System.Console.ReadKey(true).Key)

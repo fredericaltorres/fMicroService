@@ -64,7 +64,10 @@ namespace Donation.PersonSimulator.Console
             {
                 await donationQueue.EnqueueAsync(donation);
                 if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
-                    saNotification.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
+                {
+                    // saNotification.Notify(donationQueue.GetTrackedInformation("Donation pushed to queue"));
+                    await saNotification.NotifyAsync("donationQueue", "pushed to queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
+                }                
             }
 
             await saNotification.NotifyAsync(DS.List(

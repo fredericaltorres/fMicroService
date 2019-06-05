@@ -66,29 +66,32 @@ namespace Donation.PersonSimulator.Console
                                 }
                                 else
                                 {
-                                    saNotification.Notify(insertErrors.ToString(), TraceLevel.Error);
+                                    saNotification.Notify(insertErrors.ToString(), SystemActivityType.Error);
                                     donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
                             }
                             else
                             {
-                                saNotification.Notify(convertionErrors.ToString(), TraceLevel.Error);
+                                saNotification.Notify(convertionErrors.ToString(), SystemActivityType.Error);
                                 donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
                             }
                         }
                         else
                         {
-                            saNotification.Notify(validationErrors.ToString(), TraceLevel.Error);
-                            saNotification.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", TraceLevel.Error);
+                            saNotification.Notify(validationErrors.ToString(), SystemActivityType.Error);
+                            saNotification.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", SystemActivityType.Error);
                         }
                         if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
+                        {
+                            await saNotification.NotifyAsync("donationQueue", "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
                             saNotification.Notify(donationQueue.GetTrackedInformation("Donations processed from queue"));
+                        }
                     }
                 }
             }
             catch(System.Exception ex)
             {
-                saNotification.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", TraceLevel.Error);
+                saNotification.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", SystemActivityType.Error );
             }
         }
     }
