@@ -27,9 +27,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Queue.Lib", "Sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.QueueProcessor.Console", "Source\Donation.QueueProcessor.Console\Donation.QueueProcessor.Console.csproj", "{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Donation.Table.Lib", "Source\Donation.Table.Lib\Donation.Table.Lib.csproj", "{ECD46937-6232-47B0-80D6-998C3EBCCCCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Table.Lib", "Source\Donation.Table.Lib\Donation.Table.Lib.csproj", "{ECD46937-6232-47B0-80D6-998C3EBCCCCB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Monitor.Console", "Source\Donation.Monitor.Console\Donation.Monitor.Console.csproj", "{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Donation.RestApi.Entrance", "Source\Donation.RestApi.Entrance\Donation.RestApi.Entrance.csproj", "{19BDC0C6-35AC-416B-A564-98818C08E827}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +87,10 @@ Global
 		{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19BDC0C6-35AC-416B-A564-98818C08E827}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19BDC0C6-35AC-416B-A564-98818C08E827}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19BDC0C6-35AC-416B-A564-98818C08E827}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19BDC0C6-35AC-416B-A564-98818C08E827}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{ECD46937-6232-47B0-80D6-998C3EBCCCCB} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB} = {A230189C-BFF9-4536-9139-FB4045821F2C}
+		{19BDC0C6-35AC-416B-A564-98818C08E827} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1900646C-BBFC-41C8-B89A-04500597442D}
