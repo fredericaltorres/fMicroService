@@ -10,14 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
-    <ProjectReference Include="..\..\..\..\..\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
     <ProjectReference Include="..\Donation.Model.Lib\Donation.Model.Lib.csproj" />
+    <ProjectReference Include="..\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="DynamicSugarCore">
-      <HintPath>..\..\..\..\..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
+      <HintPath>..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 

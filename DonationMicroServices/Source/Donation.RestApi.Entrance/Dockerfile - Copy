@@ -5,7 +5,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
 WORKDIR /src
-COPY ["Donation.RestApi.Entrance.csproj", "Source/Donation.RestApi.Entrance/"]
+COPY ["Source/Donation.RestApi.Entrance/Donation.RestApi.Entrance.csproj", "Source/Donation.RestApi.Entrance/"]
 RUN dotnet restore "Source/Donation.RestApi.Entrance/Donation.RestApi.Entrance.csproj"
 COPY . .
 WORKDIR "/src/Source/Donation.RestApi.Entrance"

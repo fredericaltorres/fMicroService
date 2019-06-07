@@ -4,15 +4,21 @@ using System.Threading.Tasks;
 
 namespace Donation.Queue.Lib
 {
-    public class DonationQueue : PerformanceTracker
+    public interface IDonationQueueEndqueue
+    {
+        Task EnqueueAsync(DonationDTO donationDTO);
+    }
+
+    public class DonationQueue : PerformanceTracker, IDonationQueueEndqueue
     {
         public string QueueName = "DonationQueue";
         QueueManager _queueManager;
 
-        public DonationQueue(string storageAccountName, string storageAccessKey )
+        public DonationQueue(string storageAccountName, string storageAccessKey)
         {
             _queueManager = new QueueManager(storageAccountName, storageAccessKey, QueueName);
         }
+
         public async Task EnqueueAsync(DonationDTO donationDTO)
         {
             base.TrackNewItem();

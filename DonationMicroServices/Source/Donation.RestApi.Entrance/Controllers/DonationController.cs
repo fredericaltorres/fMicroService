@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Donation.Model;
+using Donation.Queue.Lib;
+using Donation.Service;
 using fDotNetCoreContainerHelper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Donation.RestApi.Entrance.Controllers
@@ -12,6 +15,12 @@ namespace Donation.RestApi.Entrance.Controllers
     [ApiController]
     public class DonationController : ControllerBase
     {
+        private readonly IDonationQueueEndqueue queue;
+
+        public DonationController(IDonationQueueEndqueue queue)
+        {
+            this.queue = queue;
+        }
 
         [HttpGet("{id}")]
         public DonationDTO GetDonationDTO(long id)
@@ -19,18 +28,24 @@ namespace Donation.RestApi.Entrance.Controllers
             return new DonationDTO();
         }
 
-
-
         // https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-2.2&tabs=visual-studio
 
         [HttpPost]
-        public CreatedAtActionResult PostDonationDTO(DonationDTO donationDTO)
+        [ProducesResponseType(typeof(DonationDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PostDonationDTO(DonationDTO donationDTO)
         {
-            return CreatedAtAction(nameof(GetDonationDTO), new { id = donationDTO.Guid.ToString() }, donationDTO);
+            var donationsService = new DonationsService(donationDTO);
+            var errors = donationsService.ValidateData();
+            if(errors.NoError)
+            {                
+                await this.queue.EnqueueAsync(donationDTO);
+                return CreatedAtAction(nameof(GetDonationDTO), new { id = donationDTO.Guid.ToString() }, donationDTO);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
-        //public async Task<ActionResult<DonationDTO>> PostDonationDTO(DonationDTO donationDTO)
-        //{
-        //    return CreatedAtAction(nameof(DonationDTO), new { id = donationDTO.Guid.ToString() }, donationDTO);
-        //}
     }
 }

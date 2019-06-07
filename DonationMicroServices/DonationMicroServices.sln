@@ -3,19 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureServiceBusPubConsole", "..\AzureServiceBus\AzureServiceBusPubConsole\AzureServiceBusPubConsole.csproj", "{93143894-2F1F-4342-BD85-0BDFFFF03ADF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureServiceBusSubConsole", "..\AzureServiceBus\AzureServiceBusSubConsole\AzureServiceBusSubConsole.csproj", "{64D80201-2FB3-4A35-A213-9203FA9EF3FC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Model.Lib", "Source\Donation.Model.Lib\Donation.Model.Lib.csproj", "{566F44CD-26FF-4EC6-92B8-75C8484BF13C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Model.Lib.UnitTests", "Source\Donation.Model.Lib.UnitTests\Donation.Model.Lib.UnitTests.csproj", "{2B918731-34F6-4AB5-92C9-B2B784E4E0B8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureServiceBusSubHelper", "..\..\..\fAzureCore\AzureServiceBusSubHelper\AzureServiceBusSubHelper.csproj", "{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fAzureHelper", "..\..\..\fAzureCore\fAzureHelper\fAzureHelper.csproj", "{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fDotNetCoreContainerHelper", "..\..\..\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj", "{3D3BFED0-A1ED-44EB-9847-3745E768EE15}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fAzureCore", "fAzureCore", "{900C88F3-13F3-473E-8396-29211D1390BC}"
 EndProject
@@ -31,7 +21,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Table.Lib", "Sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.Monitor.Console", "Source\Donation.Monitor.Console\Donation.Monitor.Console.csproj", "{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Donation.RestApi.Entrance", "Source\Donation.RestApi.Entrance\Donation.RestApi.Entrance.csproj", "{19BDC0C6-35AC-416B-A564-98818C08E827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donation.RestApi.Entrance", "Source\Donation.RestApi.Entrance\Donation.RestApi.Entrance.csproj", "{19BDC0C6-35AC-416B-A564-98818C08E827}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fDotNetCoreContainerHelper", "Source\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj", "{2ADDF180-62B2-4F31-8FB1-2DDD21B93816}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fAzureHelper", "Source\fAzureCore\fAzureHelper\fAzureHelper.csproj", "{33A0FCB6-E59A-4D42-8C13-9C461EB87DE6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureServiceBusSubHelper", "Source\fAzureCore\AzureServiceBusSubHelper\AzureServiceBusSubHelper.csproj", "{BCCB098A-18E1-4EC7-8D02-4DD62D7C639D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,14 +35,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{93143894-2F1F-4342-BD85-0BDFFFF03ADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93143894-2F1F-4342-BD85-0BDFFFF03ADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93143894-2F1F-4342-BD85-0BDFFFF03ADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93143894-2F1F-4342-BD85-0BDFFFF03ADF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{64D80201-2FB3-4A35-A213-9203FA9EF3FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{64D80201-2FB3-4A35-A213-9203FA9EF3FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{64D80201-2FB3-4A35-A213-9203FA9EF3FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{64D80201-2FB3-4A35-A213-9203FA9EF3FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{566F44CD-26FF-4EC6-92B8-75C8484BF13C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{566F44CD-26FF-4EC6-92B8-75C8484BF13C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{566F44CD-26FF-4EC6-92B8-75C8484BF13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,18 +43,6 @@ Global
 		{2B918731-34F6-4AB5-92C9-B2B784E4E0B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B918731-34F6-4AB5-92C9-B2B784E4E0B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B918731-34F6-4AB5-92C9-B2B784E4E0B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D3BFED0-A1ED-44EB-9847-3745E768EE15}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,6 +67,18 @@ Global
 		{19BDC0C6-35AC-416B-A564-98818C08E827}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19BDC0C6-35AC-416B-A564-98818C08E827}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19BDC0C6-35AC-416B-A564-98818C08E827}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ADDF180-62B2-4F31-8FB1-2DDD21B93816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ADDF180-62B2-4F31-8FB1-2DDD21B93816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ADDF180-62B2-4F31-8FB1-2DDD21B93816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ADDF180-62B2-4F31-8FB1-2DDD21B93816}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33A0FCB6-E59A-4D42-8C13-9C461EB87DE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33A0FCB6-E59A-4D42-8C13-9C461EB87DE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33A0FCB6-E59A-4D42-8C13-9C461EB87DE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33A0FCB6-E59A-4D42-8C13-9C461EB87DE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCCB098A-18E1-4EC7-8D02-4DD62D7C639D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCCB098A-18E1-4EC7-8D02-4DD62D7C639D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCCB098A-18E1-4EC7-8D02-4DD62D7C639D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCCB098A-18E1-4EC7-8D02-4DD62D7C639D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,15 +86,15 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{566F44CD-26FF-4EC6-92B8-75C8484BF13C} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{2B918731-34F6-4AB5-92C9-B2B784E4E0B8} = {A230189C-BFF9-4536-9139-FB4045821F2C}
-		{BC5FD6AB-CEA0-4D9B-AA3A-568238D3B58B} = {900C88F3-13F3-473E-8396-29211D1390BC}
-		{114DCAA5-8E9C-40D9-89A5-C87B4AFBF3DA} = {900C88F3-13F3-473E-8396-29211D1390BC}
-		{3D3BFED0-A1ED-44EB-9847-3745E768EE15} = {900C88F3-13F3-473E-8396-29211D1390BC}
 		{C3E89BA7-E8FB-4EB4-8023-8F7F572712E9} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{D31E05CB-2232-498B-86D2-04CAC9B46E6B} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{1044AB1A-106A-4B2B-AB83-95EAD8C5F53F} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{ECD46937-6232-47B0-80D6-998C3EBCCCCB} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{A7D57A50-F7C2-4252-9BC8-0DD0BD1419EB} = {A230189C-BFF9-4536-9139-FB4045821F2C}
 		{19BDC0C6-35AC-416B-A564-98818C08E827} = {A230189C-BFF9-4536-9139-FB4045821F2C}
+		{2ADDF180-62B2-4F31-8FB1-2DDD21B93816} = {900C88F3-13F3-473E-8396-29211D1390BC}
+		{33A0FCB6-E59A-4D42-8C13-9C461EB87DE6} = {900C88F3-13F3-473E-8396-29211D1390BC}
+		{BCCB098A-18E1-4EC7-8D02-4DD62D7C639D} = {900C88F3-13F3-473E-8396-29211D1390BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1900646C-BBFC-41C8-B89A-04500597442D}

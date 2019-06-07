@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Reference Include="DynamicSugarCore">
-      <HintPath>..\..\..\..\..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
+      <HintPath>..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 

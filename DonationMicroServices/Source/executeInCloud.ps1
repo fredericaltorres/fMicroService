@@ -14,6 +14,8 @@ param(
 	[ValidateSet(
 		'buildPushInstantiate', 
 		'buildPushInstantiateAll', 
+		'build',
+		'push',
 		'deleteInstance', 
 		'deleteInstanceAll', 
 		'getLog', 
@@ -69,6 +71,16 @@ $donationGenerationFile = @(0,1) #,2,3,4,5,6,7,8,9
 
 switch($action) {
 
+	Build { 
+        Write-Host "About to build this .NET Core project as a Azure Container" -ForegroundColor Yellow
+        ../deployContainerToAzureContainerRegistry.ps1 -action build -cls $false -containerImage $containerImage 
+	}
+	
+	Push { 
+        Write-Host "About to build this .NET Core project as a Azure Container" -ForegroundColor Yellow
+        ../deployContainerToAzureContainerRegistry.ps1 -action push -cls $false -containerImage $containerImage 
+	}
+	
     BuildPushInstantiate { 
         Write-Host "About to build, publish and execute this .NET Core project as a Azure Container" -ForegroundColor Yellow
 
