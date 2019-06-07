@@ -12,18 +12,27 @@ param(
     [string]$hostOrIp = "localhost",
 
     [Parameter(Mandatory=$false)]
-    [int]$port = 44399
+    [int]$port = 44399,
+    [Parameter(Mandatory=$false)]
+    [bool]$secure = $true
 )
 
-function buildUrl($hostOrIp, $port) {
-    return "https://$hostOrIp`:$port/api/Donation"
+# .\Scripts\post.ps1 -a post -count 1 -hostOrIp localhost -port 80 -secure $false
+
+function buildUrl([string]$hostOrIp, [int]$port, [bool]$secure ) {
+# "https://localhost:44399/api/Donation"
+    $protocol = "http"
+    if($secure) {
+        $protocol = "https"
+    }    
+    return "$protocol`://$hostOrIp`:$port/api/Donation"
 }
 function postNewDonation() {
     $contentType = "Content-Type: application/json; charset=utf-8"
     $guid = [System.Guid]::NewGuid()
     $data = '{ `Guid`:`[GUID]`,`FirstName`:`Sonny`,`LastName`:`Haking`,`Email`:`shaking0@theguardian.com`,`Gender`:`Male`,`Phone`:`310-632-6062`,`IpAddress`:`138.27.230.192`,`Country`:`Indonesia`,`Amount`:`$91.37`,`CC_Number`:`4026367644878790`,`CC_ExpMonth`:12,`CC_ExpYear`:2022,`CC_SecCode`:233}'
     $data = $data.replace("``","""""").replace("""","``""").Replace("[GUID]", $guid)
-    $url  = buildUrl $hostOrIp $port #"https://localhost:44399/api/Donation"
+    $url  = buildUrl $hostOrIp $port $secure
     $command = "curl.exe -H `"$contentType`" -X POST --data `"$data`" $url "
     Write-Host $command
     Write-Host ""

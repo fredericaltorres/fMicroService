@@ -35,6 +35,8 @@ namespace Donation.RestApi.Entrance.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostDonationDTO(DonationDTO donationDTO)
         {
+            Console.WriteLine($"New donation posted {donationDTO.ToJSON()}");
+
             var donationsService = new DonationsService(donationDTO);
             var errors = donationsService.ValidateData();
             if(errors.NoError)

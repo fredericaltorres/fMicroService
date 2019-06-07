@@ -37,6 +37,7 @@ namespace Donation.RestApi.Entrance
             services.AddScoped<IDonationQueueEndqueue, DonationQueue>();
             services.AddTransient<IDonationQueueEndqueue, DonationQueue>((ctx) =>
             {
+                Console.WriteLine($"Instantiate a new donationQueue");
                 var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
                 return donationQueue;
             });
@@ -45,6 +46,7 @@ namespace Donation.RestApi.Entrance
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            Console.WriteLine($"Startup Configure env ContentRootPath:{env.ContentRootPath}");
             RuntimeHelper.SetAppPath(env.ContentRootPath);
             if (env.IsDevelopment())
             {
