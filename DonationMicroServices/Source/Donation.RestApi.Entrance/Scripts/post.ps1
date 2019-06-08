@@ -17,7 +17,14 @@ param(
     [bool]$secure = $true
 )
 
+#https://donation-restapi-entrance.azurewebsites.net/api/Info
+#.\Scripts\post.ps1 -a post -count 1 -hostOrIp donation-restapi-entrance.azurewebsites.net -port 80 -secure $false
+#.\Scripts\post.ps1 -a post -count 1 -hostOrIp donation-restapi-entrance.azurewebsites.net -port 443 -secure $true
+
+# https://localhost:44399/api/Donation
+# .\Scripts\post.ps1 -a post -count 1 -hostOrIp localhost -port 44399 -secure $true
 # .\Scripts\post.ps1 -a post -count 1 -hostOrIp localhost -port 80 -secure $false
+#.\Scripts\post.ps1 -a post -count 1 -hostOrIp localhost -port 443 -secure $true
 
 function buildUrl([string]$hostOrIp, [int]$port, [bool]$secure ) {
 # "https://localhost:44399/api/Donation"

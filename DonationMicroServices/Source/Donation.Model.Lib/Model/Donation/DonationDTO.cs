@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.JSON;
+using System.Text;
 
 namespace Donation.Model
 {
@@ -21,6 +22,13 @@ namespace Donation.Model
         public string ToJSON()
         {
             return JsonObject.Serialize(this);
+        }
+
+        public string GetSummary()
+        {
+            var s = new StringBuilder();
+            s.Append($"guid:{this.Guid}, UtcCreationDate:{this.UtcCreationDate}, Amount:{this.Amount}");
+            return s.ToString();
         }
 
         public static DonationDTO FromJSON(string json)

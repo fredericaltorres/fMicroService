@@ -47,7 +47,15 @@ namespace Donation.RestApi.Entrance
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             Console.WriteLine($"Startup Configure env ContentRootPath:{env.ContentRootPath}");
+            Console.WriteLine($"Startup Configure env EnvironmentName:{env.EnvironmentName}");
+            Console.WriteLine($"Startup Configure env ApplicationName:{env.ApplicationName}");
+            Console.WriteLine($"Startup Configure env WebRootPath:{env.WebRootPath}");
+
+            var ASPNETCORE_URLS = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+            Console.WriteLine($"Startup Configure env ASPNETCORE_URLS:{ASPNETCORE_URLS}");
+
             RuntimeHelper.SetAppPath(env.ContentRootPath);
+            Console.WriteLine(RuntimeHelper.GetContextInformation());
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

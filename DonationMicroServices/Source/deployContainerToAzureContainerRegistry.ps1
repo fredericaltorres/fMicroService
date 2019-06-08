@@ -21,7 +21,8 @@ param(
     # Action to execute
     [Parameter(Mandatory=$true)] 
     [Alias('a')]
-    [ValidateSet('build', 'push', 'instantiate', 'deleteInstance', 'getLog')]
+    [ValidateSet('build', 'push', 'instantiate', 'deleteInstance', 'getLog', 
+                'createAppService', 'createWebApp', 'configContainerWebApp')]
     [string]$action,
 
     # Ths action 'instantiate', 'deleteInstance', 'getLog' may apply to a specific container instance.    
@@ -125,6 +126,8 @@ else {
 Write-Host "deployContainerToAzureContainerRegistry -Action:$action" -ForegroundColor Yellow
 Write-Host "Build project $(GetProjectName), version:$(GetProjectVersion)" -ForegroundColor DarkYellow
 $newTag = "$acrLoginServer/$containerImage`:$(GetProjectVersion)" # Compute the container image with the .NET Core project version
+$wepAppName = $containerImage.replace(".","-")
+$azureLoginName = $acrName
 
 switch($action) {
 
@@ -166,7 +169,6 @@ switch($action) {
     # In Azure Container Instance
     instantiate {
         
-        $azureLoginName = $acrName
         $dnsLabel = "$($containerInstanceName)"
 
         Write-Host-Color "About to instantiate instance of container:$containerInstanceName"
@@ -175,10 +177,37 @@ switch($action) {
 
         # We pass specific parameter to the container instance via environment variable using the command --environment-variables
         $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$containerInstanceIndex
+        write-host "Container MetaData`r`n$jsonString"
 
         # Retreive metadata about the container instance from the Json blob returned
         $url = GetContainerInstanceUrlFromJsonMetadata $jsonString
         Write-Host-Color "Container Instance URL:$url"
+    }
+
+    createAppService {
+        Write-Host-Color "About to create appService:$containerImage"
+        az appservice plan create -n $containerImage -g $myResourceGroup --sku S1 --is-linux
+    }
+
+    createWebApp {
+        # az webapp command https://docs.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest
+        # -p stand for plan or appservice name
+        Write-Host-Color "About to create webApp:$wepAppName"
+        write-host "az webapp create -g $myResourceGroup -p $containerImage -n $wepAppName --% --runtime `"DOTNETCORE|2.2`" "
+        az webapp create -g $myResourceGroup -p $containerImage -n $wepAppName --% --runtime "DOTNETCORE|2.2"
+    }
+
+    configContainerWebApp {
+        
+        Write-Host-Color "About to set container image:$newTag inside webApp:$wepAppName"
+        #$jsonString = az container create --resource-group $myResourceGroup --name $wepAppName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$containerInstanceIndex
+        $jsonString = az webapp config container set --resource-group $myResourceGroup --name $wepAppName `
+            --docker-custom-image-name $newTag `
+            --docker-registry-server-url "https://$acrLoginServer" `
+            --docker-registry-server-user  $azureLoginName `
+            --docker-registry-server-password  $azureContainerRegistryPassword
+        #--cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName 
+        #--registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$containerInstanceIndex
     }
 
     # Request the log of a specific container instance
