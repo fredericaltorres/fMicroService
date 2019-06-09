@@ -8,8 +8,15 @@ namespace Donation.Model
     public class DonationDTO : DonationPersonWithPaymentMethod
     {
         public string IpAddress { get; set; }
-        public string Amount { get; set; } //$15.92
+        public string Amount { get; set; }
         public DateTime UtcCreationDate { get; set; }
+
+        /// <summary>
+        /// The machine id running the donation.restapi.entrace web api that
+        /// received the donation first
+        /// AKA in Kubernetes the pod host name that ran the donation.restapi.entrace web api
+        /// </summary>
+        public string __ProcessingContainerID { get; set; }
 
         [JsonIgnore]
         public DonationDataProcessState ProcessState = DonationDataProcessState.New;
@@ -17,6 +24,7 @@ namespace Donation.Model
         public DonationDTO()
         {
             this.UtcCreationDate = DateTime.UtcNow;
+            this.__ProcessingContainerID = Environment.MachineName;
         }
 
         public string ToJSON()
