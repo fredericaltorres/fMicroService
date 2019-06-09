@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:  
+  name: fdotnetcorewebapp-service
+  annotations:
+    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    # service.beta.kubernetes.io/azure-load-balancer-mode: "aa"
+  labels:
+    app: fdotnetcorewebapp
+    version: 1.0.2 # This can be removed the name of the service does not need a version
+spec:
+  # ClusterIP: Stable internal cluster IP (Only inside the cluster)
+  # NodePort: Exposes the app outside of the cluster by adding a cluster wide port on top of the ClusterIP, other
+  # LoadBalancer: Integration NodePort with a cloud-based load balancers
+  type: LoadBalancer # https://docs.microsoft.com/en-us/azure/aks/concepts-network - https://docs.microsoft.com/en-us/azure/aks/internal-lb
+  ports:
+  - port: 80 # Port exposed in the container is mapped to the nodePort
+    # nodePort: 30001
+    protocol: TCP # can use UDP
+  selector:
+    app: fdotnetcorewebapp  # Must match the pod in the replication controller file
+    version: 1.0.2          # Execute `kubectl describe pods` and check Labels field
+                              

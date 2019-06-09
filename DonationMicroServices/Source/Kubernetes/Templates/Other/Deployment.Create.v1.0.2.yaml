@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fdotnetcorewebapp-deployment-1.0.2
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: fdotnetcorewebapp
+        version: 1.0.2
+    spec:
+      containers:
+      - name: fdotnetcorewebapp-pod
+        image: fredcontainerregistry.azurecr.io/fdotnetcorewebapp:1.0.2
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: fredcontainerregistry

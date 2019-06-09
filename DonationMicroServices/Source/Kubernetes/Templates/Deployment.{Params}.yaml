@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: donation-restapi-entrance-deployment-${APP_VERSION}
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: donation-restapi-entrance
+        version: ${APP_VERSION}
+    spec:
+      containers:
+      - name: donation-restapi-entrance-pod
+        image: fredcontainerregistry.azurecr.io/donation.restapi.entrance:${APP_VERSION}
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: fredcontainerregistry

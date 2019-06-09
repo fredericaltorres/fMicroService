@@ -17,6 +17,11 @@ param(
     [bool]$secure = $true
 )
 
+# Command when deploy using a Kubernetes cluster and deployment to pod2 + load balancer
+# http://40.70.134.67:80/api/info 
+# .\Scripts\post.ps1 -a post -count 1 -hostOrIp 40.70.134.67 -port 80 -secure $false
+
+# Command when web api is deployed in azure via ServicePlan + WebApp
 #https://donation-restapi-entrance.azurewebsites.net/api/Info
 #.\Scripts\post.ps1 -a post -count 1 -hostOrIp donation-restapi-entrance.azurewebsites.net -port 80 -secure $false
 #.\Scripts\post.ps1 -a post -count 1 -hostOrIp donation-restapi-entrance.azurewebsites.net -port 443 -secure $true
