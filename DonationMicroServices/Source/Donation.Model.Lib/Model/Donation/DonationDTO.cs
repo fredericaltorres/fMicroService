@@ -25,7 +25,6 @@ namespace Donation.Model
         public DonationDTO()
         {
             this.UtcCreationDate = DateTime.UtcNow;
-            this.__ProcessingMachineID = RuntimeHelper.GetMachineName();
         }
 
         public string ToJSON()

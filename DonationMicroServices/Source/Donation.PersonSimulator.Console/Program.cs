@@ -27,8 +27,9 @@ namespace Donation.PersonSimulator.Console
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
 
             var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
+            var donationEndPointIP = RuntimeHelper.GetCommandLineParameterString("-donationEndPointIP", args);
 
-            Publish(containerInstanceIndex).GetAwaiter().GetResult();
+            Publish(containerInstanceIndex, donationEndPointIP).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");
             while (true)
             {
@@ -46,17 +47,22 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
-        const string DONATION_POST_URL = "http://52.167.58.190:80/api/Donation";
-        static async Task<string> PostDonation(DonationDTO donation)
+        static string GetDonationUrl(string hostOrIp)
         {
-            var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(DONATION_POST_URL), donation.ToJSON());
+            return $"http://{hostOrIp}:80/api/Donation";
+        }
+
+        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP)
+        {
+            donation.__ProcessingMachineID = null;
+            var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP)), donation.ToJSON());
             if (succeeded)
                 return location;
             else
                 return null;
         }
 
-        static async Task Publish(int generationIndex)
+        static async Task Publish(int generationIndex, string donationEndPointIP)
         {
             var donationJsonFile = GetGeneratedDonationDataFile(generationIndex);
             if (File.Exists(donationJsonFile))
@@ -69,27 +75,34 @@ namespace Donation.PersonSimulator.Console
 
             saNotification.Notify($"Start sending Donation from file {donationJsonFile}");
 
-            var groupCount = 15;
+            var groupCount = 1;
             var perfTracker = new PerformanceTracker();
 
             while (donations.Count > 0)
             {
                 System.Console.Write(".");
                 var donation10 = donations.Take(groupCount);
-                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d)));
+
+                // TODO: Handle better http error
+                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP)));
+                if(locations.Any(location => location == null))
+                {
+                    await saNotification.NotifyAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}", SystemActivityType.Error);
+                }
+
                 donations.RemoveRange(0, groupCount);
                 perfTracker.TrackNewItem(groupCount);
 
                 if (perfTracker.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                 {
                     System.Console.WriteLine("");
-                    await saNotification.NotifyAsync("Donation", "Post to Entrace endpoint", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
+                    await saNotification.NotifyAsync("Donation", "Posted to Entrance endpoint", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
                 }
             }
 
             await saNotification.NotifyAsync(DS.List(
-                $"{donations.Count} messages published",
-                $"End sending Donation from file {donationJsonFile}"
+                $"{donations.Count} donations sent",
+                $"End sending donation from file {donationJsonFile}"
             ));
         }
     }

@@ -31,7 +31,7 @@ namespace Donation.Service
 
         private bool CanBeNull(string property)
         {
-            return property == "ZipCode";
+            return property == "ZipCode" || property == "__ProcessingMachineID";
         }
 
         public Errors ValidateData()

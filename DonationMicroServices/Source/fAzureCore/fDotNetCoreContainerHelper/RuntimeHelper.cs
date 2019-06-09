@@ -18,7 +18,10 @@ namespace fDotNetCoreContainerHelper
             using (var client = new HttpClient())
             {
                 HttpResponseMessage hrp = await client.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"));                
-                return (hrp.IsSuccessStatusCode, hrp.Headers.Location.ToString(), hrp);
+                if(hrp.IsSuccessStatusCode)
+                    return (hrp.IsSuccessStatusCode, hrp.Headers.Location.ToString(), hrp);
+                else
+                    return (hrp.IsSuccessStatusCode, null, hrp);
             }
         }
     }
@@ -41,7 +44,7 @@ namespace fDotNetCoreContainerHelper
             int i;
             if (int.TryParse(v, out i))
                 return i;
-            throw new InvalidProgramException("Cannot find parameter:{name} in command line or environment");
+            throw new InvalidProgramException($"Cannot find parameter:{name} in command line or environment");
         }
 
         public static bool GetCommandLineParameterBool(string name, string[] args)
@@ -50,7 +53,7 @@ namespace fDotNetCoreContainerHelper
             bool i;
             if (bool.TryParse(v, out i))
                 return i;
-            throw new InvalidProgramException("Cannot find parameter:{name} in command line or environment");
+            throw new InvalidProgramException($"Cannot find parameter:{name} in command line or environment");
         }
 
         public static string GetCommandLineParameterString(string name, string[] args)
@@ -59,15 +62,17 @@ namespace fDotNetCoreContainerHelper
             while(envName.StartsWith("-"))
                 envName = envName.Substring(1);
 
+            // Search for the parameter as environment variable first as it is as we
+            // pass parameter to a container
             var v = Environment.GetEnvironmentVariable(envName);
             if (!string.IsNullOrEmpty(v))
                 return v;
+
+            // Fall back on the command line args
             for(var i=0; i<args.Length; i++)
             {
                 if(args[i] == name && i+1 < args.Length)
-                {
                     return args[i+1];
-                }
             }
             return null;
         }
