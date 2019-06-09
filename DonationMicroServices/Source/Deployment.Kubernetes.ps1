@@ -5,8 +5,8 @@ param(
 	[ValidateSet('deployToProd', 'deleteDeployments', 'getInfo')]
     [string]$action = "getInfo", 
 
-    [Parameter(Mandatory=$false)]
-    [string]$appName = "donation-restapi-entrance", #  fdotnetcorewebapp, donation-restapi-entrance
+    [Parameter(Mandatory=$false)] # The appName is used as the kubernete deployment/service name and cannot contains '.'
+    [string]$appName = "donation.restapi.entrance", #  fdotnetcorewebapp, donation-restapi-entrance
 
     [Parameter(Mandatory=$false)]
     [string]$appVersion = "1.0.4", #  1.0.3
@@ -33,6 +33,7 @@ param(
 # https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auth-aks
 #az acr show --name $acrName --resource-group $myResourceGroup --query "id" --output tsv
 #az acr show --name $acrName --query loginServer --output tsv
+$appName = $appName.Replace(".", "-")
 
 if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
@@ -96,7 +97,6 @@ switch($action) {
     }
 
     getInfo {
-
         $deploymentName = "$appName-deployment-$appVersion"
         Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
 
@@ -107,7 +107,6 @@ switch($action) {
     deleteDeployments {
 
         Write-Host "Delete all deployments"
-        
         $deploymentName = "$appName-deployment-$appVersion"
         $kubernetesManager.deleteDeployment($deploymentName)
 

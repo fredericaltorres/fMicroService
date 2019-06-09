@@ -2,8 +2,8 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-    [ValidateSet('build', 'push','Nothing','deployDonationRestApiEntrace')]
-    [string]$action = "deployDonationRestApiEntrace"
+    [ValidateSet('build', 'push','Nothing','deployDonationRestApiEntrace','deleteDeployments')]
+    [string]$action = "deleteDeployments"
 )
 
 if($null -eq (Get-Module Util)) {
@@ -14,8 +14,10 @@ $dockerFilName = ".\Source\Donation.RestApi.Entrance\Dockerfile"
 $appName = GetAppNameFromProject
 $containerImageName = $appName
 $appVersion = GetProjectVersion
+$scriptTitle = "Donation Automation Deployment Utility"
+$traceKubernetesCommand = $true
 
-Write-HostColor "Donation Automation Deployment Utility" Yellow
+Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
 switch($action) {
@@ -26,13 +28,17 @@ switch($action) {
         docker build -t "$containerImageName"-f "$dockerFilName" .
         popd
     }
-    push {
+    push { # Push container to Azure Container Registry
         ..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage "$containerImageName" -cls $false
     }
-    deployDonationRestApiEntrace {
-        ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false
+    deployDonationRestApiEntrace { # Deploy rest api service on 2 pod and loadBalancer
+        ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand
+    }
+    deleteDeployments { # Delete deployment of rest api service and loadBalancer
+        ..\Deployment.Kubernetes.ps1 -a deleteDeployments -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand
     }
 }
+Write-HostColor "$scriptTitle done" Yellow
 
 <#
 Run locally on container
