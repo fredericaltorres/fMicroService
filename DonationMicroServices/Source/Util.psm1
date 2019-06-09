@@ -1,6 +1,4 @@
-﻿
-
-function Write-HostColor([string]$message, $color = "Cyan") {
+﻿function Write-HostColor([string]$message, $color = "Cyan") {
 
     Write-Host $message -ForegroundColor $color
 }
@@ -52,7 +50,6 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
     return $false
 }
 
-
 function urlMustReturnHtml($url) {
 
     Retry "Verifying url: $url returns html" {
@@ -94,7 +91,6 @@ $context = @{
 }
 #>
 
-
 function processFile($context, $fileName, $newFileName = $null) {
 
     $content = Get-Content $fileName
@@ -112,7 +108,43 @@ function processFile($context, $fileName, $newFileName = $null) {
     return $newFileName
 }
 
+function GetProjectName() {
+<#
+    .Synopsis
+        Returns the name of the .NET Core project name from the current folder
+#>
+    $project = gci -path . -Include *.csproj # Assume there is only one csproj in the current directory
+    if($project -eq $null) {
+        throw "Cannot find C# project file in current folder"
+    }
+    else {
+        return $project.Name
+    }
+}
 
+function GetAppNameFromProject() {
+<#
+    .Synopsis
+        Returns the name of the .NET Core project name from the current folder with no extension and in lowercase
+#>
+    return [System.IO.Path]::GetFileNameWithoutExtension((GetProjectName)).ToLowerInvariant()
+}
+
+function GetProjectVersion() {
+<#
+    .Synopsis
+        Returns the version of the .NET Core project from the current folder.
+        The default version 1.0.0 will not work. Set the version using the IDE.
+#>
+    $projectName = GetProjectName
+    [xml]$doc = get-content($projectName)
+    $version = $doc.Project.PropertyGroup.Version
+    return $version
+}
+
+Export-ModuleMember -Function GetAppNameFromProject
+Export-ModuleMember -Function GetProjectName
+Export-ModuleMember -Function GetProjectVersion
 Export-ModuleMember -Function processFile
 Export-ModuleMember -Function urlMustReturnHtml
 Export-ModuleMember -Function Retry

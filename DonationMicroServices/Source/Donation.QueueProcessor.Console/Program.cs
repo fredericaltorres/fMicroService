@@ -24,7 +24,7 @@ namespace Donation.PersonSimulator.Console
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
-            ProcessDonationQueue(1).GetAwaiter().GetResult();
+            ProcessDonationQueue().GetAwaiter().GetResult();
         }
 
         static string GetServiceBusConnectionString()
@@ -32,7 +32,7 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
-        static async Task ProcessDonationQueue(int generationIndex)
+        static async Task ProcessDonationQueue()
         {
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
             saNotification.Notify($"Donation.QueueProcessor.Console Running");

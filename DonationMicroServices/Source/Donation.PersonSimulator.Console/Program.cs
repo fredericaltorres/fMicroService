@@ -26,9 +26,9 @@ namespace Donation.PersonSimulator.Console
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
 
-            var generationIndex = RuntimeHelper.GetCommandLineParameterInt("-generationIndex", args);
+            var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
 
-            Publish(generationIndex).GetAwaiter().GetResult();
+            Publish(containerInstanceIndex).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");
             while (true)
             {

@@ -6,7 +6,10 @@ param(
     [string]$action = "getInfo", 
 
     [Parameter(Mandatory=$false)]
-    [string]$appName = "donation-restapi-entrance",#  fdotnetcorewebapp   
+    [string]$appName = "donation-restapi-entrance", #  fdotnetcorewebapp, donation-restapi-entrance
+
+    [Parameter(Mandatory=$false)]
+    [string]$appVersion = "1.0.4", #  1.0.3
 
      # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -31,8 +34,13 @@ param(
 #az acr show --name $acrName --resource-group $myResourceGroup --query "id" --output tsv
 #az acr show --name $acrName --query loginServer --output tsv
 
-Import-Module ".\Util.psm1" -Force
-Import-Module ".\KubernetesManager.psm1" -Force
+Write-Host "(Deployment.Kubernetes)path to Util.psm1:$PSScriptRoot\Util.psm1"
+
+if($null -eq (Get-Module Util)) {
+    Import-Module "$PSScriptRoot\Util.psm1" -Force
+}
+
+Import-Module "$PSScriptRoot\KubernetesManager.psm1" -Force
 
 function deployRelease([Hashtable]$context, [string]$message) {
 
@@ -59,7 +67,6 @@ function deployRelease([Hashtable]$context, [string]$message) {
     $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
     urlMustReturnHtml $testUrl
 }
- 
 
 function switchProductionToVersion($context, $message) {
 
@@ -70,7 +77,6 @@ function switchProductionToVersion($context, $message) {
     $kubernetesManager.waitForService($serviceName)
 }
 
-
 if($clearScreen) {
     cls
 }
@@ -78,24 +84,23 @@ else {
     Write-Host "" 
 }
 
-Write-Host "Donation Demo - Deployment.Kubernetes " -ForegroundColor Yellow -NoNewline
+Write-Host "Deployment.Kubernetes " -ForegroundColor Yellow -NoNewline
 Write-HostColor "-action:$action" DarkYellow
 
 # For now pick the first cluster available
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "initialDeploymentToProd") $traceKubernetesCommand
 
-
 switch($action) {
 
     deployToProd {
 
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3"; TEST_URL = "/api/info" }
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; TEST_URL = "/api/info" }
         deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
     }
 
     getInfo {
 
-        $deploymentName = "$appName-deployment-1.0.3"
+        $deploymentName = "$appName-deployment-$appVersion"
         Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
 
         $serviceName = "$appName-service-prod"
@@ -106,7 +111,7 @@ switch($action) {
 
         Write-Host "Delete all deployments"
         
-        $deploymentName = "$appName-deployment-1.0.3"
+        $deploymentName = "$appName-deployment-$appVersion"
         $kubernetesManager.deleteDeployment($deploymentName)
 
         $serviceName = "$appName-service-prod"
@@ -114,4 +119,4 @@ switch($action) {
     }
 }
 
-Write-Host "Done" -ForegroundColor DarkYellow
+Write-Host "Deployment.Kubernetes done" -ForegroundColor DarkYellow

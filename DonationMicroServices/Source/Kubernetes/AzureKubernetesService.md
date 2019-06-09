@@ -17,42 +17,42 @@ c:\>az aks install-cli
 * A cluster can be created from the portal or the command line
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
-az group create -n fkubernetes4  -l eastus2 # Create a resource group fkubernetes4
+az group create -n fkubernetes5  -l eastus2 # Create a resource group fkubernetes5
 first
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
 az aks create help # return all parameters
 # To be finalized
-az aks create --name fkubernetes4 --resource-group fkubernetes4 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
+az aks create --name fkubernetes5 --resource-group fkubernetes5 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
 
 # More on how to create a AKS -> https://msdn.microsoft.com/en-us/magazine/mt846465.aspx?f=255&MSPPError=-2147217396
 
 # See https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest
 # to remove the yes/no confirmation
-az aks delete -n fkubernetes4 -g fkubernetes4 # How to delete a cluster
-az group delete -n fkubernetes4 # Delete the resource group - always delete the Kubernetes service 
+az aks delete -n fkubernetes5 -g fkubernetes5 # How to delete a cluster
+az group delete -n fkubernetes5 # Delete the resource group - always delete the Kubernetes service 
 
 ```
-* A resource group named MC_fkubernetes4_fkubernetes4_eastus2 will be created containing all resources (vm, disk, load balancer).
+* A resource group named MC_fkubernetes5_fkubernetes5_eastus2 will be created containing all resources (vm, disk, load balancer).
 
 ### Learning more about your AKS (Azure Kubernetes Service)
 ```powershell
 az aks list -o table # Get the list of clusters
 ```
-### Kuster info
-```powershell
-c:\> kubectl cluster-info
-c:\> kubectl config view
-```
-
 
 ### Security and access to the cluster
 * Probably
   - To apply a fine level of security access to the cluster AKS require a Azure AD.
   - The default mode is the owner of the subscription can do every thing.
 ```powershell
-az aks get-credentials --resource-group fkubernetes4 --name fkubernetes4 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes5 --name fkubernetes5 # Switch to cluster
+```
+
+### Kuster info
+```powershell
+c:\> kubectl cluster-info
+c:\> kubectl config view
 ```
 
 #### Setup kubectl.exe
@@ -74,14 +74,14 @@ kubectl version # Get version of client and server Kubernetes
 ```powershell
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-az aks browse --resource-group fkubernetes4 --name fkubernetes4 # Start web server dashboard and open in browser
-az aks browse -n fkubernetes4 -g fkubernetes4  # open dashboard # Start web server dashboard and open in browser
+az aks browse --resource-group fkubernetes5 --name fkubernetes5 # Start web server dashboard and open in browser
+az aks browse -n fkubernetes5 -g fkubernetes5  # open dashboard # Start web server dashboard and open in browser
 ```
 ### Adding more node (VM) to the cluster
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
-az aks scale --resource-group fkubernetes4 -n fkubernetes4 --agent-count 3
+az aks scale --resource-group fkubernetes5 -n fkubernetes5 --agent-count 3
 ```
 
 ### Kubernetes Version
@@ -94,7 +94,7 @@ kubectl version # Get version of client and server Kubernetes - server 1.12.8 cl
 
 ### Switch to a specific cluster
 ```powershell
-C:\> kubectl config use-context fkubernetes4 # Switch to cluster
+C:\> kubectl config use-context fkubernetes5 # Switch to cluster
 C:\> kubectl get services
 ```
 

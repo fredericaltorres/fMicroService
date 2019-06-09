@@ -18,15 +18,13 @@ namespace Donation.PersonSimulator.Console
     class Program
     {
         /// <summary>
-        /// Parameter -generationIndex is passed as an envrironment variable when running
-        /// as a container
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
 
-            Monitor(1).GetAwaiter().GetResult();
+            Monitor().GetAwaiter().GetResult();
         }
 
         static string GetServiceBusConnectionString()
@@ -49,7 +47,7 @@ namespace Donation.PersonSimulator.Console
             }
         }
 
-        static async Task Monitor(int generationIndex)
+        static async Task Monitor()
         {
             var systemActivityNotificationSubscriber = new SystemActivityNotificationManager(GetServiceBusConnectionString(), Environment.MachineName);
             systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;

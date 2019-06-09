@@ -1,13 +1,38 @@
-Write-Host "First go up to folder before building container"
-pushd
-cd ..
-cd ..
-docker build -t donation.restapi.entrance -f .\Source\Donation.RestApi.Entrance\Dockerfile .
-popd
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$false)]
+    [Alias('a')]
+    [ValidateSet('build', 'push','Nothing','deployDonationRestApiEntrace')]
+    [string]$action = "deployDonationRestApiEntrace"
+)
 
-write-host "Press space bar to push to Azure Container Registry or CTRL-BREAK"
-# Push container into azure container registry tagged with .NET Core project version
-..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage donation.restapi.entrance
+if($null -eq (Get-Module Util)) {
+    Import-Module "$PSScriptRoot\..\Util.psm1" -Force
+}
+
+$dockerFilName = ".\Source\Donation.RestApi.Entrance\Dockerfile"
+$appName = GetAppNameFromProject
+$containerImageName = $appName
+$appVersion = GetProjectVersion
+
+Write-HostColor "Donation Automation Deployment Utility" Yellow
+Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
+
+switch($action) {
+    build { # Build the continer
+        Write-Host "First go up to folder before building container" -ForegroundColor DarkGray
+        pushd
+        cd ..\..
+        docker build -t "$containerImageName"-f "$dockerFilName" .
+        popd
+    }
+    push {
+        ..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage "$containerImageName" -cls $false
+    }
+    deployDonationRestApiEntrace {
+        ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false
+    }
+}
 
 <#
 Run locally on container

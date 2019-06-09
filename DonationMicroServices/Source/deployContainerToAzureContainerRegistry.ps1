@@ -46,7 +46,7 @@ param(
     [string]$myResourceGroup = "FredContainerRegistryResourceGroup",
     [Parameter(Mandatory=$false)] # The full login server name for your Azure container registry.  az acr show --name $acrName --query loginServer --output table
     [string]$acrLoginServer = "fredcontainerregistry.azurecr.io",
-    [Parameter(Mandatory=$false)] 
+    [Parameter(Mandatory=$false)]
     [string]$azureContainerRegistryPassword = $env:azureContainerRegistryPassword,
 
     # Container Hardware Configuration, for more hardware configuration search for:az container create
@@ -62,6 +62,10 @@ param(
     [bool]$clearScreen = $true
 )
 
+if($null -eq (Get-Module Util)) {
+    Import-Module "$PSScriptRoot\Util.psm1" -Force
+}
+
 $containerImage = $containerImage.toLower()
 if($containerInstanceName -eq "") { # If container name instance is empty use the name of the container image + ".instance"
     $containerInstanceName = $containerImage + ".instance"
@@ -71,27 +75,6 @@ $containerInstanceName = $containerInstanceName.replace(".", "-").toLower() # Re
 
 if($azureContainerRegistryPassword -eq $null -or $azureContainerRegistryPassword.Length -eq 0) {
     throw "Parameter `$azureContainerRegistryPassword is required"
-}
-
-function GetProjectName() {
-<#
-    .Synopsis
-        Returns the name of the .NET Core project name from the current folder
-#>
-    $project = gci -path . -rec -Include *.csproj # Assume there is only one csproj in the current directory
-    return $project.Name
-}
-
-function GetProjectVersion() {
-<#
-    .Synopsis
-        Returns the version of the .NET Core project from the current folder.
-        The default version 1.0.0 will not work. Set the version using the IDE.
-#>
-    $projectName = GetProjectName
-    [xml]$doc = get-content($projectName)
-    $version = $doc.Project.PropertyGroup.Version
-    return $version
 }
 
 function GetContainerInstanceUrlFromJsonMetadata($jsonString) {
@@ -176,7 +159,7 @@ switch($action) {
         Write-Host-Color "Start container with parameter: --environment-variables generationIndex=$containerInstanceIndex"
 
         # We pass specific parameter to the container instance via environment variable using the command --environment-variables
-        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables generationIndex=$containerInstanceIndex
+        $jsonString = az container create --resource-group $myResourceGroup --name $containerInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azureContainerRegistryPassword --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel --environment-variables containerInstanceIndex=$containerInstanceIndex
         write-host "Container MetaData`r`n$jsonString"
 
         # Retreive metadata about the container instance from the Json blob returned

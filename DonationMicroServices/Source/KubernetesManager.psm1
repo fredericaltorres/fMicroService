@@ -1,5 +1,6 @@
-﻿
-Import-Module ".\Util.psm1"
+﻿if($null -eq (Get-Module Util)) {
+    Import-Module "$PSScriptRoot\Util.psm1" -Force
+}
 
 # https://xainey.github.io/2016/powershell-classes-and-concepts/
 
