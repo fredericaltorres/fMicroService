@@ -1,5 +1,5 @@
 ﻿if($null -eq (Get-Module Util)) {
-    Import-Module "$PSScriptRoot\Util.psm1" -Force
+    Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
 }
 
 # https://xainey.github.io/2016/powershell-classes-and-concepts/
@@ -9,7 +9,7 @@ class KubernetesManager {
     [string] $ClusterName
     [bool] $TraceKubernetesCommand
 
-    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization, [bool]$traceKubernetesCommand) {
+    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$traceKubernetesCommand) {
    
         #$this.trace("Retreiving clusters information...", DarkYellow)
 
@@ -20,25 +20,20 @@ class KubernetesManager {
         
         $this.trace("Kubernetes cluster name: $($this.ClusterName), $($k.agentPoolProfiles.count) agents, os: $($k.agentPoolProfiles.osType)")
         $this.trace("                   version: $($k.kubernetesVersion), fqdn: $($k.fqdn)")
-        
 
         $this.trace("Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName")
 
-        if($firstInitialization) {
-            az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
-        }
+        az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
 
         # Switch to cluster
         #kubectl config use-context $this.ClusterName 
         $this.execCommand("kubectl config use-context ""$($this.ClusterName)""", $false)
 
-        if($firstInitialization) {
-
-            # Define the Azure Container Registry parameter as a docker secret
-            if(!$this.secretExists($acrName.ToLowerInvariant())) {
-                kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
-            }
+        # Define the Azure Container Registry parameter as a docker secret
+        if(!$this.secretExists($acrName.ToLowerInvariant())) {
+            kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
         }
+        
         $this.trace("")
     }
     
@@ -237,9 +232,9 @@ class KubernetesManager {
 
 
 # https://arcanecode.com/2016/04/05/accessing-a-powershell-class-defined-in-a-module-from-outside-a-module/
-function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization, [bool]$traceKubernetesCommand) {
+function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$traceKubernetesCommand) {
 
-    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $firstInitialization, $traceKubernetesCommand 
+    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $traceKubernetesCommand 
 }
 
 Export-ModuleMember -Function GetKubernetesManagerInstance

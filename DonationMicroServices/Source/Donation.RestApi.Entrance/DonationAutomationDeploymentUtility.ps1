@@ -7,7 +7,7 @@ param(
 )
 
 if($null -eq (Get-Module Util)) {
-    Import-Module "$PSScriptRoot\..\Util.psm1" -Force
+    Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\..\Util.psm1" -Force
 }
 
 $dockerFilName = ".\Source\Donation.RestApi.Entrance\Dockerfile"

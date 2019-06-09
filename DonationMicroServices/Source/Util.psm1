@@ -113,12 +113,17 @@ function GetProjectName() {
     .Synopsis
         Returns the name of the .NET Core project name from the current folder
 #>
-    $project = gci -path . -Include *.csproj # Assume there is only one csproj in the current directory
+    $project = gci -path . -rec -Include *.csproj # Assume there is only one csproj in the current directory
     if($project -eq $null) {
         throw "Cannot find C# project file in current folder"
     }
     else {
-        return $project.Name
+        if($project.GetType().Name -eq "FileInfo") { # it is an array, we loaded more than one .csproj            
+            return $project.Name
+        }
+        else {
+            throw "Found $($project.Length) C# project files in current folder"
+        }
     }
 }
 
@@ -142,6 +147,12 @@ function GetProjectVersion() {
     return $version
 }
 
+function getCurrentScriptPath() {
+
+    return [System.IO.Path]::GetDirectoryName($script:MyInvocation.MyCommand.Path)
+}
+
+Export-ModuleMember -Function getCurrentScriptPath
 Export-ModuleMember -Function GetAppNameFromProject
 Export-ModuleMember -Function GetProjectName
 Export-ModuleMember -Function GetProjectVersion

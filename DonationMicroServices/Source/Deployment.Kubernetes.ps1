@@ -34,25 +34,22 @@ param(
 #az acr show --name $acrName --resource-group $myResourceGroup --query "id" --output tsv
 #az acr show --name $acrName --query loginServer --output tsv
 
-Write-Host "(Deployment.Kubernetes)path to Util.psm1:$PSScriptRoot\Util.psm1"
-
 if($null -eq (Get-Module Util)) {
-    Import-Module "$PSScriptRoot\Util.psm1" -Force
+    Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
 }
-
-Import-Module "$PSScriptRoot\KubernetesManager.psm1" -Force
+Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\KubernetesManager.psm1" -Force
 
 function deployRelease([Hashtable]$context, [string]$message) {
 
     Write-HostColor $message DarkYellow
 
     # Deploy the web app $appName from docker image on 3 pods
-    $processedFile = processFile $context ".\Templates\Deployment.{Params}.yaml"
+    $processedFile = processFile $context "$(getCurrentScriptPath)\Templates\Deployment.{Params}.yaml" # TODO:Script
     $deploymentName = $kubernetesManager.createDeployment($processedFile)
     $kubernetesManager.waitForDeployment($deploymentName)
 
     # Deploy service/loadBalancer for the 3 pods
-    $processedFile = processFile $context ".\Templates\Service.{Params}.yaml"
+    $processedFile = processFile $context "$(getCurrentScriptPath)\Templates\Service.{Params}.yaml"
     $serviceName = $kubernetesManager.createService($processedFile)
     $kubernetesManager.waitForService($serviceName)
     
@@ -85,10 +82,10 @@ else {
 }
 
 Write-Host "Deployment.Kubernetes " -ForegroundColor Yellow -NoNewline
-Write-HostColor "-action:$action" DarkYellow
+Write-HostColor "-action:$action, appName:$appName - $appVersion" DarkYellow
 
 # For now pick the first cluster available
-$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "initialDeploymentToProd") $traceKubernetesCommand
+$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword $traceKubernetesCommand
 
 switch($action) {
 
