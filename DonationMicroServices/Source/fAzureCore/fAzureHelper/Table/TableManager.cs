@@ -75,8 +75,8 @@ namespace fAzureHelper
         public async Task<IList<T>> GetRecords<T>(string partition, string rowKey = null, WhereClauseExpression extra = null) where T : ITableEntity, new()
         {
             var items = new List<T>();
-            TableContinuationToken token = null;
-            CancellationToken ct = default(CancellationToken);
+            // TableContinuationToken token = null;
+            // CancellationToken ct = default(CancellationToken);
 
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partition));
             if(rowKey != null)

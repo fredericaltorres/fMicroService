@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using fDotNetCoreContainerHelper;
+using Newtonsoft.Json;
 using System;
 using System.JSON;
 using System.Text;
@@ -16,7 +17,7 @@ namespace Donation.Model
         /// received the donation first
         /// AKA in Kubernetes the pod host name that ran the donation.restapi.entrace web api
         /// </summary>
-        public string __ProcessingContainerID { get; set; }
+        public string __ProcessingMachineID { get; set; }
 
         [JsonIgnore]
         public DonationDataProcessState ProcessState = DonationDataProcessState.New;
@@ -24,7 +25,7 @@ namespace Donation.Model
         public DonationDTO()
         {
             this.UtcCreationDate = DateTime.UtcNow;
-            this.__ProcessingContainerID = Environment.MachineName;
+            this.__ProcessingMachineID = RuntimeHelper.GetMachineName();
         }
 
         public string ToJSON()

@@ -3,9 +3,11 @@ pushd
 cd ..
 cd ..
 docker build -t donation.restapi.entrance -f .\Source\Donation.RestApi.Entrance\Dockerfile .
-
-Pause
 popd
+
+write-host "Press space bar to push to Azure Container Registry or CTRL-BREAK"
+# Push container into azure container registry tagged with .NET Core project version
+..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage donation.restapi.entrance
 
 <#
 Run locally on container

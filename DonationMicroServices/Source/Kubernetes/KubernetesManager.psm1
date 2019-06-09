@@ -25,15 +25,29 @@ class KubernetesManager {
             az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
         }
 
-        kubectl config use-context $this.ClusterName # Switch to cluster
+        # Switch to cluster
+        #kubectl config use-context $this.ClusterName 
+        $this.execCommand("kubectl config use-context ""$($this.ClusterName)""", $false)
 
         if($firstInitialization) {
 
-            # Define the Azure Container Registry as a docker secret
-            kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+            # Define the Azure Container Registry parameter as a docker secret
+            if(!$this.secretExists($acrName.ToLowerInvariant())) {
+                kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+            }
         }
-
         $this.trace("")
+    }
+    
+    [bool] secretExists([string]$secretName) {
+
+        $jsonParsed = $this.getSecret([string]$secretName)
+        return $jsonParsed.kind -eq "Secret"
+    }
+
+    [object] getSecret([string]$secretName) {
+
+        return $this.execCommand("kubectl get secret ""$secretName"" --output json", $true)
     }
 
     [void] trace([string]$message, [string]$color) {
@@ -52,13 +66,14 @@ class KubernetesManager {
         $jsonParsed = $null
         if($record) {
 
-            $jsonParsed = JsonParse( kubectl create -f $fileName --record -o json )
+            #$jsonParsed = JsonParse( kubectl create -f $fileName --record -o json )
+            return $this.execCommand("kubectl create -f ""$fileName"" --record -o json", $true)
         }
         else {
 
-            $jsonParsed = JsonParse( kubectl create -f $fileName  -o json )
-        }    
-        return $jsonParsed
+            #$jsonParsed = JsonParse( kubectl create -f $fileName  -o json )
+            return $this.execCommand("kubectl create -f ""$fileName""  -o json", $true)
+        }
     }
 
     [object] apply([string]$fileName, [bool]$record) {

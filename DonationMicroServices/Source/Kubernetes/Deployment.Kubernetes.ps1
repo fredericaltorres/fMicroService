@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
 	[ValidateSet('initialDeploymentToProd', 'deleteDeployments', 'deployToStaging', 'switchStagingToProd', 'revertProdToPrevious', 'getInfo')]
-    [string]$action = "deleteDeployments", 
+    [string]$action = "initialDeploymentToProd", 
 
     [Parameter(Mandatory=$false)]
     [string]$appName = "donation-restapi-entrance",#  fdotnetcorewebapp   
@@ -31,7 +31,7 @@ param(
 Import-Module ".\Util.psm1" -Force
 Import-Module ".\KubernetesManager.psm1" -Force
 
-function deployRelease($context, $message) {
+function deployRelease([Hashtable]$context, [string]$message) {
 
     Write-HostColor $message DarkYellow
 
@@ -53,7 +53,8 @@ function deployRelease($context, $message) {
     $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
     $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
     Write-HostColor "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
-    urlMustReturnHtml "http://$loadBlancerIp`:$loadBlancerPort"
+    $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
+    urlMustReturnHtml $testUrl
 }
 
 function switchProductionToVersion($context, $message) {
@@ -73,7 +74,7 @@ else {
     Write-Host "" 
 }
 
-Write-Host "BlueGreenDeployment.Kubernetes " -ForegroundColor Yellow -NoNewline
+Write-Host "Donation Demo - Deployment.Kubernetes " -ForegroundColor Yellow -NoNewline
 Write-HostColor "-action:$action" DarkYellow
 
 # For now pick the first cluster available
@@ -82,9 +83,9 @@ $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azur
 
 switch($action) {
 
-    initialDeploymentToProd { 
+    initialDeploymentToProd {
 
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.1" }
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3"; TEST_URL = "/api/info" }
         deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
     }
 
@@ -102,13 +103,13 @@ switch($action) {
     }
 
     revertProdToPrevious {
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.1" }
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3" }
         switchProductionToVersion $context "`r`n*** Revert $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
     }
 
     getInfo {
 
-        $deploymentName = "$appName-deployment-1.0.1"
+        $deploymentName = "$appName-deployment-1.0.3"
         Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
 
         $serviceName = "$appName-service-prod"
@@ -125,13 +126,13 @@ switch($action) {
 
         Write-Host "Delete all deployments"
         
-        $deploymentName = "$appName-deployment-1.0.1"
+        $deploymentName = "$appName-deployment-1.0.3"
         $kubernetesManager.deleteDeployment($deploymentName)
 
         $serviceName = "$appName-service-prod"
         $kubernetesManager.deleteService($serviceName)
 
-        $deploymentName = "$appName-deployment-1.0.3"
+        $deploymentName = "$appName-deployment-1.0.113"
         $kubernetesManager.deleteDeployment($deploymentName)
 
         $serviceName = "$appName-service-staging"

@@ -9,6 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="DynamicSugarCore">
       <HintPath>..\fAzureCore\References\DynamicSugarCore\DynamicSugar.Lib\bin\Release\netcoreapp2.2\DynamicSugarCore.dll</HintPath>
     </Reference>

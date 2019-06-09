@@ -56,7 +56,6 @@ namespace fDotNetCoreContainerHelper
             return null;
         }
 
-
         public static Dictionary<string, object> GetContextInformationDictionary()
         {
             var d = new Dictionary<string, object>();
@@ -97,6 +96,18 @@ namespace fDotNetCoreContainerHelper
                     s.Append($"{e.Key}: {e.Value}").AppendLine();
                 return s.ToString();
             }
+        }
+
+        /// <summary>
+        /// Environment.MachineName is limited to 38 char and therefore in container mode we use Env:HOSTNAME
+        /// </summary>
+        /// <returns></returns>
+        public static string GetMachineName()
+        {
+            if(IsRunningContainerMode())
+                return Environment.GetEnvironmentVariable("HOSTNAME");
+            else
+                return Environment.MachineName;
         }
 
         public static bool IsRunningContainerMode()
