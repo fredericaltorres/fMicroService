@@ -6,14 +6,16 @@ Import-Module ".\Util.psm1"
 class KubernetesManager {
 
     [string] $ClusterName
+    [bool] $TraceKubernetesCommand
 
-    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization) {
+    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization, [bool]$traceKubernetesCommand) {
    
         #$this.trace("Retreiving clusters information...", DarkYellow)
 
         $ks = $this.getAllClusterInfo()
         $k = $ks[0]
         $this.ClusterName = $k.name
+        $this.TraceKubernetesCommand = $traceKubernetesCommand
         
         $this.trace("Kubernetes cluster name: $($this.ClusterName), $($k.agentPoolProfiles.count) agents, os: $($k.agentPoolProfiles.osType)")
         $this.trace("                   version: $($k.kubernetesVersion), fqdn: $($k.fqdn)")
@@ -92,7 +94,8 @@ class KubernetesManager {
 
     [object] getDeployment([string]$deploymentName) {
 
-        return JsonParse( kubectl get deployment $deploymentName --output json )
+        #return JsonParse( kubectl get deployment $deploymentName --output json )
+        return $this.execCommand("kubectl get deployment ""$deploymentName"" --output json", $true)
     }
 
     [void] waitForDeployment([string]$deploymentName) {
@@ -116,7 +119,8 @@ class KubernetesManager {
 
     [object] getService([string]$serviceName) {
 
-        return JsonParse( kubectl get service $serviceName --output json )
+        #return JsonParse( kubectl get service $serviceName --output json )
+        return $this.execCommand("kubectl get service ""$serviceName"" --output json", $true)
     }
 
     [void] waitForService([string]$serviceName) {
@@ -215,7 +219,9 @@ class KubernetesManager {
     }
 
     [object] execCommand([string]$cmd, [bool]$parseJson) {
-        $this.trace("K: $cmd", "DarkGray")
+        if($this.TraceKubernetesCommand) {
+            $this.trace("$cmd", "DarkGray")
+        }
         if($parseJson) {
             $json = Invoke-Expression $cmd
             $parsedJon = JsonParse($json)
@@ -230,9 +236,9 @@ class KubernetesManager {
 
 
 # https://arcanecode.com/2016/04/05/accessing-a-powershell-class-defined-in-a-module-from-outside-a-module/
-function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization) {
+function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization, [bool]$traceKubernetesCommand) {
 
-    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $firstInitialization
+    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $firstInitialization, $traceKubernetesCommand 
 }
 
 Export-ModuleMember -Function GetKubernetesManagerInstance

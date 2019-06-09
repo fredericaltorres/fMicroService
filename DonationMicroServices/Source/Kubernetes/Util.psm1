@@ -57,8 +57,26 @@ function urlMustReturnHtml($url) {
 
     Retry "Verifying url: $url returns html" {
 
-        $homePage = (Invoke-RestMethod -Uri $url).ToLowerInvariant()
-        if($homePage.Contains("<html")) {
+        $httpResponse = (Invoke-RestMethod -Uri $url) # This will throw an error if the url does not respond
+        $dataType = $httpResponse.GetType().Name
+        switch($dataType) {
+            String {
+                if($httpResponse.ToLowerInvariant().Contains("<html")) {
+                    return $true
+                }
+                else {
+                    $m = "Url:$url does not return html"
+                    Write-Error $m
+                    return $false
+                }
+            }
+            PSCustomObject {
+                # this is probably a JSON response that has been parsed by PowerShell
+                return $true 
+            }
+        }
+
+        if($homePage.ToLowerInvariant().Contains("<html")) {
             return $true
         }
         else {

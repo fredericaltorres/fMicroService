@@ -19,7 +19,7 @@ param(
 
 # Command when deploy using a Kubernetes cluster and deployment to pod2 + load balancer
 # http://40.70.134.67:80/api/info 
-# .\Scripts\post.ps1 -a post -count 1 -hostOrIp 104.209.238.43 -port 80 -secure $false
+# .\Scripts\post.ps1 -a post -count 1 -hostOrIp 104.208.142.35 -port 80 -secure $false
 
 # Command when web api is deployed in azure via ServicePlan + WebApp
 #https://donation-restapi-entrance.azurewebsites.net/api/Info

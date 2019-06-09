@@ -2,8 +2,8 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-	[ValidateSet('initialDeploymentToProd', 'deleteDeployments', 'deployToStaging', 'switchStagingToProd', 'revertProdToPrevious', 'getInfo')]
-    [string]$action = "initialDeploymentToProd", 
+	[ValidateSet('deployToProd', 'deleteDeployments', 'getInfo')]
+    [string]$action = "getInfo", 
 
     [Parameter(Mandatory=$false)]
     [string]$appName = "donation-restapi-entrance",#  fdotnetcorewebapp   
@@ -21,7 +21,10 @@ param(
 	
     [Parameter(Mandatory=$false)] 
 	[Alias('cls')]
-    [bool]$clearScreen = $true
+    [bool]$clearScreen = $true,
+
+    [Parameter(Mandatory=$false)] 
+    [bool]$traceKubernetesCommand = $false
 )
 
 # https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auth-aks
@@ -56,6 +59,7 @@ function deployRelease([Hashtable]$context, [string]$message) {
     $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
     urlMustReturnHtml $testUrl
 }
+ 
 
 function switchProductionToVersion($context, $message) {
 
@@ -78,33 +82,15 @@ Write-Host "Donation Demo - Deployment.Kubernetes " -ForegroundColor Yellow -NoN
 Write-HostColor "-action:$action" DarkYellow
 
 # For now pick the first cluster available
-$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "initialDeploymentToProd")
+$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "initialDeploymentToProd") $traceKubernetesCommand
 
 
 switch($action) {
 
-    initialDeploymentToProd {
+    deployToProd {
 
         $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3"; TEST_URL = "/api/info" }
         deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
-    }
-
-    deployToStaging {
-
-        $context = @{ ENVIRONMENT = "staging"; APP_VERSION = "1.0.4" }
-        deployRelease $context "`r`n*** Deploy version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
-    }
-
-    switchStagingToProd {
-
-        # Make the production service/lodBalancer from prod point to the pods of the new version
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.4" }
-        switchProductionToVersion $context "`r`n*** Switch $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
-    }
-
-    revertProdToPrevious {
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3" }
-        switchProductionToVersion $context "`r`n*** Revert $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
     }
 
     getInfo {
@@ -113,12 +99,6 @@ switch($action) {
         Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
 
         $serviceName = "$appName-service-prod"
-        Write-HostColor $kubernetesManager.getForServiceInformation($serviceName)
-
-        $deploymentName = "$appName-deployment-1.0.4"
-        Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
-
-        $serviceName = "$appName-service-staging"
         Write-HostColor $kubernetesManager.getForServiceInformation($serviceName)
     }
 
@@ -130,12 +110,6 @@ switch($action) {
         $kubernetesManager.deleteDeployment($deploymentName)
 
         $serviceName = "$appName-service-prod"
-        $kubernetesManager.deleteService($serviceName)
-
-        $deploymentName = "$appName-deployment-1.0.113"
-        $kubernetesManager.deleteDeployment($deploymentName)
-
-        $serviceName = "$appName-service-staging"
         $kubernetesManager.deleteService($serviceName)
     }
 }
