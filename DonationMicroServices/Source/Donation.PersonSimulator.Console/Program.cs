@@ -8,6 +8,7 @@ using fAzureHelper;
 using fDotNetCoreContainerHelper;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,6 +46,16 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
+        const string DONATION_POST_URL = "http://52.167.58.190:80/api/Donation";
+        static async Task<string> PostDonation(DonationDTO donation)
+        {
+            var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(DONATION_POST_URL), donation.ToJSON());
+            if (succeeded)
+                return location;
+            else
+                return null;
+        }
+
         static async Task Publish(int generationIndex)
         {
             var donationJsonFile = GetGeneratedDonationDataFile(generationIndex);
@@ -58,16 +69,22 @@ namespace Donation.PersonSimulator.Console
 
             saNotification.Notify($"Start sending Donation from file {donationJsonFile}");
 
-            // Settings come frm the appsettings.json file
-            var donationQueue = new DonationQueue( RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey") );
+            var groupCount = 10;
+            var perfTracker = new PerformanceTracker();
 
-            foreach (var donation in donations)
+            while (donations.Count > 0)
             {
-                await donationQueue.EnqueueAsync(donation);
-                if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
+                System.Console.Write(".");
+                var donation10 = donations.Take(groupCount);
+                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d)));
+                donations.RemoveRange(0, groupCount);
+                perfTracker.TrackNewItem(groupCount);
+
+                if (perfTracker.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                 {
-                    await saNotification.NotifyAsync("donationQueue", "pushed to queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);                    
-                }                
+                    System.Console.WriteLine("");
+                    await saNotification.NotifyAsync("Donation", "Post to Entrace endpoint", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
+                }
             }
 
             await saNotification.NotifyAsync(DS.List(

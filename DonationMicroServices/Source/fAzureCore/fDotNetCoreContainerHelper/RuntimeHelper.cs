@@ -6,11 +6,27 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace fDotNetCoreContainerHelper
 {
+    public class HttpHelper
+    {
+        public async Task<(bool succeeded, string location, HttpResponseMessage httpResponseMessage)> PostJson(Uri uri, string json)
+        {
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage hrp = await client.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"));                
+                return (hrp.IsSuccessStatusCode, hrp.Headers.Location.ToString(), hrp);
+            }
+        }
+    }
+
     public class RuntimeHelper
     {
+        public static readonly HttpHelper HttpHelper = new HttpHelper();
+
         private static string ListToString(List<string> list)
         {
             var s = new StringBuilder();

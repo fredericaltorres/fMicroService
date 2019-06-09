@@ -31,7 +31,9 @@ namespace Donation.Queue.Lib
         {
             get
             {
-                return ItemCount / this.Duration;
+                var d = this.Duration;
+                if (d == 0) return 0;
+                return ItemCount / d;
             }
         }
 
