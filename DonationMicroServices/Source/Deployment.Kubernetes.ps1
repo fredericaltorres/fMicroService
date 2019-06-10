@@ -11,6 +11,12 @@ param(
     [Parameter(Mandatory=$false)]
     [string]$appVersion = "1.0.4", #  1.0.3
 
+    [Parameter(Mandatory=$false)]
+    [string]$appUrl = "/api/info",
+
+    [Parameter(Mandatory=$false)] 
+    [bool]$deployService = $true,
+
      # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
     [string]$acrName = "FredContainerRegistry", # Consider that the Azure Container `FredContainerRegistry` already exist
@@ -40,39 +46,36 @@ if($null -eq (Get-Module Util)) {
 }
 Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\KubernetesManager.psm1" -Force
 
-function deployRelease([Hashtable]$context, [string]$message) {
+function getKubernetesYamlFile($postFixFileName) {
+    return "$(getCurrentScriptPath)\Templates\$appName--$postFixFileName" 
+}
+function deployRelease([Hashtable]$context, [string]$message, [bool]$deployService) {
 
     Write-HostColor $message DarkYellow
 
-    # Deploy the web app $appName from docker image on 3 pods
-    $processedFile = processFile $context "$(getCurrentScriptPath)\Templates\Deployment.{Params}.yaml" # TODO:Script
+    # Deploy the web app $appName from docker image on x pods
+    $processedFile = processFile $context (getKubernetesYamlFile("Deployment.{Params}.yaml")) # TODO:Script
     $deploymentName = $kubernetesManager.createDeployment($processedFile)
     $kubernetesManager.waitForDeployment($deploymentName)
 
-    # Deploy service/loadBalancer for the 3 pods
-    $processedFile = processFile $context "$(getCurrentScriptPath)\Templates\Service.{Params}.yaml"
-    $serviceName = $kubernetesManager.createService($processedFile)
-    $kubernetesManager.waitForService($serviceName)
-    
-    $waitTime = 30
-    Write-HostColor "Waiting $waitTime seconds before testing the web site home url"
-    Start-Sleep -s $waitTime # I noticed that it takes some time for the machine to be ready
+    if($deployService) {
 
-    # Retreive ip + port and verify home url
-    $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
-    $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
-    Write-HostColor "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
-    $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
-    urlMustReturnHtml $testUrl
-}
+        # Deploy service/loadBalancer for the x pods    
+        $processedFile = processFile $context (getKubernetesYamlFile("Service.{Params}.yaml"))
+        $serviceName = $kubernetesManager.createService($processedFile)
+        $kubernetesManager.waitForService($serviceName)
+        
+        $waitTime = 30
+        Write-HostColor "Waiting $waitTime seconds before testing the web site home url"
+        Start-Sleep -s $waitTime # I noticed that it takes some time for the machine to be ready
 
-function switchProductionToVersion($context, $message) {
-
-    Write-HostColor $message DarkYellow
-
-    $processedFile = processFile $context ".\Templates\Service.{Params}.yaml"
-    $serviceName = $kubernetesManager.applyService($processedFile)
-    $kubernetesManager.waitForService($serviceName)
+        # Retreive ip + port and verify home url
+        $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
+        $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
+        Write-HostColor "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
+        $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
+        urlMustReturnHtml $testUrl
+    }
 }
 
 if($clearScreen) {
@@ -83,7 +86,7 @@ else {
 }
 
 Write-Host "Deployment.Kubernetes " -ForegroundColor Yellow -NoNewline
-Write-HostColor "-action:$action, appName:$appName - $appVersion" DarkYellow
+Write-HostColor "action:$action, appName:$appName - $appVersion" DarkYellow
 
 # For now pick the first cluster available
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "deployToProd") $traceKubernetesCommand
@@ -92,10 +95,9 @@ switch($action) {
 
     deployToProd {
 
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; TEST_URL = "/api/info" }
-        deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; APP_NAME = $appName; TEST_URL = $appUrl }
+        deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***" $deployService
     }
-
     getInfo {
         $deploymentName = "$appName-deployment-$appVersion"
         Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
@@ -103,22 +105,23 @@ switch($action) {
         $serviceName = "$appName-service-prod"
         Write-HostColor $kubernetesManager.getForServiceInformation($serviceName)
     }
-
     deleteDeployments {
 
-        Write-Host "Delete all deployments"
+        Write-Host "Delete deployment"
         $deploymentName = "$appName-deployment-$appVersion"
         $kubernetesManager.deleteDeployment($deploymentName)
 
-        $serviceName = "$appName-service-prod"
-        $kubernetesManager.deleteService($serviceName)
+        if($deployService) {
+
+            $serviceName = "$appName-service-prod"
+            $kubernetesManager.deleteService($serviceName)
+        }
     }
     getLogs {
 
         Write-Host "getLogs"
         $podNames = $kubernetesManager.getPodNames()
         $kubernetesManager.writeLogs($podNames)
-
     }
 }
 

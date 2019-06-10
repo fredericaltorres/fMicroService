@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:  
+  name: donation-personsimulator-console-deployment-${APP_VERSION}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: donation-personsimulator-console
+        version: ${APP_VERSION}
+    spec:
+      containers:
+      - name: donation-personsimulator-console-pod
+        image: fredcontainerregistry.azurecr.io/donation.personsimulator.console:${APP_VERSION}
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: fredcontainerregistry

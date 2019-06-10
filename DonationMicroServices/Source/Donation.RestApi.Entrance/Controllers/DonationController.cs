@@ -48,7 +48,8 @@ namespace Donation.RestApi.Entrance.Controllers
             }
             else
             {
-                return BadRequest();
+                Console.WriteLine(errors.ToString());
+                return BadRequest(errors.ToString());
             }
         }
     }

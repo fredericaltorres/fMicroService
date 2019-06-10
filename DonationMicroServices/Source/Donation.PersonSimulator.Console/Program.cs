@@ -75,7 +75,7 @@ namespace Donation.PersonSimulator.Console
 
             saNotification.Notify($"Start sending Donation from file {donationJsonFile}");
 
-            var groupCount = 1;
+            var groupCount = 20;
             var perfTracker = new PerformanceTracker();
 
             while (donations.Count > 0)

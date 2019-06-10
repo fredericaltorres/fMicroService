@@ -14,7 +14,7 @@ $dockerFilName = ".\Source\Donation.RestApi.Entrance\Dockerfile"
 $appName = GetAppNameFromProject
 $containerImageName = $appName
 $appVersion = GetProjectVersion
-$scriptTitle = "Donation Automation Deployment Utility -- RestApi.Entrance"
+$scriptTitle = "Donation Automation Deployment Utility -- PersonSimulator.Console"
 $traceKubernetesCommand = $true
 
 Write-HostColor "$scriptTitle" Yellow
@@ -43,13 +43,13 @@ switch($action) {
         pushContainerImageToRegistry
     }
     deploy { # Deploy rest api service on 2 pod and loadBalancer
-        ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $true
+        ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $false
     }
     deleteDeployment { # Delete deployment of rest api service and loadBalancer
-        ..\Deployment.Kubernetes.ps1 -a deleteDeployments -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $true
+        ..\Deployment.Kubernetes.ps1 -a deleteDeployments -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand  -deployService $false
     }
     getLogs { 
-        ..\Deployment.Kubernetes.ps1 -a getLogs -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $true
+        ..\Deployment.Kubernetes.ps1 -a getLogs -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand  -deployService $false
     }
 }
 Write-HostColor "$scriptTitle done" Yellow
