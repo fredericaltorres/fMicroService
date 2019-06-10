@@ -216,8 +216,15 @@ class KubernetesManager {
         }
         if($parseJson) {
             $json = Invoke-Expression $cmd
-            $parsedJon = JsonParse($json)
-            return $parsedJon
+            # $this.trace("$cmd -> $json", "DarkGray")
+            if($json -eq $null) {
+                write-error "The command failed: $cmd"
+                return $null
+            }
+            else {
+                $parsedJon = JsonParse($json)
+                return $parsedJon
+            }
         }        
         else {
             $r = Invoke-Expression $cmd

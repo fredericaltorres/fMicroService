@@ -16,7 +16,9 @@ spec:
         ports:
         - containerPort: 80
         env:
-          - name: donationEndPointIP
-            value: 104.43.208.137
+        - name: donationEndPointIP
+          value: "104.43.208.137"
+        - name: containerInstanceIndex
+          value: "0"
       imagePullSecrets:
       - name: fredcontainerregistry
