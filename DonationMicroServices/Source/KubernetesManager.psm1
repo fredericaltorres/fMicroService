@@ -9,7 +9,7 @@ class KubernetesManager {
     [string] $ClusterName
     [bool] $TraceKubernetesCommand
 
-    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$traceKubernetesCommand) {
+    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool] $firstInitialization, [bool]$traceKubernetesCommand) {
    
         #$this.trace("Retreiving clusters information...", DarkYellow)
 
@@ -23,15 +23,18 @@ class KubernetesManager {
 
         $this.trace("Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName")
 
-        az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
+        if($firstInitialization) {
 
-        # Switch to cluster
-        #kubectl config use-context $this.ClusterName 
-        $this.execCommand("kubectl config use-context ""$($this.ClusterName)""", $false)
+            az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
 
-        # Define the Azure Container Registry parameter as a docker secret
-        if(!$this.secretExists($acrName.ToLowerInvariant())) {
-            kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+            # Switch to cluster
+            #kubectl config use-context $this.ClusterName 
+            $this.execCommand("kubectl config use-context ""$($this.ClusterName)""", $false)
+
+            # Define the Azure Container Registry parameter as a docker secret
+            if(!$this.secretExists($acrName.ToLowerInvariant())) {
+                kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+            }
         }
         
         $this.trace("")
@@ -115,7 +118,6 @@ class KubernetesManager {
 
     [object] getService([string]$serviceName) {
 
-        #return JsonParse( kubectl get service $serviceName --output json )
         return $this.execCommand("kubectl get service ""$serviceName"" --output json", $true)
     }
 
@@ -224,17 +226,41 @@ class KubernetesManager {
             return $parsedJon
         }        
         else {
-            Invoke-Expression $cmd
-            return $true
+            $r = Invoke-Expression $cmd
+            return $r
+        }
+    }
+
+    [Collections.Generic.List[String]] getPodNames() {
+
+        $list = New-Object Collections.Generic.List[String]
+        
+        $jsonParsed = $this.execCommand("kubectl get pods -o json", $true)
+        foreach($item in $jsonParsed.items) {
+            $list.Add($item.metadata.name)    
+        }
+        return $list
+    }
+
+    writeLogs([Collections.Generic.List[String]] $podNames) {
+        
+        foreach($podName in $podNames) {
+
+            $contents = $this.execCommand("kubectl logs ""$podName"" ", $false)
+            Write-HostColor "Log Pod:$podName" Yellow
+            foreach($content in $contents) {
+                Write-HostColor "$content" DarkYellow
+            }
+            Write-HostColor "" DarkYellow
         }
     }
 }
 
 
 # https://arcanecode.com/2016/04/05/accessing-a-powershell-class-defined-in-a-module-from-outside-a-module/
-function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$traceKubernetesCommand) {
+function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool] $firstInitialization, [bool]$traceKubernetesCommand) {
 
-    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $traceKubernetesCommand 
+    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $firstInitialization, $traceKubernetesCommand 
 }
 
 Export-ModuleMember -Function GetKubernetesManagerInstance

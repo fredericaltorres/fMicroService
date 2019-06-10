@@ -2,8 +2,8 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-    [ValidateSet('build', 'push','buildAndPush','deployDonationRestApiEntrace','deleteDonationRestApiEntrace')]
-    [string]$action = "deleteDonationRestApiEntrace"
+    [ValidateSet('build', 'push','Nothing','deployDonationRestApiEntrace','deleteDonationRestApiEntrace','getLogs')]
+    [string]$action = "getLogs"
 )
 
 if($null -eq (Get-Module Util)) {
@@ -20,32 +20,25 @@ $traceKubernetesCommand = $true
 Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
-function buildContainer() {
-    Write-Host "First go up to folder before building container" -ForegroundColor DarkGray
-    pushd
-    cd ..\..
-    docker build -t "$containerImageName"-f "$dockerFilName" .
-    popd
-}
-function pushContainerToRegistry() {
-    ..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage "$containerImageName" -cls $false
-}
 switch($action) {
     build { # Build the continer
-        buildContainer
+        Write-Host "First go up to folder before building container" -ForegroundColor DarkGray
+        pushd
+        cd ..\..
+        docker build -t "$containerImageName"-f "$dockerFilName" .
+        popd
     }
     push { # Push container to Azure Container Registry
-        pushContainerToRegistry
-    }
-    buildAndPush {
-        buildContainer
-        pushContainerToRegistry
+        ..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage "$containerImageName" -cls $false
     }
     deployDonationRestApiEntrace { # Deploy rest api service on 2 pod and loadBalancer
         ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand
     }
     deleteDonationRestApiEntrace { # Delete deployment of rest api service and loadBalancer
         ..\Deployment.Kubernetes.ps1 -a deleteDeployments -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand
+    }
+    getLogs { 
+        ..\Deployment.Kubernetes.ps1 -a getLogs -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand
     }
 }
 Write-HostColor "$scriptTitle done" Yellow

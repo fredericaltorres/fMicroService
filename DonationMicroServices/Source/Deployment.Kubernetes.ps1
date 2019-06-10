@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-	[ValidateSet('deployToProd', 'deleteDeployments', 'getInfo')]
+	[ValidateSet('deployToProd', 'deleteDeployments', 'getInfo', 'getLogs')]
     [string]$action = "getInfo", 
 
     [Parameter(Mandatory=$false)] # The appName is used as the kubernete deployment/service name and cannot contains '.'
@@ -86,7 +86,7 @@ Write-Host "Deployment.Kubernetes " -ForegroundColor Yellow -NoNewline
 Write-HostColor "-action:$action, appName:$appName - $appVersion" DarkYellow
 
 # For now pick the first cluster available
-$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword $traceKubernetesCommand
+$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "deployToProd") $traceKubernetesCommand
 
 switch($action) {
 
@@ -112,6 +112,13 @@ switch($action) {
 
         $serviceName = "$appName-service-prod"
         $kubernetesManager.deleteService($serviceName)
+    }
+    getLogs {
+
+        Write-Host "getLogs"
+        $podNames = $kubernetesManager.getPodNames()
+        $kubernetesManager.writeLogs($podNames)
+
     }
 }
 
