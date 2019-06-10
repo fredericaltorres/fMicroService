@@ -15,5 +15,8 @@ spec:
         image: fredcontainerregistry.azurecr.io/donation.personsimulator.console:${APP_VERSION}
         ports:
         - containerPort: 80
+        env:
+          - name: donationEndPointIP
+            value: 104.43.208.137
       imagePullSecrets:
       - name: fredcontainerregistry

@@ -10,11 +10,12 @@ if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\..\Util.psm1" -Force
 }
 
-$dockerFilName = ".\Source\Donation.RestApi.Entrance\Dockerfile"
+
 $appName = GetAppNameFromProject
+$dockerFilName = ".\Source\$appName\Dockerfile"
 $containerImageName = $appName
 $appVersion = GetProjectVersion
-$scriptTitle = "Donation Automation Deployment Utility -- PersonSimulator.Console"
+$scriptTitle = "Donation Automation Deployment Utility -- $appName"
 $traceKubernetesCommand = $true
 
 Write-HostColor "$scriptTitle" Yellow

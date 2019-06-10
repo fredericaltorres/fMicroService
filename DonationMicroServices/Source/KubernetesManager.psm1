@@ -11,8 +11,7 @@ class KubernetesManager {
 
     KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool] $firstInitialization, [bool]$traceKubernetesCommand) {
    
-        #$this.trace("Retreiving clusters information...", DarkYellow)
-
+        $this.trace("Retreiving clusters information...")
         $ks = $this.getAllClusterInfo()
         $k = $ks[0]
         $this.ClusterName = $k.name
@@ -56,7 +55,6 @@ class KubernetesManager {
         Write-HostColor $message $color
     }
 
-
     [void] trace([string]$message) {
 
         Write-HostColor $message Cyan
@@ -66,13 +64,9 @@ class KubernetesManager {
 
         $jsonParsed = $null
         if($record) {
-
-            #$jsonParsed = JsonParse( kubectl create -f $fileName --record -o json )
             return $this.execCommand("kubectl create -f ""$fileName"" --record -o json", $true)
         }
         else {
-
-            #$jsonParsed = JsonParse( kubectl create -f $fileName  -o json )
             return $this.execCommand("kubectl create -f ""$fileName""  -o json", $true)
         }
     }

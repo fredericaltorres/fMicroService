@@ -29,6 +29,8 @@ namespace Donation.PersonSimulator.Console
             var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
             var donationEndPointIP = RuntimeHelper.GetCommandLineParameterString("-donationEndPointIP", args);
 
+            System.Console.WriteLine($"containerInstanceIndex:{containerInstanceIndex}, donationEndPointIP:{donationEndPointIP}");
+
             Publish(containerInstanceIndex, donationEndPointIP).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");
             while (true)
