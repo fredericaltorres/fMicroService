@@ -28,9 +28,7 @@ namespace Donation.PersonSimulator.Console
 
             var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
             var donationEndPointIP = RuntimeHelper.GetCommandLineParameterString("-donationEndPointIP", args);
-
             System.Console.WriteLine($"containerInstanceIndex:{containerInstanceIndex}, donationEndPointIP:{donationEndPointIP}");
-
             Publish(containerInstanceIndex, donationEndPointIP).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");
             while (true)
@@ -56,12 +54,19 @@ namespace Donation.PersonSimulator.Console
 
         static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP)
         {
-            donation.__ProcessingMachineID = null;
-            var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP)), donation.ToJSON());
-            if (succeeded)
-                return location;
-            else
-                return null;
+            try
+            {
+                donation.__ProcessingMachineID = null;
+                // TODO: Handle failure better, send notification
+                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP)), donation.ToJSON());
+                if (succeeded)
+                    return location;
+            }
+            catch(System.Exception ex)
+            {
+                System.Console.WriteLine($"PostDonation failed, ex:{ex}");
+            }
+            return null;
         }
 
         static async Task Publish(int generationIndex, string donationEndPointIP)

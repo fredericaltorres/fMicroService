@@ -35,7 +35,7 @@ namespace Donation.RestApi.Entrance.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostDonationDTO(DonationDTO donationDTO)
         {
-            Console.WriteLine($"New donation posted {donationDTO.GetSummary()}");
+            // Console.WriteLine($"New donation posted {donationDTO.GetSummary()}");
 
             donationDTO.__ProcessingMachineID = RuntimeHelper.GetMachineName();
             var donationsService = new DonationsService(donationDTO);

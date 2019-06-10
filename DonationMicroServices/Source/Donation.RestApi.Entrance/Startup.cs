@@ -37,7 +37,7 @@ namespace Donation.RestApi.Entrance
             services.AddScoped<IDonationQueueEndqueue, DonationQueue>();
             services.AddTransient<IDonationQueueEndqueue, DonationQueue>((ctx) =>
             {
-                Console.WriteLine($"Instantiate a new donationQueue");
+                // Console.WriteLine($"Instantiate a new donationQueue");
                 var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
                 return donationQueue;
             });
