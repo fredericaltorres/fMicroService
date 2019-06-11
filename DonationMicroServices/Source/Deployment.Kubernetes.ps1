@@ -89,13 +89,13 @@ function deleteRelease([Hashtable]$context, [string]$message, [bool]$deployServi
 
     # Deploy the web app $appName from docker image on x pods
     $processedFile = processFile $context (getKubernetesYamlFile("Deployment.{Params}.yaml")) # TODO:Script
-    $deploymentName = $kubernetesManager.delete($processedFile)
+    $kubernetesManager.delete($processedFile)
 
     if($deployService) {
 
         # Deploy service/loadBalancer for the x pods    
         $processedFile = processFile $context (getKubernetesYamlFile("Service.{Params}.yaml"))
-        $serviceName = $kubernetesManager.delete($processedFile)        
+        $kubernetesManager.delete($processedFile)        
     }
 }
 

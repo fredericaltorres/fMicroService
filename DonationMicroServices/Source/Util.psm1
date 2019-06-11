@@ -1,4 +1,6 @@
-﻿function Write-HostColor([string]$message, $color = "Cyan") {
+﻿write-host "LAST UTIL.PSM1"
+
+function Write-HostColor([string]$message, $color = "Cyan") {
 
     Write-Host $message -ForegroundColor $color
 }

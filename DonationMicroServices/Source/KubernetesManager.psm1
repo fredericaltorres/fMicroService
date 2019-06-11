@@ -73,8 +73,8 @@ class KubernetesManager {
 
     [object] delete([string]$fileName) {
         
-        $jsonParsed = $this.execCommand("kubectl delete -f ""$fileName"" -o json", $true)
-        return $jsonParsed
+        $r = $this.execCommand("kubectl delete -f ""$fileName"" ", $false)
+        return $r        
     }
 
     [object] apply([string]$fileName, [bool]$record) {
