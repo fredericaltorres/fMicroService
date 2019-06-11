@@ -55,6 +55,10 @@ function deployRelease([Hashtable]$context, [string]$message, [bool]$deployServi
 
     # Deploy the web app $appName from docker image on x pods
     $processedFile = processFile $context (getKubernetesYamlFile("Deployment.{Params}.yaml")) # TODO:Script
+
+    write-host "ABOUT TO DEPLOY"
+    pause
+
     $deploymentName = $kubernetesManager.createDeployment($processedFile)
     $kubernetesManager.waitForDeployment($deploymentName)
 
@@ -78,6 +82,23 @@ function deployRelease([Hashtable]$context, [string]$message, [bool]$deployServi
     }
 }
 
+
+function deleteRelease([Hashtable]$context, [string]$message, [bool]$deployService) {
+
+    Write-HostColor $message DarkYellow
+
+    # Deploy the web app $appName from docker image on x pods
+    $processedFile = processFile $context (getKubernetesYamlFile("Deployment.{Params}.yaml")) # TODO:Script
+    $deploymentName = $kubernetesManager.delete($processedFile)
+
+    if($deployService) {
+
+        # Deploy service/loadBalancer for the x pods    
+        $processedFile = processFile $context (getKubernetesYamlFile("Service.{Params}.yaml"))
+        $serviceName = $kubernetesManager.delete($processedFile)        
+    }
+}
+
 if($clearScreen) {
     cls
 }
@@ -91,11 +112,11 @@ Write-HostColor "action:$action, appName:$appName - $appVersion" DarkYellow
 # For now pick the first cluster available
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "deployToProd") $traceKubernetesCommand
 
+$context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; APP_NAME = $appName; TEST_URL = $appUrl }
+
 switch($action) {
 
     deployToProd {
-
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; APP_NAME = $appName; TEST_URL = $appUrl }
         deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***" $deployService
     }
     getInfo {
@@ -107,6 +128,8 @@ switch($action) {
     }
     deleteDeployments {
 
+        deleteRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***" $deployService
+        <#
         Write-Host "Delete deployment"
         $deploymentName = "$appName-deployment-$appVersion"
         $kubernetesManager.deleteDeployment($deploymentName)
@@ -115,7 +138,7 @@ switch($action) {
 
             $serviceName = "$appName-service-prod"
             $kubernetesManager.deleteService($serviceName)
-        }
+        }#>
     }
     getLogs {
 

@@ -99,10 +99,13 @@ function processFile($context, $fileName, $newFileName = $null) {
         $newFileName = [System.IO.Path]::Combine($env:TEMP, [System.IO.Path]::GetFileName($fileName))
     }
 
+write-host "_UNDERSCORE"
+
     foreach($key in $context.keys) {
 
         $value = $context[$key]
         $content = $content.Replace("`${$key}", $value)
+        $content = $content.Replace("`${$($key)_UNDERSCORE}", $value.replace(".", "-"))
     }
     $content | Set-Content $newFileName | Out-Null
     return $newFileName

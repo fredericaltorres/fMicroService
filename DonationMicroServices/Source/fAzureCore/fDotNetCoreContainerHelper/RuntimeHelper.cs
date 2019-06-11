@@ -131,6 +131,27 @@ namespace fDotNetCoreContainerHelper
                 return Environment.MachineName;
         }
 
+        /// <summary>
+        /// When deploying a Kubernetes statefulsets each pod machine name end
+        /// with a -0, -1, -2. This allows to run the same app with one different
+        /// initial parameter. This function retreive this index
+        /// </summary>
+        /// <returns></returns>
+        public static int GetKubernetesStatefullSetMachineNamePodIndex(int defaultValue = 0)
+        {
+            if (IsRunningContainerMode())
+            {
+                var machineName = GetMachineName();
+                var x = machineName.LastIndexOf('-');
+                var stringValue = machineName.Substring(x + 1);
+                int value = 0;
+                if (int.TryParse(stringValue, out value))
+                    return value;
+                throw new ApplicationException($"Cannot extract Kuberneste statefulsets pod machine name index from:{machineName}");
+            }
+            else return defaultValue;
+        }
+
         public static bool IsRunningContainerMode()
         {
             return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";

@@ -71,6 +71,12 @@ class KubernetesManager {
         }
     }
 
+    [object] delete([string]$fileName) {
+        
+        $jsonParsed = $this.execCommand("kubectl delete -f ""$fileName"" -o json", $true)
+        return $jsonParsed
+    }
+
     [object] apply([string]$fileName, [bool]$record) {
 
         $jsonParsed = $null
@@ -191,18 +197,16 @@ class KubernetesManager {
         return $jsonParsed.metadata.name
     }
 
-    [void] deleteService([string]$fileName) {
+    [void] deleteService([string]$name) {
 
-        $this.trace("Delete Service $fileName")
-        #kubectl delete service $fileName
-        $this.execCommand("kubectl delete service $fileName", $false)
+        $this.trace("Delete Service $name")
+        $this.execCommand("kubectl delete service $name", $false)
     }
 
-    [void] deleteDeployment([string]$fileName) {
+    [void] deleteDeployment([string]$name) {
 
-        $this.trace("Delete Deployment $fileName")
-        #kubectl delete deployment $fileName
-        $this.execCommand("kubectl delete deployment $fileName", $false)
+        $this.trace("Delete Deployment $name")
+        $this.execCommand("kubectl delete deployment $name", $false)
     }
 
     [object] getAllClusterInfo() {
@@ -211,6 +215,7 @@ class KubernetesManager {
     }
 
     [object] execCommand([string]$cmd, [bool]$parseJson) {
+
         if($this.TraceKubernetesCommand) {
             $this.trace("$cmd", "DarkGray")
         }

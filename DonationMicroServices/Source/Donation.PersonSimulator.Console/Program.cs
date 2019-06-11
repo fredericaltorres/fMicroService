@@ -26,8 +26,12 @@ namespace Donation.PersonSimulator.Console
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
 
-            var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
+            //var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
+            // The console app is provisioned as Kubernetes statefulsets, therefore is pod machine name end
+            // with -0, -1, -2 index, that we extract
+            var containerInstanceIndex = RuntimeHelper.GetKubernetesStatefullSetMachineNamePodIndex();
             var donationEndPointIP = RuntimeHelper.GetCommandLineParameterString("-donationEndPointIP", args);
+
             System.Console.WriteLine($"containerInstanceIndex:{containerInstanceIndex}, donationEndPointIP:{donationEndPointIP}");
             Publish(containerInstanceIndex, donationEndPointIP).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");
