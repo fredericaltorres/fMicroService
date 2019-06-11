@@ -11,7 +11,7 @@ This folder contains experimentation with the Azure Service Bus Pub / Sub featur
 
 ## Donation MicroServices
 This folder contains the source code of a back end and client simulator to
-1. Send 500 000 donnation transactions
+1. Send 500 000 donation transactions
 1. Process the transactions
 
 in progress
