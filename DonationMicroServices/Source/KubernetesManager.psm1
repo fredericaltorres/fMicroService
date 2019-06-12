@@ -62,9 +62,15 @@ class KubernetesManager {
    
     [object] create([string]$fileName, [bool]$record) {
 
+        $content = Get-Content $fileName # < Return an array of string
+        $containMultiYamlFile = $false
+        if($content.Contains("---")) {
+            $containMultiYamlFile = $true
+            Write-host "The file contains multi yaml files - $fileName"
+        }
         $jsonParsed = $null
         if($record) {
-            return $this.execCommand("kubectl create -f ""$fileName"" --record -o json", $true)
+            return $this.execCommand("kubectl create -f ""$fileName"" --record -o json", $true, $containMultiYamlFile)
         }
         else {
             return $this.execCommand("kubectl create -f ""$fileName""  -o json", $true)
@@ -214,19 +220,78 @@ class KubernetesManager {
         return JsonParse ( az aks list -o json )
     }
 
+
+    [string] ConvertKubernetesInvalidJsonIntoAnArrayOfObject($kubectlJson) {
+        <#
+            .Synopsis
+                kubectl.exe create yaml-file, may return invalid json if the yaml file contains multiple
+                resource. The answer is multiple json object in a row. This function convert the invalid json blob
+                into an array of object which is a valid json string
+        #>
+        $json = $kubectlJson # [System.IO.File]::ReadAllText("C:\DVT\a.json")
+        $jsonBlocks = New-Object Collections.Generic.List[String]
+        $JSON_END_TAG = "`r`n}"
+        while($true) {
+            $blockEndIndex = $json.indexOf($JSON_END_TAG)
+            if($blockEndIndex -eq -1) {
+                break
+            }
+            else {
+                $newJson = $json.Substring(0, $blockEndIndex + $JSON_END_TAG.Length)
+                $jsonBlocks.Add($newJson)
+                $json = $json.Substring($blockEndIndex + $JSON_END_TAG.Length).Trim()
+                if($json -eq ""){
+                    break
+                }        
+            }
+        }
+        if($jsonBlocks.Count -eq 1) {
+            return $jsonBlocks[0]
+        }
+        else {
+            return "[$($jsonBlocks -join ",")]" # turn the json object into an array of object
+        }
+    }
+
+    
+    [void] printKubectlOutpuResourceInfo($j) {
+
+        Write-Host "Kind:$($j.kind), Name:$($j.metadata.name), Status:$($j.status)"
+    }
+
+    [void] printKubectlOutpuResourceInfos($jsonParsed) {
+
+        if($jsonParsed.GetType().Name -eq "Object[]") {
+            foreach($j in $jsonParsed) {
+                PrintKubectlOutpuResourceInfo $j
+            }
+        }
+        else {
+            PrintKubectlOutpuResourceInfo $jsonParsed
+        }
+    }   
+
     [object] execCommand([string]$cmd, [bool]$parseJson) {
+
+        return $this.execCommand($cmd, $parseJson, $false)
+    }
+
+    [object] execCommand([string]$cmd, [bool]$parseJson, [bool]$multiYamlFile = $false) {
 
         if($this.TraceKubernetesCommand) {
             $this.trace("$cmd", "DarkGray")
         }
         if($parseJson) {
-            $json = Invoke-Expression $cmd
-            # $this.trace("$cmd -> $json", "DarkGray")
+            $json = Invoke-Expression $cmd # Return an array of string
             if($json -eq $null) {
                 write-error "The command failed: $cmd"
                 return $null
             }
             else {
+                if($multiYamlFile) {
+                    $json = $json -join "`r`n" # convert the array of string into a string
+                    $json = $this.ConvertKubernetesInvalidJsonIntoAnArrayOfObject($json)
+                }
                 $parsedJon = JsonParse($json)
                 return $parsedJon
             }

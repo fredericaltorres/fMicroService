@@ -36,7 +36,7 @@ spec:
           name: psim-${APP_VERSION_UNDERSCORE} # was personsimulator-${APP_VERSION_UNDERSCORE}web
         env:
         - name: donationEndPointIP
-          value: "13.68.178.26"
+          value: "104.209.239.82"
       imagePullSecrets:
       - name: fredcontainerregistry
 ##################

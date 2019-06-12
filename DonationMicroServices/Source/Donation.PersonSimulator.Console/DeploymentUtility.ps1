@@ -3,12 +3,13 @@ param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
     [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs')]
-    [string]$action = "deleteDeployment"
+    [string]$action = "deploy"
 )
 
 if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\..\Util.psm1" -Force
 }
+
 
 $appName = GetAppNameFromProject
 $dockerFilName = ".\Source\$appName\Dockerfile"

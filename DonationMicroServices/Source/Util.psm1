@@ -1,5 +1,4 @@
-﻿write-host "LAST UTIL.PSM1"
-
+﻿
 function Write-HostColor([string]$message, $color = "Cyan") {
 
     Write-Host $message -ForegroundColor $color
@@ -100,8 +99,6 @@ function processFile($context, $fileName, $newFileName = $null) {
 
         $newFileName = [System.IO.Path]::Combine($env:TEMP, [System.IO.Path]::GetFileName($fileName))
     }
-
-write-host "_UNDERSCORE"
 
     foreach($key in $context.keys) {
 

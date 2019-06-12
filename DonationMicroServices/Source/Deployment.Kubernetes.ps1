@@ -42,12 +42,14 @@ param(
 $appName = $appName.Replace(".", "-")
 
 if($null -eq (Get-Module Util)) {
+
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
 }
 Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\KubernetesManager.psm1" -Force
 
 function getKubernetesYamlFile($postFixFileName) {
-    return "$(getCurrentScriptPath)\Templates\$appName--$postFixFileName" 
+
+    return "$(getCurrentScriptPath)\Kubernetes.Templates\$appName--$postFixFileName" 
 }
 function deployRelease([Hashtable]$context, [string]$message, [bool]$deployService) {
 
@@ -55,12 +57,9 @@ function deployRelease([Hashtable]$context, [string]$message, [bool]$deployServi
 
     # Deploy the web app $appName from docker image on x pods
     $processedFile = processFile $context (getKubernetesYamlFile("Deployment.{Params}.yaml")) # TODO:Script
-
-    write-host "ABOUT TO DEPLOY"
-    pause
-
-    $deploymentName = $kubernetesManager.createDeployment($processedFile)
-    $kubernetesManager.waitForDeployment($deploymentName)
+    $json = $kubernetesManager.create($processedFile, $true)
+    $kubernetesManager.printKubectlOutpuResourceInfos($json)
+    #$kubernetesManager.waitForDeployment($deploymentName)
 
     if($deployService) {
 
@@ -113,6 +112,7 @@ Write-HostColor "action:$action, appName:$appName - $appVersion" DarkYellow
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "deployToProd") $traceKubernetesCommand
 
 $context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; APP_NAME = $appName; TEST_URL = $appUrl }
+
 
 switch($action) {
 

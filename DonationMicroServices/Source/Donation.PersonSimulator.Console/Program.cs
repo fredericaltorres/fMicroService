@@ -79,7 +79,7 @@ namespace Donation.PersonSimulator.Console
             if (File.Exists(donationJsonFile))
                 System.Console.WriteLine($"JSON File {donationJsonFile} ");
             else
-                throw new InvalidDataException($"Cannot find file {donationJsonFile}");
+                throw new InvalidDataException($"Cannot find file {Path.GetFileName(donationJsonFile)}");
 
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
