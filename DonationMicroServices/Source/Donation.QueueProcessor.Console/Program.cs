@@ -7,6 +7,7 @@ using DynamicSugar;
 using fAzureHelper;
 using fDotNetCoreContainerHelper;
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -40,50 +41,66 @@ namespace Donation.PersonSimulator.Console
             {
                 // Settings come frm the appsettings.json file
                 var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                var donationTableManager = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationTableManager = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));    
+                var donationAggregateTableManager = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationAggregationService = new DonationsAggregationService();
+                const int queuBatchSize = 10;
 
                 while (true)
                 {
-                    (DonationDTO donationDTO, string messageId) = await donationQueue.DequeueAsync();
-                    if (donationDTO == null)
+                    var donations = await donationQueue.DequeueAsync(queuBatchSize);
+                    if (donations.Count == 0)
                     {
                         Thread.Sleep(2 * 1000);
                     }
                     else
                     {
-                        var donationsService = new DonationsService(donationDTO);
-                        var validationErrors = donationsService.ValidateData();
+                        var donationsValidationService = new DonationsValidationService(donations);
+                        var validationErrors = donationsValidationService.ValidateData();
                         if (validationErrors.Count == 0)
                         {
-                            var donationTableRecord = new DonationAzureTableRecord();
-                            var convertionErrors = donationTableRecord.Set(donationDTO);
-                            if(convertionErrors.Count == 0)
+                            donationAggregationService.Add(donations);
+                            donationAggregationService.AggregateData();
+
+                            // TODO: Can we write to the azure table in batch and delete from queue in batch
+                            foreach (var donation in donations)
                             {
-                                var insertErrors = await donationTableManager.InsertAsync(donationTableRecord);
-                                if(insertErrors.Count == 0)
+                                var donationTableRecord = new DonationAzureTableRecord();
+                                var convertionErrors = donationTableRecord.Set(donation);
+                                if (convertionErrors.Count == 0)
                                 {
-                                    await donationQueue.DeleteAsync(messageId);
+                                    donationTableRecord.ProcessState = DonationDataProcessState.ApprovedForSubmission;
+                                    var insertErrors = await donationTableManager.InsertAsync(donationTableRecord);
+                                    if (insertErrors.Count == 0)
+                                    {
+                                        await donationQueue.DeleteAsync(donation.__QueueMessageID);
+                                    }
+                                    else
+                                    {
+                                        saNotification.Notify(insertErrors.ToString(), SystemActivityType.Error);
+                                        donationQueue.Release(donation.__QueueMessageID); // Release and will retry the messager after x time the message will go to dead letter queue
+                                    }
                                 }
                                 else
                                 {
-                                    saNotification.Notify(insertErrors.ToString(), SystemActivityType.Error);
-                                    donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
+                                    saNotification.Notify(convertionErrors.ToString(), SystemActivityType.Error);
+                                    donationQueue.Release(donation.__QueueMessageID); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
-                            }
-                            else
-                            {
-                                saNotification.Notify(convertionErrors.ToString(), SystemActivityType.Error);
-                                donationQueue.Release(messageId); // Release and will retry the messager after x time the message will go to dead letter queue
                             }
                         }
                         else
                         {
-                            saNotification.Notify(validationErrors.ToString(), SystemActivityType.Error);
-                            saNotification.Notify($"Error validating JSON Donation:{donationDTO.ToJSON()}", SystemActivityType.Error);
+                            saNotification.Notify($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}", SystemActivityType.Error);
+                            donationQueue.Release(donations.Select(d => d.__QueueMessageID)); // Release and will retry the messager after x time the message will go to dead letter queue                            
                         }
                         if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                         {
                             await saNotification.NotifyAsync("donationQueue", "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
+
+                            await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donations.Count));
+                            await saNotification.NotifyAsync($"AggregateComputation:{donationAggregationService.CountryAggregateData.ToJSON()}", SystemActivityType.DashboardInfo);
+                            donationAggregationService.Clear();
+
                             saNotification.Notify(donationQueue.GetTrackedInformation("Donations processed from queue"));
                         }
                     }

@@ -27,6 +27,9 @@ namespace Donation.Table.Lib
 
         public DonationDataProcessState ProcessState { get; set; } = DonationDataProcessState.New;
 
+        public string __ProcessingMachineID { get; set; }
+        public string __QueueMessageID { get; set; }
+
         public Errors Set(DonationDTO fromDonationDTO)
         {
             var r = new Errors();

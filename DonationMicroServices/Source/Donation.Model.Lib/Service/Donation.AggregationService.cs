@@ -1,34 +1,51 @@
 ﻿using Donation.Model;
-using System;
-using System.Collections.Generic;
-using System.JSON;
 
 namespace Donation.Service
 {
-    public class DonationsAggregate
-    {
-
-    }
 
     public class DonationsAggregationService
     {
         DonationDTOs _donations;
+        public DonationsAggregate CountryAggregateData = new DonationsAggregate();
 
-        public DonationsAggregationService(DonationDTO donation)
+        public void Clear()
         {
-            _donations = new DonationDTOs() { donation };
+            this.CountryAggregateData.Clear();
+            Reset();
+        }
+
+        private void Reset()
+        {
+            this._donations = new DonationDTOs();
+        }
+
+        public DonationsAggregationService()
+        {
+            this.Reset();
         }
 
         public DonationsAggregationService(DonationDTOs donations)
         {
             _donations = donations;
         }
+
+        public void Add(DonationDTOs donations)
+        {
+            this._donations.AddRange(donations);
+        }
+       
+        private void Aggregate(DonationDTO donation)
+        {
+            CountryAggregateData.Aggregate(donation.Country, donation.GetAmount());
+        }
         
         public Errors AggregateData()
         {
             var totalErrors = new Errors();
+            this.CountryAggregateData.Clear();
             foreach (var donation in _donations)
             {
+                this.Aggregate(donation);
             }
 
             return totalErrors;

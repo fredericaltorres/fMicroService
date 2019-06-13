@@ -19,6 +19,11 @@ namespace Donation.Model
         /// </summary>
         public string __ProcessingMachineID { get; set; }
 
+        /// <summary>
+        /// The message id when the donation is read from a queue
+        /// </summary>
+        public string __QueueMessageID { get; set; }
+
         [JsonIgnore]
         public DonationDataProcessState ProcessState = DonationDataProcessState.New;
 

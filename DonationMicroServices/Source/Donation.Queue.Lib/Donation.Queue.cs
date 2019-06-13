@@ -1,5 +1,7 @@
 ﻿using Donation.Model;
 using fAzureHelper;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Donation.Queue.Lib
@@ -30,18 +32,23 @@ namespace Donation.Queue.Lib
             return await _queueManager.ApproximateMessageCountAsync();
         }
 
-        public async Task<(DonationDTO donationDTO, string messageId)> DequeueAsync()
+        public async Task<DonationDTOs> DequeueAsync(int count)
         {
-            var m = await _queueManager.DequeueAsync();
-            if(m == null)
+            var messages = await _queueManager.DequeueAsync(count);
+            if(messages.Count == 0)
             {
-                return (null, null);
+                return new DonationDTOs();
             }
             else
             {
-                base.TrackNewItem();
-                var donationDTO = DonationDTO.FromJSON(m.AsString);
-                return (donationDTO, m.Id);
+                base.TrackNewItem(count);
+                return new DonationDTOs( messages.Select(
+                    m => {
+                        var d = DonationDTO.FromJSON(m.AsString);
+                        d.__QueueMessageID = m.Id;
+                        return d;
+                    }
+                ));
             }
         }
 
@@ -51,6 +58,9 @@ namespace Donation.Queue.Lib
         }
 
         public void Release(string id)
+        {
+        }
+        public void Release(IEnumerable<string> id)
         {
         }
     }

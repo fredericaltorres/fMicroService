@@ -66,15 +66,29 @@ namespace fAzureHelper
             return this._queue.ApproximateMessageCount.HasValue ? this._queue.ApproximateMessageCount.Value : -1;
         }
 
-        public async Task<QueueMessage> DequeueAsync()
+        public async Task<List<QueueMessage>> DequeueAsync(int count)
         {
-            CloudQueueMessage m = await this._queue.GetMessageAsync();
-            if (m == null)
-                return null;
+            var waitTimeForAllMessageToArraiveInQueue = new TimeSpan(0, 0, 0, 0, 500);
+            IEnumerable<CloudQueueMessage> messages = await this._queue.GetMessagesAsync(
+                count, 
+                waitTimeForAllMessageToArraiveInQueue, 
+                new QueueRequestOptions {
+                         
+                }, 
+                new Microsoft.WindowsAzure.Storage.OperationContext {
+                     
+                }
+            );
 
-            this._inProcessMessages.Add(m);
+            var l = new List<QueueMessage>();
 
-            return BuildQueueMessage(m);
+            foreach(var m in messages)
+            {
+                this._inProcessMessages.Add(m);
+                l.Add(BuildQueueMessage(m));
+            }
+
+            return l;
         }
 
         public async Task DeleteAsync(string id)
@@ -91,9 +105,10 @@ namespace fAzureHelper
             var l = new List<QueueMessage>();
             while(await ApproximateMessageCountAsync() > 0)
             {
-                var m = await DequeueAsync();
-                l.Add(m);
-                await this.DeleteAsync(m.Id);
+                var messages = await DequeueAsync(1);
+                l.AddRange(messages);
+                foreach(var m in messages)
+                    await this.DeleteAsync(m.Id);
             }
 
             return l;

@@ -18,5 +18,16 @@ namespace Donation.Model.Lib.UnitTests
             var donations = DonationDTOs.FromJsonFile(DonationJsonFile);
             Assert.AreEqual(donations.Count, 100);
         }
+        [TestMethod]
+        public void GetAmout_ShouldReturnExpectedValue()
+        {
+            Assert.AreEqual(1.2m, new DonationDTO() { Amount = "$1.2" }.GetAmount());
+        }
+        [TestMethod]
+        public void GetAmout_ShouldReturnInvalidValueErrorCode()
+        {
+            Assert.AreEqual(-1, new DonationDTO() { Amount = "1.2" }.GetAmount());
+            Assert.AreEqual(-1, new DonationDTO() { Amount = "$bad" }.GetAmount());
+        }
     }
 }

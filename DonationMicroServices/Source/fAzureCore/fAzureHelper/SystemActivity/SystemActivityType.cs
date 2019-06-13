@@ -2,10 +2,11 @@
 {
     public enum SystemActivityType
     {
-        CrititalError = 1,
-        Error = 2,
-        Warning = 3,
-        Info = 4,
-        PerformanceInfo
+        CrititalError = 1 << 0,
+        Error = 1 << 2,
+        Warning = 1 << 3,
+        Info = 1 << 4,
+        PerformanceInfo = 1 << 5,
+        DashboardInfo = 1 << 6,
     }
 }

@@ -5,9 +5,10 @@ namespace Donation.Model
     [Flags]
     public enum DonationDataProcessState 
     {
-        New = 0x1,
-        DataValidated = 0x2,
-        ApprovedForSubmission = 0x4,
-        NotApprovedForSubmission = 0x8,
+        New = 1 << 0,
+        DataValidated = 1 << 1,
+        ApprovedForSubmission = 1 << 2,
+        NotApprovedForSubmission = 1 << 3,
+        Submitted = 1 << 4,
     };
 }

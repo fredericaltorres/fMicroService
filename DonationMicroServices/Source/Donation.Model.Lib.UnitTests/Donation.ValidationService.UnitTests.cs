@@ -6,14 +6,14 @@ using System.IO;
 namespace Donation.Model.Lib.UnitTests
 {
     [TestClass]
-    public class Donations_Service_UnitTests
+    public class Donations_ValidationService_UnitTests
     {
         [TestMethod]
         public void SumDonations()
         {
             var expectedSumAmount = 5191.75M;
             var donations = DonationDTOs.FromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
-            var donationsService = new DonationsService(donations);
+            var donationsService = new DonationsValidationService(donations);
             Assert.AreEqual(expectedSumAmount, donationsService.Sum());
         }
 
@@ -24,7 +24,7 @@ namespace Donation.Model.Lib.UnitTests
             var donations = new DonationDTOs() {
                 new DonationDTO() { Amount = "99.11" }
             };
-            var donationsService = new DonationsService(donations);
+            var donationsService = new DonationsValidationService(donations);
             Assert.AreEqual(expectedSumAmount, donationsService.Sum());
         }
 
@@ -35,7 +35,7 @@ namespace Donation.Model.Lib.UnitTests
             var donations = new DonationDTOs() {
                 new DonationDTO() { Amount = "$BAD" }
             };
-            var donationsService = new DonationsService(donations);
+            var donationsService = new DonationsValidationService(donations);
             Assert.AreEqual(expectedSumAmount, donationsService.Sum());
         }
 
@@ -43,7 +43,7 @@ namespace Donation.Model.Lib.UnitTests
         public void ValidateDonationSmallSampleData()
         {
             var donations = DonationDTOs.FromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
-            var donationsService = new DonationsService(donations);
+            var donationsService = new DonationsValidationService(donations);
             var errors = donationsService.ValidateData();
             Assert.AreEqual(0, errors.Count);
         }
@@ -56,7 +56,7 @@ namespace Donation.Model.Lib.UnitTests
             foreach(var jsonFile in jsonFiles)
             {
                 var donations = DonationDTOs.FromJsonFile(jsonFile);
-                var donationsService = new DonationsService(donations);
+                var donationsService = new DonationsValidationService(donations);
                 var errors = donationsService.ValidateData();
                 Assert.AreEqual(0, errors.Count);
             }
@@ -72,7 +72,7 @@ namespace Donation.Model.Lib.UnitTests
                     Amount = "$123"
                 }
             };
-            var donationsService = new DonationsService(donations);
+            var donationsService = new DonationsValidationService(donations);
             var errors = donationsService.ValidateData();
             Assert.AreEqual(expectedValidationErrorCount, errors.Count);
             Assert.IsTrue(donations[0].ProcessState == DonationDataProcessState.NotApprovedForSubmission);
