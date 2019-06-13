@@ -43,5 +43,18 @@ namespace Donation.Model
         {
             return JsonObject.Deserialize<DonationDTO>(json);            
         }
+
+        public decimal GetAmount()
+        {
+            if (this.Amount.StartsWith("$"))
+            {
+                Decimal amount;
+                if (Decimal.TryParse(this.Amount.Replace("$", ""), out amount))
+                {
+                    return amount;
+                }
+            }
+            return -1;
+        }
     }
 }

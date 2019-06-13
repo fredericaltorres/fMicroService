@@ -5,16 +5,16 @@ using System.JSON;
 
 namespace Donation.Service
 {
-    public class DonationsService
+    public class DonationsValidationService
     {
         DonationDTOs _donations;
 
-        public DonationsService(DonationDTO donation)
+        public DonationsValidationService(DonationDTO donation)
         {
             _donations = new DonationDTOs() { donation };
         }
 
-        public DonationsService(DonationDTOs donations)
+        public DonationsValidationService(DonationDTOs donations)
         {
             _donations = donations;
         }
