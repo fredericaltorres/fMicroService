@@ -37,7 +37,7 @@ namespace Donation.PersonSimulator.Console
         static async Task ProcessDonationQueue()
         {
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
-            saNotification.Notify($"Donation.QueueProcessor.Console Running");
+            await saNotification.NotifyAsync($"Donation.QueueProcessor.Console Running");
             try
             {
                 // Settings come frm the appsettings.json file
@@ -80,37 +80,38 @@ namespace Donation.PersonSimulator.Console
                                     }
                                     else
                                     {
-                                        saNotification.Notify(insertErrors.ToString(), SystemActivityType.Error);
+                                        await saNotification.NotifyAsync(insertErrors.ToString(), SystemActivityType.Error);
                                         donationQueue.Release(donation);
                                     }
                                 }
                                 else
                                 {
-                                    saNotification.Notify(convertionErrors.ToString(), SystemActivityType.Error);
+                                    await saNotification.NotifyAsync(convertionErrors.ToString(), SystemActivityType.Error);
                                     donationQueue.Release(donation); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
                             }
                         }
                         else
                         {
-                            saNotification.Notify($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}", SystemActivityType.Error);
+                            await saNotification.NotifyAsync($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}", SystemActivityType.Error);
                             donationQueue.Release(donations); // Release and will retry the messager after x time the message will go to dead letter queue                            
                         }
                         if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                         {
-                            await saNotification.NotifyAsync("donationQueue", "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
+                            await saNotification.NotifyPerformanceInfoAsync("donationQueue", "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
                             await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));
-                            await saNotification.NotifyAsync($"AggregateComputation:{donationAggregationService.CountryAggregateData.ToJSON()}", SystemActivityType.DashboardInfo, sendToConsole: false);
+                            await saNotification.NotifySetDashboardInfoInfoAsync("CountryAggregate", donationAggregationService.CountryAggregateData.ToJSON(), donationAggregationService.AggregatedRecordCount);
+                                
                             donationAggregationService.Clear();
 
-                            saNotification.Notify(donationQueue.GetTrackedInformation("Donations processed from queue"));
+                            await saNotification.NotifyAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
                         }
                     }
                 }
             }
             catch(System.Exception ex)
             {
-                saNotification.Notify($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", SystemActivityType.Error );
+                await saNotification.NotifyAsync($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", SystemActivityType.Error );
             }
         }
     }

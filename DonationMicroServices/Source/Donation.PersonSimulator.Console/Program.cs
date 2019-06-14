@@ -84,7 +84,7 @@ namespace Donation.PersonSimulator.Console
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 
-            saNotification.Notify($"Start sending Donation from file {donationJsonFile}");
+            await saNotification.NotifyAsync($"Start sending Donation from file {donationJsonFile}");
 
             var groupCount = 10;
             var perfTracker = new PerformanceTracker();
@@ -107,7 +107,7 @@ namespace Donation.PersonSimulator.Console
                 if (perfTracker.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                 {
                     System.Console.WriteLine("");
-                    await saNotification.NotifyAsync("Donation", "Posted to Entrance endpoint", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
+                    await saNotification.NotifyPerformanceInfoAsync("Donation", "Posted to Entrance endpoint", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
                 }
             }
 

@@ -47,9 +47,18 @@ namespace fAzureHelper
             _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Publish, serviceBusConnectionString, SystemActivityTopic);
         }
 
-        public async Task<string> NotifyAsync(string resource, string action, int durationSecond, int itemProcessedPerSeconds, int totalItemProcessed, bool sendToConsole = true)
+        public async Task<string> NotifyPerformanceInfoAsync(string resource, string action, int durationSecond, int itemProcessedPerSeconds, int totalItemProcessed, bool sendToConsole = true)
         {
-            var sa = new SystemActivity(resource, action, durationSecond, itemProcessedPerSeconds, totalItemProcessed);
+            var sa = new SystemActivity().SetPerformanceInfo(resource, action, durationSecond, itemProcessedPerSeconds, totalItemProcessed);            
+            await NotifyAsync(sa);
+            if (sendToConsole)
+                System.Console.WriteLine($"[san:{sa.Type}]{sa.Message}");
+            return sa.Message;
+        }
+
+        public async Task<string> NotifySetDashboardInfoInfoAsync(string dashboardResource, string jsonData, int totalItemProcessed, bool sendToConsole = true)
+        {
+            var sa = new SystemActivity().SetDashboardInfo(dashboardResource, jsonData, totalItemProcessed);
             await NotifyAsync(sa);
             if (sendToConsole)
                 System.Console.WriteLine($"[san:{sa.Type}]{sa.Message}");
@@ -62,14 +71,11 @@ namespace fAzureHelper
                 await this.NotifyAsync(message, type, sendToConsole);
         }
 
-        public string Notify(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
-        {
-            // Wait for the call so the notification are logged in the right order
-            return NotifyAsync(message, type, sendToConsole).GetAwaiter().GetResult();
-        }
-
-
-
+        //public string Notify(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
+        //{
+        //    // Wait for the call so the notification are logged in the right order
+        //    return NotifyAsync(message, type, sendToConsole).GetAwaiter().GetResult();
+        //}
 
         public async Task<string> NotifyAsync(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
         {

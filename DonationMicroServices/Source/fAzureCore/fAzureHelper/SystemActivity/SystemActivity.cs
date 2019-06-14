@@ -4,14 +4,6 @@ using System.Reflection;
 
 namespace fAzureHelper
 {
-    public class SystemActivityPerformanceInformation
-    {
-        public string Resource { get; set; }
-        public string Action { get; set; }
-        public int DurationSecond { get; set; }
-        public int ItemProcessedPerSecond { get; set; }
-        public int TotalItemProcessed { get; set; }
-    }
     public class SystemActivity : SystemActivityEnvironment
     {
         public string AppName { get; set; }
@@ -22,6 +14,7 @@ namespace fAzureHelper
         /// Null by default
         /// </summary>
         public SystemActivityPerformanceInformation PerformanceInformation { get; set; }
+        public SystemActivityDashboardInformation DashboardInformation { get; set; }
 
         /// <summary>
         /// Needed for deserialization
@@ -38,18 +31,31 @@ namespace fAzureHelper
             this.Type = type;
             this.Message = message;
         }
+                
+        public SystemActivity SetDashboardInfo(string dashboardResource, string jsonData, int totalItemProcessed)
+        {
+            this.Message = $"Dashboard:{dashboardResource}, totalItemProcessed:{totalItemProcessed}";
+            this.Type = SystemActivityType.DashboardInfo;
+            this.DashboardInformation = new SystemActivityDashboardInformation() {
+                TotalItemProcessed = totalItemProcessed,
+                JsonData = jsonData
+            };
+            return this;
+        }
 
-        public SystemActivity(string resource, string action, int durationSecond, int itemProcessedPerSeconds, int totalItemProcessed) : this("", SystemActivityType.PerformanceInfo)
+        public SystemActivity SetPerformanceInfo(string resource, string action, int durationSecond, int itemProcessedPerSeconds, int totalItemProcessed) 
         {
             this.Message = $"{totalItemProcessed} {resource}s {action} in {durationSecond} seconds. {itemProcessedPerSeconds} / S";
+            this.Type = SystemActivityType.PerformanceInfo;
             this.PerformanceInformation = new SystemActivityPerformanceInformation()
             {
                 Resource = resource,
                 Action = action,
                 DurationSecond = durationSecond,
                 ItemProcessedPerSecond = itemProcessedPerSeconds,
-                TotalItemProcessed = totalItemProcessed
+                TotalItemProcessed = totalItemProcessed,
             };
+            return this;
         }
 
         public string ToJSON()
