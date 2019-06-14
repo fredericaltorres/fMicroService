@@ -20,9 +20,8 @@ namespace Donation.Model.Lib.UnitTests
 
         [TestMethod]
         public void Aggregate()
-        {
-            const string jsonExpectedDataFileName = @".\TestFiles\Donation.Aggregate.0.json";
-            var expectedAggregatedData = DonationsAggregate.FromJSON(File.ReadAllText(jsonExpectedDataFileName));
+        {            
+            var expectedAggregatedData = DonationsAggregate.FromJSON(File.ReadAllText(@".\TestFiles\Donation.Aggregate.0.json"));
             var donations = DonationDTOs.FromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
             var donationsAggregationService = new DonationsAggregationService(donations);
 
@@ -34,18 +33,20 @@ namespace Donation.Model.Lib.UnitTests
         [TestMethod]
         public void Aggregate_MultipleTime()
         {
-            const string jsonExpectedDataFileName = @".\TestFiles\Donation.Aggregate.0.json";
-            var expectedAggregatedData = DonationsAggregate.FromJSON(File.ReadAllText(jsonExpectedDataFileName));
+            var expectedAggregatedData = DonationsAggregate.FromJSON(File.ReadAllText(@".\TestFiles\Donation.Aggregate.0.json"));
             var donations = DonationDTOs.FromJsonFile(Donations_Model_UnitTests.DonationJsonFile);
             var donationsAggregationService = new DonationsAggregationService(donations);
 
             donationsAggregationService.AggregateData();
             AssertAggregateDataForJson0DataFile(expectedAggregatedData, donationsAggregationService);
 
-            // Add a second set of data
+            // Add a second set of the same data
             donationsAggregationService.Add(donations);
             donationsAggregationService.AggregateData();
-            Assert.AreEqual(5191.75m, donationsAggregationService.CountryAggregateData.GetTotal());
+             
+            var expectedDoubleAggregatedData = DonationsAggregate.FromJSON(File.ReadAllText(@".\TestFiles\Donation.Aggregate.0.doubled.json"));
+            Assert.AreEqual(5191.75m * 2m, donationsAggregationService.CountryAggregateData.GetTotal());
+            Assert.AreEqual(expectedDoubleAggregatedData.ToJSON(), donationsAggregationService.CountryAggregateData.ToJSON());
         }
 
         private static void AssertAggregateDataForJson0DataFile(DonationsAggregate expectedAggregatedData, DonationsAggregationService donationsAggregationService)

@@ -5,7 +5,7 @@ namespace Donation.Service
 
     public class DonationsAggregationService
     {
-        DonationDTOs _donations;
+        DonationDTOs _donations = new DonationDTOs();
         public DonationsAggregate CountryAggregateData = new DonationsAggregate();
 
         public void Clear()
@@ -26,7 +26,7 @@ namespace Donation.Service
 
         public DonationsAggregationService(DonationDTOs donations)
         {
-            _donations = donations;
+            this._donations.AddRange(donations);
         }
 
         public void Add(DonationDTOs donations)
