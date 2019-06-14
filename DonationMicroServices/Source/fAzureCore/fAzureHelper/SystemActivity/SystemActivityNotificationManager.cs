@@ -18,9 +18,10 @@ namespace fAzureHelper
 
         private AzurePubSubManager _pubSub;
 
-        public SystemActivityNotificationManager(string serviceBusConnectionString, string subscriptionName)
+        public SystemActivityNotificationManager(string serviceBusConnectionString, string subscriptionName, bool purgeSubscription)
         {
-            _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, serviceBusConnectionString, SystemActivityTopic, subscriptionName);
+            _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, serviceBusConnectionString, SystemActivityTopic, subscriptionName, purgeSubscription: purgeSubscription);
+
             _pubSub.Subscribe(InternalOnMessageReceived);
         }
 

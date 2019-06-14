@@ -50,13 +50,13 @@ namespace AzureServiceBusSubHelper
                     this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
                 }
 
-                _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
-
-                if(purgeSubscription)
+                if (purgeSubscription)
                 {
                     this.DeleteSubscription().GetAwaiter().GetResult();
                     this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
                 }
+
+                _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
             }
         }
 
@@ -86,7 +86,7 @@ namespace AzureServiceBusSubHelper
         private async Task DeleteSubscription()
         {
             var managementClient = new ManagementClient(_connectionString);
-            if (!await managementClient.SubscriptionExistsAsync(_topic, this._subscriptionName))
+            if (await managementClient.SubscriptionExistsAsync(_topic, this._subscriptionName))
             {
                 await managementClient.DeleteSubscriptionAsync(_topic, this._subscriptionName);
             }
