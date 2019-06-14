@@ -22,7 +22,7 @@ Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
 function buildContainer() {
-    Write-Host "First go up to folder before building container" -ForegroundColor DarkGray
+    Write-Host "First go up 2 folders before building container" -ForegroundColor DarkGray
     pushd
     cd ..\..
     docker build -t "$containerImageName"-f "$dockerFilName" .

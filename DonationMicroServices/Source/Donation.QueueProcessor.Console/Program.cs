@@ -99,9 +99,8 @@ namespace Donation.PersonSimulator.Console
                         if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                         {
                             await saNotification.NotifyAsync("donationQueue", "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
-
-                            await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donations.Count));
-                            await saNotification.NotifyAsync($"AggregateComputation:{donationAggregationService.CountryAggregateData.ToJSON()}", SystemActivityType.DashboardInfo);
+                            await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));
+                            await saNotification.NotifyAsync($"AggregateComputation:{donationAggregationService.CountryAggregateData.ToJSON()}", SystemActivityType.DashboardInfo, sendToConsole: false);
                             donationAggregationService.Clear();
 
                             saNotification.Notify(donationQueue.GetTrackedInformation("Donations processed from queue"));

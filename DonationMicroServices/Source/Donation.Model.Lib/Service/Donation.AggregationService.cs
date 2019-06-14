@@ -7,6 +7,7 @@ namespace Donation.Service
     {
         DonationDTOs _donations = new DonationDTOs();
         public DonationsAggregate CountryAggregateData = new DonationsAggregate();
+        public int AggregatedRecordCount;
 
         public void Clear()
         {
@@ -37,6 +38,7 @@ namespace Donation.Service
         private void Aggregate(DonationDTO donation)
         {
             CountryAggregateData.Aggregate(donation.Country, donation.GetAmount());
+            this.AggregatedRecordCount += 1;
         }
         
         public Errors AggregateData()

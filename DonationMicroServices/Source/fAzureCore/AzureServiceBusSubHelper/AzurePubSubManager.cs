@@ -8,11 +8,6 @@ using System.Threading.Tasks;
 
 namespace AzureServiceBusSubHelper
 {
-    public enum AzurePubSubManagerType
-    {
-        Publish,
-        Subcribe
-    };
     public class AzurePubSubManager
     {
         const int MAX_SUBSCRIPTION_NAME_LENGTH = 50;
@@ -35,7 +30,7 @@ namespace AzureServiceBusSubHelper
 
         public delegate bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber);
 
-        public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null, bool mustCreateSubscription = true)
+        public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null, bool mustCreateSubscription = true, bool purgeSubscription = false)
         {
             _type = type;
             _connectionString = connectionString;
@@ -54,8 +49,29 @@ namespace AzureServiceBusSubHelper
                 {
                     this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
                 }
+
                 _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
+
+                if(purgeSubscription)
+                {
+                    this.DeleteSubscription().GetAwaiter().GetResult();
+                    this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
+                }
             }
+        }
+
+        public void Purge()
+        {
+            //var receiveMode = _subscriptionClient.ReceiveMode;
+            //while (true)
+            //{
+            //    var messages = _subscriptionClient.
+            //    if (messages.Count() == 0)
+            //    {
+            //        break;
+            //    }
+            //}
+
         }
 
         private async Task CreateSubscriptionIfNeededAsync(string subscriptionName)
@@ -64,6 +80,15 @@ namespace AzureServiceBusSubHelper
             if(!await managementClient.SubscriptionExistsAsync(_topic, subscriptionName))
             {
                 var subscriptionDescription = await managementClient.CreateSubscriptionAsync(_topic, subscriptionName);
+            }
+        }
+
+        private async Task DeleteSubscription()
+        {
+            var managementClient = new ManagementClient(_connectionString);
+            if (!await managementClient.SubscriptionExistsAsync(_topic, this._subscriptionName))
+            {
+                await managementClient.DeleteSubscriptionAsync(_topic, this._subscriptionName);
             }
         }
 
