@@ -97,6 +97,8 @@ namespace fAzureHelper
             if (cloudMessage == null)
                 throw new ApplicationException($"Cannot find queue message id:{id} in the _inProcessMessages list");
 
+            this._inProcessMessages.Remove(cloudMessage);
+
             await this._queue.DeleteMessageAsync(cloudMessage);
         }
 

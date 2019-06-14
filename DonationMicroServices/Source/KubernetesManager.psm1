@@ -263,7 +263,7 @@ class KubernetesManager {
 
         if($jsonParsed.GetType().Name -eq "Object[]") {
             foreach($j in $jsonParsed) {
-                PrintKubectlOutpuResourceInfo $j
+                $this.PrintKubectlOutpuResourceInfo($j)
             }
         }
         else {

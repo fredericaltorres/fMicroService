@@ -52,15 +52,21 @@ namespace Donation.Queue.Lib
             }
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(DonationDTOs donations)
         {
-            await _queueManager.DeleteAsync(id);
+            foreach (var d in donations)
+                await DeleteAsync(d);
         }
 
-        public void Release(string id)
+        public async Task DeleteAsync(DonationDTO donation)
+        {
+            await _queueManager.DeleteAsync(donation.__QueueMessageID);
+        }
+
+        public void Release(DonationDTO donation)
         {
         }
-        public void Release(IEnumerable<string> id)
+        public void Release(IEnumerable<DonationDTO> donations)
         {
         }
     }

@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Donation.PersonSimulator.Console
 {
@@ -62,36 +63,38 @@ namespace Donation.PersonSimulator.Console
                             donationAggregationService.Add(donations);
                             donationAggregationService.AggregateData();
 
-                            // TODO: Can we write to the azure table in batch and delete from queue in batch
+                            // Donation insert in azure table is not done in batch, because
+                            // batch require that all record belongs to the same partition key.
+                            // The partition key is the country
                             foreach (var donation in donations)
                             {
                                 var donationTableRecord = new DonationAzureTableRecord();
                                 var convertionErrors = donationTableRecord.Set(donation);
-                                if (convertionErrors.Count == 0)
+                                if (convertionErrors.NoError)
                                 {
                                     donationTableRecord.ProcessState = DonationDataProcessState.ApprovedForSubmission;
                                     var insertErrors = await donationTableManager.InsertAsync(donationTableRecord);
-                                    if (insertErrors.Count == 0)
+                                    if (insertErrors.NoError)
                                     {
-                                        await donationQueue.DeleteAsync(donation.__QueueMessageID);
+                                        await donationQueue.DeleteAsync(donation);
                                     }
                                     else
                                     {
                                         saNotification.Notify(insertErrors.ToString(), SystemActivityType.Error);
-                                        donationQueue.Release(donation.__QueueMessageID); // Release and will retry the messager after x time the message will go to dead letter queue
+                                        donationQueue.Release(donation);
                                     }
                                 }
                                 else
                                 {
                                     saNotification.Notify(convertionErrors.ToString(), SystemActivityType.Error);
-                                    donationQueue.Release(donation.__QueueMessageID); // Release and will retry the messager after x time the message will go to dead letter queue
+                                    donationQueue.Release(donation); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
                             }
                         }
                         else
                         {
                             saNotification.Notify($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}", SystemActivityType.Error);
-                            donationQueue.Release(donations.Select(d => d.__QueueMessageID)); // Release and will retry the messager after x time the message will go to dead letter queue                            
+                            donationQueue.Release(donations); // Release and will retry the messager after x time the message will go to dead letter queue                            
                         }
                         if (donationQueue.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                         {

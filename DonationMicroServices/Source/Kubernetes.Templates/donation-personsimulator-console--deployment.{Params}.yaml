@@ -18,7 +18,7 @@ metadata:
   name: personsimulator-${APP_VERSION_UNDERSCORE}kuard
 spec:
   serviceName: "personsimulator-${APP_VERSION_UNDERSCORE}kuard"
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: personsimulator-${APP_VERSION_UNDERSCORE}kuard
@@ -36,7 +36,7 @@ spec:
           name: psim-${APP_VERSION_UNDERSCORE} # was personsimulator-${APP_VERSION_UNDERSCORE}web
         env:
         - name: donationEndPointIP
-          value: "104.209.239.82"
+          value: "52.232.163.164"
       imagePullSecrets:
       - name: fredcontainerregistry
 ##################

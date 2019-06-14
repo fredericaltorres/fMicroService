@@ -42,11 +42,12 @@ namespace Donation.Service
         public Errors AggregateData()
         {
             var totalErrors = new Errors();
-            this.CountryAggregateData.Clear();
+            // this.CountryAggregateData.Clear();
             foreach (var donation in _donations)
             {
                 this.Aggregate(donation);
             }
+            this._donations.Clear(); // Once we aggregate the data we clear it, so we do not recount the data
 
             return totalErrors;
         }

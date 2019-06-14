@@ -49,6 +49,15 @@ namespace fAzureHelper
             var op = TableOperation.Insert(entity);
             await _table.ExecuteAsync(op);
         }
+        
+        public async Task InsertAsync(IEnumerable<ITableEntity> entities)
+        {
+            var batchOperation = new TableBatchOperation();
+            foreach (var e in entities)
+                batchOperation.Insert(e);
+
+            await _table.ExecuteBatchAsync(batchOperation);
+        }
 
         public class WhereClauseExpression
         {
