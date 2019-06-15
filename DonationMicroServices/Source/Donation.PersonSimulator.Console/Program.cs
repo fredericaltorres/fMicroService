@@ -56,19 +56,24 @@ namespace Donation.PersonSimulator.Console
             return $"http://{hostOrIp}:80/api/Donation";
         }
 
-        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP)
+        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, int recursiveCallCount = 0)
         {
             try
             {
                 donation.__EntranceMachineID = null;
-                // TODO: Handle failure better, send notification
                 var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP)), donation.ToJSON());
                 if (succeeded)
                     return location;
             }
             catch(System.Exception ex)
             {
-                System.Console.WriteLine($"PostDonation failed, ex:{ex}");
+                System.Console.WriteLine($"PostDonation failed, ex:{ex.Message}");
+                if (recursiveCallCount < 2)
+                {
+                    recursiveCallCount += 1;
+                    System.Console.WriteLine($"Retry PostDonation recursiveCallCount:{recursiveCallCount}");
+                    return await PostDonation(donation, donationEndPointIP, recursiveCallCount);
+                }
             }
             return null;
         }

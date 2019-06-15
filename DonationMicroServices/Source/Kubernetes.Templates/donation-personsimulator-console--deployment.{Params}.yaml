@@ -1,24 +1,24 @@
 apiVersion: v1 # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
 kind: Service
 metadata:
-  name: personsimulator-${APP_VERSION_UNDERSCORE}-svc # here
+  name: personsimulator-${APP_VERSION_UNDERSCORE}-svc
   labels:
-    app: personsimulator-${APP_VERSION_UNDERSCORE}-svc #here2
+    app: personsimulator-${APP_VERSION_UNDERSCORE}-svc
 spec:
   type: NodePort
   ports:
   - port: 8080
     name: personsimulator-${APP_VERSION_UNDERSCORE}web
   selector:
-    app: personsimulator-${APP_VERSION_UNDERSCORE}-svc #here2
+    app: personsimulator-${APP_VERSION_UNDERSCORE}-svc
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: personsimulator-${APP_VERSION_UNDERSCORE}-sfs
 spec:
-  serviceName: "personsimulator-${APP_VERSION_UNDERSCORE}-svc" #-svc here
-  replicas: 1
+  serviceName: "personsimulator-${APP_VERSION_UNDERSCORE}-svc"
+  replicas: 2
   selector:
     matchLabels:
       app: personsimulator-${APP_VERSION_UNDERSCORE}-sfs
@@ -33,7 +33,7 @@ spec:
         image: fredcontainerregistry.azurecr.io/donation.personsimulator.console:${APP_VERSION}
         ports:
         - containerPort: 8080
-          name: psim-${APP_VERSION_UNDERSCORE} # was personsimulator-${APP_VERSION_UNDERSCORE}web
+          name: psim-${APP_VERSION_UNDERSCORE}
         env:
         - name: donationEndPointIP
           value: "${APP_ENDPOINT_IP}"
