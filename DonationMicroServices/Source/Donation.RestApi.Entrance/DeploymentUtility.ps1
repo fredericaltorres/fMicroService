@@ -22,18 +22,24 @@ Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
 function buildContainer() {
+
     Write-Host "First go up 2 folders before building container" -ForegroundColor DarkGray
     pushd
     cd ..\..
     docker build -t "$containerImageName"-f "$dockerFilName" .
     popd
 }
+
 function pushContainerImageToRegistry() {
+
     ..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage "$containerImageName" -cls $false
 }
+
 function deploy() {
+
     ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $deployService
 }
+
 switch($action) {
     build {
         buildContainer

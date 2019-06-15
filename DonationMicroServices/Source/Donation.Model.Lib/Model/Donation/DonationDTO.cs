@@ -17,7 +17,11 @@ namespace Donation.Model
         /// received the donation first
         /// AKA in Kubernetes the pod host name that ran the donation.restapi.entrace web api
         /// </summary>
-        public string __ProcessingMachineID { get; set; }
+        public string __EntranceMachineID { get; set; }
+        /// <summary>
+        /// The machine that processed the record from the queue to the tabe
+        /// </summary>
+        public string __ProcessingMachineID { get; set; }        
 
         /// <summary>
         /// The message id when the donation is read from a queue

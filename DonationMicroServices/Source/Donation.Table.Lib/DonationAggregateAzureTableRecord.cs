@@ -13,7 +13,7 @@ namespace Donation.Table.Lib
 
         public int DonationsProcessedCount { get; set; }
         public string DonationsAggregateJSON { get; set; }
-        public string __ProcessingMachineID { get; set; }
+        public string __EntranceMachineID { get; set; }
         public DateTime __UtcCreationDate { get; set; }
 
         public DonationAggregateAzureTableRecord(DonationsAggregate donationsAggregate, int donationsProcessedCount)
@@ -28,7 +28,7 @@ namespace Donation.Table.Lib
             this.Guid = Guid.NewGuid();
             this.DonationsProcessedCount = donationsProcessedCount;
             this.__UtcCreationDate = DateTime.UtcNow;
-            this.__ProcessingMachineID = RuntimeHelper.GetMachineName();
+            this.__EntranceMachineID = RuntimeHelper.GetMachineName();
             this.DonationsAggregateJSON = donationsAggregate.ToJSON();
             this.SetIdentification();
             return r;

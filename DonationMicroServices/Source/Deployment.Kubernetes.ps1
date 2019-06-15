@@ -33,7 +33,10 @@ param(
     [bool]$clearScreen = $true,
 
     [Parameter(Mandatory=$false)] 
-    [bool]$traceKubernetesCommand = $false
+    [bool]$traceKubernetesCommand = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$APP_ENDPOINT_IP
 )
 
 # https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auth-aks
@@ -111,7 +114,7 @@ Write-HostColor "action:$action, appName:$appName - $appVersion" DarkYellow
 # For now pick the first cluster available
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "deployToProd") $traceKubernetesCommand
 
-$context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; APP_NAME = $appName; TEST_URL = $appUrl }
+$context = @{ ENVIRONMENT = "prod"; APP_VERSION = $appVersion; APP_NAME = $appName; TEST_URL = $appUrl; APP_ENDPOINT_IP = $APP_ENDPOINT_IP }
 
 
 switch($action) {

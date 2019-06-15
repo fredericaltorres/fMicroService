@@ -68,6 +68,7 @@ namespace Donation.PersonSimulator.Console
                             // The partition key is the country
                             foreach (var donation in donations)
                             {
+                                donation.__EntranceMachineID = RuntimeHelper.GetMachineName();
                                 var donationTableRecord = new DonationAzureTableRecord();
                                 var convertionErrors = donationTableRecord.Set(donation);
                                 if (convertionErrors.NoError)

@@ -60,7 +60,7 @@ namespace Donation.PersonSimulator.Console
         {
             try
             {
-                donation.__ProcessingMachineID = null;
+                donation.__EntranceMachineID = null;
                 // TODO: Handle failure better, send notification
                 var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP)), donation.ToJSON());
                 if (succeeded)

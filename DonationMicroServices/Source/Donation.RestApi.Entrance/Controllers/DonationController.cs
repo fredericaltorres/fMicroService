@@ -37,7 +37,7 @@ namespace Donation.RestApi.Entrance.Controllers
         {
             // Console.WriteLine($"New donation posted {donationDTO.GetSummary()}");
 
-            donationDTO.__ProcessingMachineID = RuntimeHelper.GetMachineName();
+            donationDTO.__EntranceMachineID = RuntimeHelper.GetMachineName();
             var donationsService = new DonationsValidationService(donationDTO);
             
             var errors = donationsService.ValidateData();

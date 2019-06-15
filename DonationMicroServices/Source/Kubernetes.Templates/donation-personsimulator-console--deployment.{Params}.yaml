@@ -1,31 +1,31 @@
 apiVersion: v1 # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
 kind: Service
 metadata:
-  name: personsimulator-${APP_VERSION_UNDERSCORE}kuard
+  name: personsimulator-${APP_VERSION_UNDERSCORE}-svc # here
   labels:
-    app: personsimulator-${APP_VERSION_UNDERSCORE}kuard
+    app: personsimulator-${APP_VERSION_UNDERSCORE}-svc #here2
 spec:
   type: NodePort
   ports:
   - port: 8080
     name: personsimulator-${APP_VERSION_UNDERSCORE}web
   selector:
-    app: personsimulator-${APP_VERSION_UNDERSCORE}kuard
+    app: personsimulator-${APP_VERSION_UNDERSCORE}-svc #here2
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: personsimulator-${APP_VERSION_UNDERSCORE}kuard
+  name: personsimulator-${APP_VERSION_UNDERSCORE}-sfs
 spec:
-  serviceName: "personsimulator-${APP_VERSION_UNDERSCORE}kuard"
+  serviceName: "personsimulator-${APP_VERSION_UNDERSCORE}-svc" #-svc here
   replicas: 1
   selector:
     matchLabels:
-      app: personsimulator-${APP_VERSION_UNDERSCORE}kuard
+      app: personsimulator-${APP_VERSION_UNDERSCORE}-sfs
   template:
     metadata:
       labels:
-        app: personsimulator-${APP_VERSION_UNDERSCORE}kuard
+        app: personsimulator-${APP_VERSION_UNDERSCORE}-sfs
     spec:
       containers:
       # pod machine name must be less 15 - 2 because a '-x' will be appended
@@ -36,31 +36,6 @@ spec:
           name: psim-${APP_VERSION_UNDERSCORE} # was personsimulator-${APP_VERSION_UNDERSCORE}web
         env:
         - name: donationEndPointIP
-          value: "52.232.163.164"
+          value: "${APP_ENDPOINT_IP}"
       imagePullSecrets:
       - name: fredcontainerregistry
-##################
-# apiVersion: extensions/v1beta1
-# kind: Deployment
-# metadata:  
-#   name: personsimulator-${APP_VERSION_UNDERSCORE}
-# spec:
-#   replicas: 1
-#   template:
-#     metadata:
-#       labels:
-#         app: donation-personsimulator-console
-#         version: ${APP_VERSION_UNDERSCORE}
-#     spec:
-#       containers:
-#       - name: donation-personsimulator-console-pod
-#         image: fredcontainerregistry.azurecr.io/donation.personsimulator.console:${APP_VERSION_UNDERSCORE}
-#         ports:
-#         - containerPort: 80
-#         env:
-#         - name: donationEndPointIP
-#           value: "104.43.247.226"
-#         - name: containerInstanceIndex
-#           value: "0"
-#       imagePullSecrets:
-#       - name: fredcontainerregistry

@@ -21,19 +21,39 @@ $deployService = $false
 Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
+function getDonationRestApiEntranceMetadatJsonFileName() {
+
+    return [System.IO.Path]::Combine($env:TEMP, "donation-restapi-entrance.json")
+}
+
+function GetDonationRestApiEntranceLoadBalancerIP() {
+
+    $json = Get-Content (getDonationRestApiEntranceMetadatJsonFileName)
+    $jsonParsed = JsonParse($json)
+    $ip = $jsonParsed.EndPointIP
+    write-host "Donation Rest Api Entrance - LoadBalancer IP:$ip" -ForegroundColor DarkYellow
+	return $ip
+}
+
 function buildContainer() {
+
     Write-Host "First go up 2 folders before building container" -ForegroundColor DarkGray
     pushd
     cd ..\..
     docker build -t "$containerImageName"-f "$dockerFilName" .
     popd
 }
+
 function pushContainerImageToRegistry() {
+
     ..\deployContainerToAzureContainerRegistry.ps1 -a push -containerImage "$containerImageName" -cls $false
 }
+
 function deploy() {
-    ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $deployService
+
+    ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $deployService -APP_ENDPOINT_IP (GetDonationRestApiEntranceLoadBalancerIP)
 }
+
 switch($action) {
     build {
         buildContainer
