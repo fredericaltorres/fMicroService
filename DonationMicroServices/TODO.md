@@ -2,7 +2,7 @@
 
 ## Donation-PersonSimulator-Console
 
-- Handle better http post error 
+- Handle better http post error [DONE]
     * HttpRequestException: Connection reset by peer
     * Retry once.
 

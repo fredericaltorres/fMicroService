@@ -86,7 +86,9 @@ namespace Donation.PersonSimulator.Console
             else
                 throw new InvalidDataException($"Cannot find file {Path.GetFileName(donationJsonFile)}");
 
+
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
+            var donationTotalCount = donations.Count;
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
 
             await saNotification.NotifyAsync($"Start sending Donation from file {donationJsonFile}");
@@ -98,8 +100,7 @@ namespace Donation.PersonSimulator.Console
             {
                 System.Console.Write(".");
                 var donation10 = donations.Take(groupCount);
-
-                // TODO: Handle better http error
+                
                 var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP)));
                 if(locations.Any(location => location == null))
                 {
@@ -112,7 +113,8 @@ namespace Donation.PersonSimulator.Console
                 if (perfTracker.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
                 {
                     System.Console.WriteLine("");
-                    await saNotification.NotifyPerformanceInfoAsync("Donation", "Posted to Entrance endpoint", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
+                    var percentDone = 1.0 * perfTracker.ItemCount / donationTotalCount;
+                    await saNotification.NotifyPerformanceInfoAsync("Donation", $"Posted to Entrance endpoint ({percentDone}% done)", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
                 }
             }
 
