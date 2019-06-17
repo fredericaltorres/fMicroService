@@ -8,7 +8,6 @@ COPY ["Source/Donation.Model.Lib/Donation.Model.Lib.csproj", "Source/Donation.Mo
 COPY ["Source/fAzureCore/fDotNetCoreContainerHelper/fDotNetCoreContainerHelper.csproj", "Source/fAzureCore/fDotNetCoreContainerHelper/"]
 COPY ["Source/Donation.Queue.Lib/Donation.Queue.Lib.csproj", "Source/Donation.Queue.Lib/"]
 COPY ["Source/fAzureCore/fAzureHelper/fAzureHelper.csproj", "Source/fAzureCore/fAzureHelper/"]
-COPY ["Source/fAzureCore/AzureServiceBusSubHelper/AzureServiceBusSubHelper.csproj", "Source/fAzureCore/AzureServiceBusSubHelper/"]
 RUN dotnet restore "Source/Donation.PersonSimulator.Console/Donation.PersonSimulator.Console.csproj"
 COPY . .
 WORKDIR "/src/Source/Donation.PersonSimulator.Console"

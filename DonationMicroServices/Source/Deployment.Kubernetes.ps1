@@ -54,6 +54,12 @@ function getKubernetesYamlFile($postFixFileName) {
 
     return "$(getCurrentScriptPath)\Kubernetes.Templates\$appName--$postFixFileName" 
 }
+
+function getAppMetadatJsonFileName() {
+
+    return [System.IO.Path]::Combine($env:TEMP, "$($appName.replace(".","-")).json")
+}
+
 function deployRelease([Hashtable]$context, [string]$message, [bool]$deployService) {
 
     Write-HostColor $message DarkYellow
@@ -79,6 +85,10 @@ function deployRelease([Hashtable]$context, [string]$message, [bool]$deployServi
         $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
         $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
         Write-HostColor "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
+
+        updateJsonFileWithProperty (getAppMetadatJsonFileName) "EndPointIP" $loadBlancerIp
+        updateJsonFileWithProperty (getAppMetadatJsonFileName) "EndPointPort" $loadBlancerPort
+
         $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
         urlMustReturnHtml $testUrl
     }

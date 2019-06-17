@@ -9,7 +9,6 @@ COPY ["Source/Donation.Model.Lib/Donation.Model.Lib.csproj", "Source/Donation.Mo
 COPY ["Source/fAzureCore/fDotNetCoreContainerHelper/fDotNetCoreContainerHelper.csproj", "Source/fAzureCore/fDotNetCoreContainerHelper/"]
 COPY ["Source/Donation.Table.Lib/Donation.Table.Lib.csproj", "Source/Donation.Table.Lib/"]
 COPY ["Source/fAzureCore/fAzureHelper/fAzureHelper.csproj", "Source/fAzureCore/fAzureHelper/"]
-COPY ["Source/fAzureCore/AzureServiceBusSubHelper/AzureServiceBusSubHelper.csproj", "Source/fAzureCore/AzureServiceBusSubHelper/"]
 COPY ["Source/Donation.Queue.Lib/Donation.Queue.Lib.csproj", "Source/Donation.Queue.Lib/"]
 RUN dotnet restore "Source/Donation.QueueProcessor.Console/Donation.QueueProcessor.Console.csproj"
 COPY . .

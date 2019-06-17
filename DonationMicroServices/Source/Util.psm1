@@ -154,6 +154,33 @@ function getCurrentScriptPath() {
     return [System.IO.Path]::GetDirectoryName($script:MyInvocation.MyCommand.Path)
 }
 
+
+function updateJsonFileWithProperty([string]$jsonFileName, [string]$propertyName, $propertyValue) {
+
+    if(Test-Path $jsonFileName) {
+        $json = Get-Content ($jsonFileName)
+    }
+    else {
+        $json = "{}"
+    }
+
+    $jsonParsed = JsonParse($json)
+    $dic = @{}; # Load the parsed json into a dictionary - only support a JSON object containing a list of name/value
+    foreach($e in $jsonParsed) {
+        $meta = Get-Member -InputObject $e -MemberType NoteProperty
+        if($meta -ne $null) {
+            $value = $e | Select-Object -ExpandProperty $meta[0].Name
+            $dic.Add($meta[0].Name, $value)
+        }
+    }
+    if($dic.ContainsKey($propertyName)) {
+        $dic.Remove($propertyName)
+    }
+    $dic.Add($propertyName, $propertyValue);
+    ConvertTo-Json -InputObject $dic | Set-Content ($jsonFileName)
+}
+
+Export-ModuleMember -Function updateJsonFileWithProperty
 Export-ModuleMember -Function getCurrentScriptPath
 Export-ModuleMember -Function GetAppNameFromProject
 Export-ModuleMember -Function GetProjectName

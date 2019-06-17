@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
     [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs')]
-    [string]$action = "getLogs"
+    [string]$action = "deploy"
 )
 
 if($null -eq (Get-Module Util)) {
