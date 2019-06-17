@@ -79,8 +79,7 @@ class KubernetesManager {
 
     [object] delete([string]$fileName) {
         
-        $r = $this.execCommand("kubectl delete -f ""$fileName"" ", $false)
-        return $r        
+        return $this.execCommand("kubectl delete -f ""$fileName"" ", $false)        
     }
 
     [object] apply([string]$fileName, [bool]$record) {
@@ -273,7 +272,16 @@ class KubernetesManager {
 
     [object] execCommand([string]$cmd, [bool]$parseJson) {
 
-        return $this.execCommand($cmd, $parseJson, $false)
+        try {
+            $r = $this.execCommand($cmd, $parseJson, $false)
+            return $r
+        }
+        catch {                        
+            $ErrorMessage = $_.Exception.Message
+            $FailedItem = $_.Exception.ItemName
+            Write-Error $ErrorMessage          
+            throw $_.Exception # rethrow  
+        }
     }
 
     [object] execCommand([string]$cmd, [bool]$parseJson, [bool]$multiYamlFile = $false) {
@@ -298,6 +306,13 @@ class KubernetesManager {
         }        
         else {
             $r = Invoke-Expression $cmd
+            # When the kubectl command failed I would get a value kinda $null but that could
+            # not be returned as a function value and would create a exception
+            if($r -eq $null) {
+                # for some reason Write-Error does not display the error
+                Write-HostColor "The command failed: $cmd" Red
+                return $null # Return a true $null.
+            }
             return $r
         }
     }

@@ -14,7 +14,7 @@ $appName = GetAppNameFromProject
 $dockerFilName = ".\Source\$appName\Dockerfile"
 $containerImageName = $appName
 $appVersion = GetProjectVersion
-$scriptTitle = "Donation Automation Deployment Utility -- $appName"
+$scriptTitle = "Donation Automation Deployment Utility -- $appName  $($appVersion)"
 $traceKubernetesCommand = $true
 $deployService = $true
 
@@ -67,5 +67,5 @@ switch($action) {
     }
 }
 Write-HostColor "$scriptTitle -- done" Yellow
-Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
+
 
