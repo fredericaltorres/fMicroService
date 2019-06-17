@@ -34,8 +34,10 @@ spec:
         ports:
         - containerPort: 8080
           name: psim-${APP_VERSION_UNDERSCORE}
-        env:
+        env: # https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
         - name: donationEndPointIP
           value: "${APP_ENDPOINT_IP}"
+        - name: donationEndPointPort
+          value: "${APP_ENDPOINT_PORT}"
       imagePullSecrets:
       - name: fredcontainerregistry

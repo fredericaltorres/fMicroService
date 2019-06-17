@@ -31,9 +31,10 @@ namespace Donation.PersonSimulator.Console
             // with -0, -1, -2 index, that we extract
             var containerInstanceIndex = RuntimeHelper.GetKubernetesStatefullSetMachineNamePodIndex();
             var donationEndPointIP = RuntimeHelper.GetCommandLineParameterString("-donationEndPointIP", args);
+            var donationEndPointPort = RuntimeHelper.GetCommandLineParameterString("-donationEndPointPort", args);
 
-            System.Console.WriteLine($"containerInstanceIndex:{containerInstanceIndex}, donationEndPointIP:{donationEndPointIP}");
-            Publish(containerInstanceIndex, donationEndPointIP).GetAwaiter().GetResult();
+            System.Console.WriteLine($"containerInstanceIndex:{containerInstanceIndex}, donationEndPointIP:{donationEndPointIP}, donationEndPointPort:{donationEndPointPort}");
+            Publish(containerInstanceIndex, donationEndPointIP, donationEndPointPort).GetAwaiter().GetResult();
             System.Console.WriteLine("Job done waiting for ever");
             while (true)
             {
@@ -51,17 +52,21 @@ namespace Donation.PersonSimulator.Console
             return RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString");
         }
 
-        static string GetDonationUrl(string hostOrIp)
+        static string GetDonationUrl(string hostOrIp, string port)
         {
-            return $"http://{hostOrIp}:80/api/Donation";
+            var protocol = "http";
+            if (port == "443")
+                protocol = "htttps";
+
+            return $"{protocol}://{hostOrIp}:{port}/api/Donation";
         }
 
-        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, int recursiveCallCount = 0)
+        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, int recursiveCallCount = 0)
         {
             try
             {
                 donation.__EntranceMachineID = null;
-                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP)), donation.ToJSON());
+                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)), donation.ToJSON());
                 if (succeeded)
                     return location;
             }
@@ -72,13 +77,13 @@ namespace Donation.PersonSimulator.Console
                 {
                     recursiveCallCount += 1;
                     System.Console.WriteLine($"Retry PostDonation recursiveCallCount:{recursiveCallCount}");
-                    return await PostDonation(donation, donationEndPointIP, recursiveCallCount);
+                    return await PostDonation(donation, donationEndPointIP, donationEndPointPort, recursiveCallCount);
                 }
             }
             return null;
         }
 
-        static async Task Publish(int generationIndex, string donationEndPointIP)
+        static async Task Publish(int generationIndex, string donationEndPointIP, string donationEndPointPort)
         {
             var donationJsonFile = GetGeneratedDonationDataFile(generationIndex);
             if (File.Exists(donationJsonFile))
@@ -101,7 +106,7 @@ namespace Donation.PersonSimulator.Console
                 System.Console.Write(".");
                 var donation10 = donations.Take(groupCount);
                 
-                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP)));
+                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort)));
                 if(locations.Any(location => location == null))
                 {
                     await saNotification.NotifyAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}", SystemActivityType.Error);

@@ -63,7 +63,8 @@ switch($action) {
         ..\Deployment.Kubernetes.ps1 -a getLogs -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand  -deployService $false
     }
 }
-Write-HostColor "$scriptTitle done" Yellow
+Write-HostColor "$scriptTitle -- done" Yellow
+Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
 <#
 Run locally on container

@@ -81,9 +81,16 @@ namespace Donation.PersonSimulator.Console
                     var queueCount = await donationQueue.ApproximateMessageCountAsync();
                     if(previousQueueCount != queueCount)
                     {
-                        System.Console.WriteLine($"{queueCount} Message in Queue {donationQueue.QueueName}");
-                        previousQueueCount = queueCount;
+                        System.Console.Write($"{queueCount} messages in queue {donationQueue.QueueName}");
+                        if (previousQueueCount > queueCount)
+                        {
+                            var msgProcessedInInterval = previousQueueCount - queueCount;
+                            var msgProcessedPerSecond = 1.0 * msgProcessedInInterval / waitSeconds;
+                            System.Console.Write($" {msgProcessedInInterval} donations processed in {waitSeconds}, {msgProcessedPerSecond} donations processed per second (From queue)");
+                        }
+                        System.Console.WriteLine("");
                     }
+                    previousQueueCount = queueCount;
                 }                
             }
             catch(System.Exception ex)
