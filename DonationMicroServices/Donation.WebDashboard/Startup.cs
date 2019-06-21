@@ -1,3 +1,5 @@
+using fAzureHelper;
+using fDotNetCoreContainerHelper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Donation.WebDashboard
 {
@@ -17,6 +20,8 @@ namespace Donation.WebDashboard
 
         public IConfiguration Configuration { get; }
 
+        static SystemActivityNotificationManager systemActivityNotificationSubscriber;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -27,6 +32,20 @@ namespace Donation.WebDashboard
             {
                 configuration.RootPath = "ClientApp/build";
             });
+        }
+
+        private static void SystemActivityNotificationSubscriber_OnMessageReveived(SystemActivity sa)
+        {
+            if (sa.Type == SystemActivityType.PerformanceInfo)
+            {
+                Controllers.SystemActivitiesController.AddDonationPushed(
+                     sa.PerformanceInformation.TotalItemProcessed,
+                     sa.PerformanceInformation.ItemProcessedPerSecond,
+                     sa.MachineName
+                    );
+            }
+            //var msg = $"[{sa.Type}] Host:{sa.MachineName}\r\n      {sa.UtcDateTime.ToShortTimeString()}, {sa.Message}";
+            //Controllers.SystemActivitiesController.AddSystemActivitySummary(msg);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +82,11 @@ namespace Donation.WebDashboard
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            RuntimeHelper.SetAppPath(env.ContentRootPath);
+
+            systemActivityNotificationSubscriber = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"), Environment.MachineName, true);
+            systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;
         }
     }
 }

@@ -6,9 +6,11 @@ function generate2DigitNumber(n) {
         return `0${n}`;
     return `${n}`;
 }
+
 function generateTimeStamp(hour, minute) {
     return `${generate2DigitNumber(hour)}:${generate2DigitNumber(minute)}`;
 }
+
 function getRandomInt(max, min) {
 
     const v = Math.floor(Math.random() * Math.floor(max));
@@ -35,12 +37,47 @@ function getDonationReceivedPerSecChartData() {
     return data;
 }
 
-
 // Chart demo http://recharts.org/en-US/examples/BiaxialLineChart
 
 export class Home extends Component {
 
     static displayName = Home.name;
+
+    timerId = null;
+    refreshTimeOut = 1000*4;
+
+    state = {
+        timeStamp: new Date().toString(),
+        systemActivitySummary: {
+            totalDonationPushed : 0,
+            donationPushedPerSecond: 0,
+            machineName: null,
+            lastMessage: "No message yet",
+        }
+    };
+
+    componentDidMount() {
+        this.timerId = setInterval(() => {
+            console.log(`About to refresh...`);
+
+            fetch('api/SystemActivities/GetSystemActivitySummary')
+                .then(response => response.json())
+                .then(data => {
+                    
+                    console.log(`data fetched:${JSON.stringify(data)}`);                   
+                    this.updateState('systemActivitySummary', data);
+                    this.updateState('timeStamp', new Date().toString());
+                });
+            
+        }, this.refreshTimeOut)
+    }
+
+    updateState = (property, value) => {
+
+        this.setState({ ...this.state, [property]: value }, () => {
+            console.log(`state: ${JSON.stringify(this.state)}`);
+        });
+    }
 
     render() {
 
@@ -64,10 +101,10 @@ export class Home extends Component {
             </LineChart>
         );
 
-
         return (
             <div>                
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.onClear} > Clear </button>
+                <small>{this.state.timeStamp}</small>
 
                 <div className="card">
                     <div className="card-header">Donation Received Per Second</div>
@@ -84,12 +121,25 @@ export class Home extends Component {
                 </div>
 
                 <div className="card">
-                    <div className="card-header">Total Donation Received</div>
-                    <div className="card-body"> <h4 className="card-title">70 856</h4> </div>
+                    <div className="card-header">Message</div>
+                    <div className="card-body"> <h4 className="card-title">
+                        {this.state.systemActivitySummary.lastMessage}
+                    </h4> </div>
+                </div>
+
+                <div className="card">
+                    <div className="card-header">Donation Pushed</div>
+                    <div className="card-body"> <h4 className="card-title">
+                        totalDonationPushed: {this.state.systemActivitySummary.totalDonationPushed}, 
+                        donationPushedPerSecond: {this.state.systemActivitySummary.donationPushedPerSecond}, 
+                        machineName: {this.state.systemActivitySummary.machineName}
+                    </h4> </div>
                 </div>
                 <div className="card">
                     <div className="card-header">Total Donation Processed</div>
-                    <div className="card-body"> <h4 className="card-title">50 456</h4> </div>
+                    <div className="card-body"> <h4 className="card-title">
+                        {this.state.systemActivitySummary.donationProcessedPerSecond}
+                    </h4> </div>
                     <p className="card-text">Total amount: $ 1 345 678.</p>
                 </div>
             </div>
