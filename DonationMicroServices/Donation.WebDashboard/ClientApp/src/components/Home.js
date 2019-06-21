@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 function generate2DigitNumber(n) {
     if (n < 10)
@@ -44,14 +46,11 @@ export class Home extends Component {
     static displayName = Home.name;
 
     timerId = null;
-    refreshTimeOut = 1000*4;
+    refreshTimeOut = 1000 * 4;
 
-    state = {
-        timeStamp: new Date().toString(),
+    state = {        
         systemActivitySummary: {
-            totalDonationPushed : 0,
-            donationPushedPerSecond: 0,
-            machineName: null,
+            pushedDonationActivitySummaryDictionary: { },
             lastMessage: "No message yet",
         }
     };
@@ -65,8 +64,7 @@ export class Home extends Component {
                 .then(data => {
                     
                     console.log(`data fetched:${JSON.stringify(data)}`);                   
-                    this.updateState('systemActivitySummary', data);
-                    this.updateState('timeStamp', new Date().toString());
+                    this.updateState('systemActivitySummary', data);                    
                 });
             
         }, this.refreshTimeOut)
@@ -77,6 +75,57 @@ export class Home extends Component {
         this.setState({ ...this.state, [property]: value }, () => {
             console.log(`state: ${JSON.stringify(this.state)}`);
         });
+    }
+
+    getPushedDonationActivitySummaryTable = () => {
+        const r = Object.keys(this.state.systemActivitySummary.pushedDonationActivitySummaryDictionary).map(
+            (machineName) => {
+                const machineInfo = this.state.systemActivitySummary.pushedDonationActivitySummaryDictionary[machineName];
+                return {
+                    machineName: machineInfo.machineName,
+                    caption: machineInfo.caption,
+                    total: machineInfo.total,
+                    itemPerSecond: machineInfo.itemPerSecond,
+                };
+            });
+        return r;
+    }
+
+    renderPushedDonationActivitySummaryTable = () => {
+        const { data } = this.getPushedDonationActivitySummaryTable();
+        return (
+            <div>
+                <ReactTable
+                    data={data}
+                    columns={[
+                        {
+                            Header: "Name",
+                            columns: [
+                                {
+                                    Header: "Machine Name",
+                                    accessor: "machineName"
+                                },
+                                {
+                                    Header: "Activity",
+                                    accessor: "caption"
+                                },
+                                {
+                                    Header: "Total",
+                                    accessor: "total"
+                                },
+                                {
+                                    Header: "Donation/S",
+                                    accessor: "itemPerSecond"
+                                }
+                            ]
+                        }                     
+                    ]}
+                    defaultPageSize={4}
+                    className="-striped -highlight"
+                />
+                <br />
+            </div>
+        );
     }
 
     render() {
@@ -104,8 +153,7 @@ export class Home extends Component {
         return (
             <div>                
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.onClear} > Clear </button>
-                <small>{this.state.timeStamp}</small>
-
+                
                 <div className="card">
                     <div className="card-header">Donation Received Per Second</div>
                     <div className="card-body">
@@ -130,15 +178,13 @@ export class Home extends Component {
                 <div className="card">
                     <div className="card-header">Donation Pushed</div>
                     <div className="card-body"> <h4 className="card-title">
-                        totalDonationPushed: {this.state.systemActivitySummary.totalDonationPushed}, 
-                        donationPushedPerSecond: {this.state.systemActivitySummary.donationPushedPerSecond}, 
-                        machineName: {this.state.systemActivitySummary.machineName}
+                        {this.renderPushedDonationActivitySummaryTable()}
                     </h4> </div>
                 </div>
                 <div className="card">
                     <div className="card-header">Total Donation Processed</div>
                     <div className="card-body"> <h4 className="card-title">
-                        {this.state.systemActivitySummary.donationProcessedPerSecond}
+                        {123456}
                     </h4> </div>
                     <p className="card-text">Total amount: $ 1 345 678.</p>
                 </div>
