@@ -63,7 +63,6 @@ export class Home extends Component {
                 .then(response => response.json())
                 .then(data => {
                     
-                    console.log(`data fetched:${JSON.stringify(data)}`);                   
                     this.updateState('systemActivitySummary', data);                    
                 });
             
@@ -71,9 +70,8 @@ export class Home extends Component {
     }
 
     updateState = (property, value) => {
-
         this.setState({ ...this.state, [property]: value }, () => {
-            console.log(`state: ${JSON.stringify(this.state)}`);
+            //console.log(`state: ${JSON.stringify(this.state)}`);
         });
     }
 
@@ -97,7 +95,10 @@ export class Home extends Component {
                 };
             });
 
-        sItemPerSecond = sItemPerSecond / machineNames.length; // compute average
+        if (machineNames.length > 0) {
+            sItemPerSecond = sItemPerSecond / machineNames.length; // compute average
+        }
+            
         r.push({ // Add summation row
             machineName: 'Total',
             caption: sCaption,
@@ -112,16 +113,22 @@ export class Home extends Component {
     // With colors
     // https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
     renderPushedDonationActivitySummaryTable = () => {
-        const data = this.getPushedDonationActivitySummaryTable();        
+        const data = this.getPushedDonationActivitySummaryTable();       
+        if (data.length === 0)
+            return null
+
         return (
-            <div>
                 <ReactTable
                     data={data}
                     columns={[
                         {
-                            Header: "Name",
+                            Header: "Donation Pushed To Queue",
                             columns: [
-                                { Header: "Machine Name", accessor: "machineName" },
+                                {
+                                    Header: "Machine Name",
+                                    id: "machineName",
+                                    accessor: d => d.machineName.replace("person", "")
+                                },
                                 { Header: "Activity", accessor: "caption" },
                                 { Header: "Total", accessor: "total" },
                                 { Header: "Donation/S", accessor: "itemPerSecond" }
@@ -132,8 +139,6 @@ export class Home extends Component {
                     className="-striped -highlight"
                     showPagination={false}
             />
-                <br />
-            </div>
         );
     }
 
