@@ -78,9 +78,17 @@ export class Home extends Component {
     }
 
     getPushedDonationActivitySummaryTable = () => {
-        const r = Object.keys(this.state.systemActivitySummary.pushedDonationActivitySummaryDictionary).map(
+        let sTotal = 0;
+        let sItemPerSecond = 0;
+        let sCaption = null;
+        const machineNames = Object.keys(this.state.systemActivitySummary.pushedDonationActivitySummaryDictionary);
+        const r = machineNames.map(
             (machineName) => {
                 const machineInfo = this.state.systemActivitySummary.pushedDonationActivitySummaryDictionary[machineName];
+                sTotal += machineInfo.total;
+                sItemPerSecond += machineInfo.itemPerSecond;
+                if (sCaption === null)
+                    sCaption = machineInfo.caption;
                 return {
                     machineName: machineInfo.machineName,
                     caption: machineInfo.caption,
@@ -88,11 +96,23 @@ export class Home extends Component {
                     itemPerSecond: machineInfo.itemPerSecond,
                 };
             });
+
+        sItemPerSecond = sItemPerSecond / machineNames.length; // compute average
+        r.push({ // Add summation row
+            machineName: 'Total',
+            caption: sCaption,
+            total: sTotal,
+            itemPerSecond: sItemPerSecond,
+        });
         return r;
     }
 
+    // https://www.npmjs.com/package/react-table
+    // https://codesandbox.io/s/react-table-simple-table-hpduw
+    // With colors
+    // https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
     renderPushedDonationActivitySummaryTable = () => {
-        const { data } = this.getPushedDonationActivitySummaryTable();
+        const data = this.getPushedDonationActivitySummaryTable();        
         return (
             <div>
                 <ReactTable
@@ -101,28 +121,17 @@ export class Home extends Component {
                         {
                             Header: "Name",
                             columns: [
-                                {
-                                    Header: "Machine Name",
-                                    accessor: "machineName"
-                                },
-                                {
-                                    Header: "Activity",
-                                    accessor: "caption"
-                                },
-                                {
-                                    Header: "Total",
-                                    accessor: "total"
-                                },
-                                {
-                                    Header: "Donation/S",
-                                    accessor: "itemPerSecond"
-                                }
+                                { Header: "Machine Name", accessor: "machineName" },
+                                { Header: "Activity", accessor: "caption" },
+                                { Header: "Total", accessor: "total" },
+                                { Header: "Donation/S", accessor: "itemPerSecond" }
                             ]
-                        }                     
+                        }
                     ]}
-                    defaultPageSize={4}
+                    defaultPageSize={3}
                     className="-striped -highlight"
-                />
+                    showPagination={false}
+            />
                 <br />
             </div>
         );
