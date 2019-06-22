@@ -1,23 +1,46 @@
 ﻿using System;
+using System.Threading;
 
 namespace Donation.Queue.Lib
 {
     public class PerformanceTracker
     {
-        public int ItemCount = 0;
+        private long _itemCount = 0;
         private DateTime StartTimeStamp;
 
+        public long ItemCount
+        {
+            get
+            {
+                return this._itemCount;
+            }
+        }
+
+        public long ItemCountThreadSafe
+        {
+            get { return Interlocked.Read(ref this._itemCount); }
+        }
+        
         public void TrackNewItem(int count = 1)
         {
             if (ItemCount == 0) // Set MessageSentTimeStamp on the first message that we send
                 StartTimeStamp = DateTime.UtcNow;
 
-            ItemCount += count;
+            this._itemCount += count;
+        }
+
+        public void TrackNewItemThreadSafe(int count = 1)
+        {
+            // TODO: Not protected
+            if (ItemCount == 0) // Set MessageSentTimeStamp on the first message that we send
+                StartTimeStamp = DateTime.UtcNow;
+
+            Interlocked.Add(ref _itemCount, count);
         }
 
         public void ResetTrackedInformation()
         {
-            ItemCount = 0;
+            this._itemCount = 0;
         }
 
         public int Duration
@@ -33,7 +56,7 @@ namespace Donation.Queue.Lib
             {
                 var d = this.Duration;
                 if (d == 0) return 0;
-                return ItemCount / d;
+                return (int)(ItemCount / d);
             }
         }
 
@@ -43,9 +66,9 @@ namespace Donation.Queue.Lib
             var messagePerSecond = this.ItemPerSecond;
             return $"{ItemCount} {action} - {duration:0.0} seconds, {messagePerSecond:0.0} message/S";
         }
-        public long GetPerformanceTrackerCounter()
-        {
-            return ItemCount;
-        }
+        //public long GetPerformanceTrackerCounter()
+        //{
+        //    return ItemCount;
+        //}
     }
 }

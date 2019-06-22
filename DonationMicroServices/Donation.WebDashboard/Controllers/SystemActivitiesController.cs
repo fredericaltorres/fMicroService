@@ -14,11 +14,23 @@ namespace Donation.WebDashboard.Controllers
             LastMessage = "Nothing Recieved yet"
         };
 
-        public static void AddDonationPushed(int totalDonationPushed, int donationPushedPerSecond, string machineName)
+        public static void AddDonationSentToEndpoint(long totalDonationPushed, int donationPushedPerSecond, string machineName)
         {
-            __systemActivitySummary.PushedDonationActivitySummaryDictionary.Add(
+            __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Add(
                 new DonationActivitySummary() {
                     Caption = "Pushed Donation",
+                    MachineName = machineName,
+                    Total = totalDonationPushed,
+                    ItemPerSecond = donationPushedPerSecond
+                });
+        }
+
+        public static void AddDonationEnqueued(long totalDonationPushed, int donationPushedPerSecond, string machineName)
+        {
+            __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Add(
+                new DonationActivitySummary()
+                {
+                    Caption = "Pushed Enqueued",
                     MachineName = machineName,
                     Total = totalDonationPushed,
                     ItemPerSecond = donationPushedPerSecond
@@ -33,14 +45,15 @@ namespace Donation.WebDashboard.Controllers
 
         public class SystemActivitySummary
         {
-            public DonationActivitySummaryDictionary PushedDonationActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+            public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+            public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public string LastMessage { get; set; }
         }
 
         public class DonationActivitySummary
         {
             public int ItemPerSecond { get; set; }
-            public int Total { get; set; }
+            public long Total { get; set; }
             public string MachineName { get; set; }
             public string Caption { get; set; }
         }

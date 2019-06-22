@@ -115,11 +115,11 @@ namespace Donation.PersonSimulator.Console
                 donations.RemoveRange(0, groupCount);
                 perfTracker.TrackNewItem(groupCount);
 
-                if (perfTracker.GetPerformanceTrackerCounter() % saNotification.NotifyEvery == 0)
+                if (perfTracker.ItemCount % saNotification.NotifyEvery == 0)
                 {
                     System.Console.WriteLine("");
                     var percentDone = 1.0 * perfTracker.ItemCount / donationTotalCount;
-                    await saNotification.NotifyPerformanceInfoAsync("Donation", $"Posted to Entrance endpoint ({percentDone}% done)", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
+                    await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationSentToEndPoint, $"Posted to Entrance endpoint ({percentDone}% done)", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
                 }
             }
 

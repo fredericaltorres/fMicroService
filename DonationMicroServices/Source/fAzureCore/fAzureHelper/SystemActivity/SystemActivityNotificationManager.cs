@@ -47,9 +47,9 @@ namespace fAzureHelper
             _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Publish, serviceBusConnectionString, SystemActivityTopic);
         }
 
-        public async Task<string> NotifyPerformanceInfoAsync(string resource, string action, int durationSecond, int itemProcessedPerSeconds, int totalItemProcessed, bool sendToConsole = true)
+        public async Task<string> NotifyPerformanceInfoAsync(SystemActivityPerformanceType performanceType, string action, int durationSecond, int itemProcessedPerSeconds, long totalItemProcessed, bool sendToConsole = true)
         {
-            var sa = new SystemActivity().SetPerformanceInfo(resource, action, durationSecond, itemProcessedPerSeconds, totalItemProcessed);            
+            var sa = new SystemActivity().SetPerformanceInfo(performanceType, action, durationSecond, itemProcessedPerSeconds, totalItemProcessed);
             await NotifyAsync(sa);
             if (sendToConsole)
                 System.Console.WriteLine($"[san:{sa.Type}]{sa.Message}");

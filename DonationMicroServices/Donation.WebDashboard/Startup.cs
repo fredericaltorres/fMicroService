@@ -38,14 +38,19 @@ namespace Donation.WebDashboard
         {
             if (sa.Type == SystemActivityType.PerformanceInfo)
             {
-                Controllers.SystemActivitiesController.AddDonationPushed(
-                     sa.PerformanceInformation.TotalItemProcessed,
-                     sa.PerformanceInformation.ItemProcessedPerSecond,
-                     sa.MachineName
-                    );
+                if(sa.PerformanceInformation.PerformanceType == SystemActivityPerformanceType.DonationSentToEndPoint)
+                {
+                    Controllers.SystemActivitiesController.AddDonationSentToEndpoint(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+                }
+                if (sa.PerformanceInformation.PerformanceType == SystemActivityPerformanceType.DonationEnqueued)
+                {
+                    Controllers.SystemActivitiesController.AddDonationEnqueued(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+                }
             }
-            //var msg = $"[{sa.Type}] Host:{sa.MachineName}\r\n      {sa.UtcDateTime.ToShortTimeString()}, {sa.Message}";
-            //Controllers.SystemActivitiesController.AddSystemActivitySummary(msg);
+            if (sa.Type == SystemActivityType.DashboardInfo)
+            {
+                Controllers.SystemActivitiesController.AddDonationEnqueued(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -43,13 +43,13 @@ namespace fAzureHelper
             return this;
         }
 
-        public SystemActivity SetPerformanceInfo(string resource, string action, int durationSecond, int itemProcessedPerSeconds, int totalItemProcessed) 
+        public SystemActivity SetPerformanceInfo(SystemActivityPerformanceType performanceType, string action, int durationSecond, int itemProcessedPerSeconds, long totalItemProcessed) 
         {
-            this.Message = $"{totalItemProcessed} {resource}s {action} in {durationSecond} seconds. {itemProcessedPerSeconds} / S";
+            this.Message = $"{totalItemProcessed} {performanceType} {action} in {durationSecond} seconds. {itemProcessedPerSeconds} / S";
             this.Type = SystemActivityType.PerformanceInfo;
             this.PerformanceInformation = new SystemActivityPerformanceInformation()
             {
-                Resource = resource,
+                PerformanceType = performanceType,
                 Action = action,
                 DurationSecond = durationSecond,
                 ItemProcessedPerSecond = itemProcessedPerSeconds,

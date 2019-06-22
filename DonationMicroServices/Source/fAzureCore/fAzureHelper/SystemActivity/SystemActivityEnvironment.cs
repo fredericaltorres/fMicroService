@@ -1,4 +1,5 @@
-﻿using System;
+﻿using fDotNetCoreContainerHelper;
+using System;
 using System.Diagnostics;
 
 namespace fAzureHelper
@@ -16,7 +17,7 @@ namespace fAzureHelper
         public string CommandLine;
         public SystemActivityEnvironment()
         {
-            this.MachineName = Environment.MachineName;
+            this.MachineName = RuntimeHelper.GetMachineName();
             this.UserName = Environment.UserName;
             this.CurrentDirectory = Environment.CurrentDirectory;
             this.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;

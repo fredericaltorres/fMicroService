@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Donation.Queue.Lib;
+using Donation.RestApi.Entrance.Middleware;
+using fAzureHelper;
 using fDotNetCoreContainerHelper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +19,8 @@ namespace Donation.RestApi.Entrance
 {
     public class Startup
     {
+        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -66,8 +70,14 @@ namespace Donation.RestApi.Entrance
                 app.UseHsts();
             }
 
+            // Middleware must be called before UseMvc()
+            RuntimeHelper.SetAppPath(env.ContentRootPath);
+            app.UseMiddleware(typeof(DonationCounterMiddleware));
+
             app.UseHttpsRedirection();
             app.UseMvc();
+
+
         }
     }
 }
