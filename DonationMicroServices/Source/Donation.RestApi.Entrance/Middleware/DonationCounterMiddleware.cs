@@ -10,26 +10,27 @@ using System.Threading.Tasks;
 namespace Donation.RestApi.Entrance.Middleware
 {
     public class DonationCounterMiddleware
-    {        
-        static SystemActivityNotificationManager _systemActivityNotificationPublisher;
-        static PerformanceTracker perfTracker;
+    {
+        static PerformanceTracker __perfTracker = new PerformanceTracker();
+
         private readonly RequestDelegate _next;
 
         public DonationCounterMiddleware(RequestDelegate next)
         {
-            _next = next;
-            _systemActivityNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
-            perfTracker = new PerformanceTracker();
+            this._next = next;
+            
         }
 
         public async Task Invoke(HttpContext context)
         {
             if(context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path == "/api/Donation")
             {
-                perfTracker.TrackNewItemThreadSafe();
-                if (perfTracker.ItemCountThreadSafe % _systemActivityNotificationPublisher.NotifyEvery == 0)
+                __perfTracker.TrackNewItemThreadSafe();
+                
+                if (__perfTracker.ItemCountThreadSafe % SystemActivityNotificationManager.NotifyEvery == 0)
                 {
-                    await _systemActivityNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, "DonationEnqueued", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCountThreadSafe);
+                    var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
+                    await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, "DonationEnqueued", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
                 }
             }
             await _next(context); // Call the next delegate/middleware in the pipeline

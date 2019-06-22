@@ -115,7 +115,7 @@ namespace Donation.PersonSimulator.Console
                 donations.RemoveRange(0, groupCount);
                 perfTracker.TrackNewItem(groupCount);
 
-                if (perfTracker.ItemCount % saNotification.NotifyEvery == 0)
+                if (perfTracker.ItemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                 {
                     System.Console.WriteLine("");
                     var percentDone = 1.0 * perfTracker.ItemCount / donationTotalCount;

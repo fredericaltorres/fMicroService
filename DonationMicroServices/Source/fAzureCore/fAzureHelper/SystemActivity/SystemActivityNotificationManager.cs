@@ -9,7 +9,7 @@ namespace fAzureHelper
     public class SystemActivityNotificationManager
     {
         public const string SystemActivityTopic = "systemactivity";
-        public readonly int NotifyEvery = 500;
+        public const int NotifyEvery = 500;
 
         public delegate void OnMessageReceivedEventHandler(SystemActivity systemActivity);
         public event OnMessageReceivedEventHandler OnMessageReceived;

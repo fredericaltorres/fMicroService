@@ -97,7 +97,7 @@ namespace Donation.PersonSimulator.Console
                             await saNotification.NotifyAsync($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}", SystemActivityType.Error);
                             donationQueue.Release(donations); // Release and will retry the messager after x time the message will go to dead letter queue                            
                         }
-                        if (donationQueue.ItemCount % saNotification.NotifyEvery == 0)
+                        if (donationQueue.ItemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                         {
                             await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationProcessed, "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
                             await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));

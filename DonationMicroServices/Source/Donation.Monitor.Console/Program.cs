@@ -49,7 +49,7 @@ namespace Donation.PersonSimulator.Console
 
         static async Task Monitor()
         {
-            var systemActivityNotificationSubscriber = new SystemActivityNotificationManager(GetServiceBusConnectionString(), Environment.MachineName, true);
+            var systemActivityNotificationSubscriber = new SystemActivityNotificationManager(GetServiceBusConnectionString(), Environment.MachineName, false);
             systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;
             const int waitSeconds = 4;
             int previousQueueCount = -1;
