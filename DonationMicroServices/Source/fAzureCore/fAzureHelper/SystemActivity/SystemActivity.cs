@@ -38,7 +38,8 @@ namespace fAzureHelper
             this.Type = SystemActivityType.DashboardInfo;
             this.DashboardInformation = new SystemActivityDashboardInformation() {
                 TotalItemProcessed = totalItemProcessed,
-                JsonData = jsonData
+                JsonData = jsonData,
+                DashboardResource = dashboardResource,
             };
             return this;
         }

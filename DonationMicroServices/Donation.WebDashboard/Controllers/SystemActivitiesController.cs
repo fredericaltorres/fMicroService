@@ -37,6 +37,18 @@ namespace Donation.WebDashboard.Controllers
                 });
         }
 
+        public static void AddDashboardResource(string dashboardResource, int total, string jsonData, string machineName)
+        {
+            __systemActivitySummary.DashboardResourceActivitySummaryDictionary.Add(
+                new DonationActivitySummary()
+                {
+                    Caption = $"Dashboard:{dashboardResource}",
+                    MachineName = machineName,
+                    Total = total,
+                    JsonData = jsonData
+                });
+        }
+
         [HttpGet("[action]")]
         public SystemActivitySummary GetSystemActivitySummary()
         {
@@ -47,6 +59,7 @@ namespace Donation.WebDashboard.Controllers
         {
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public string LastMessage { get; set; }
         }
 
@@ -56,6 +69,7 @@ namespace Donation.WebDashboard.Controllers
             public long Total { get; set; }
             public string MachineName { get; set; }
             public string Caption { get; set; }
+            public string JsonData { get; set; }
         }
 
         /// <summary>

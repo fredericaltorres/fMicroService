@@ -52,6 +52,7 @@ export class Home extends Component {
         systemActivitySummary: {
             donationSentToEndPointActivitySummaryDictionary: {},
             donationEnqueuedActivitySummaryDictionary: {},
+            dashboardResourceActivitySummaryDictionary: {},
             lastMessage: "No message yet",
         }
     };
@@ -158,10 +159,11 @@ export class Home extends Component {
                                 {
                                     Header: "Machine Name",
                                     id: "machineName",
-                                    accessor: d => d.machineName.replace("person", "")
+                                    accessor: d => d.machineName.replace("person", ""),
+                                    // minWidth: 150
                                 },
-                                { Header: "Activity", accessor: "caption" },
-                                { Header: "Total", accessor: "total" },
+                                //{ Header: "Activity", accessor: "caption" },
+                                { Header: "Total", accessor: "total"},
                                 { Header: "Donation/S", accessor: "itemPerSecond" }
                             ]
                         }
@@ -192,9 +194,10 @@ export class Home extends Component {
                             {
                                 Header: "Machine Name",
                                 id: "machineName",
-                                accessor: d => d.machineName.replace("donation-restapi-entrance-", "")
+                                accessor: d => d.machineName.replace("donation-restapi-entrance-", ""),
+                                // minWidth: 230
                             },
-                            { Header: "Activity", accessor: "caption" },
+                            //{ Header: "Activity", accessor: "caption" },
                             { Header: "Total", accessor: "total" },
                             { Header: "Donation/S", accessor: "itemPerSecond" }
                         ]

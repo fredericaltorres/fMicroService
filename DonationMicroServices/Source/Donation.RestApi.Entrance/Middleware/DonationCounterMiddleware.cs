@@ -17,8 +17,7 @@ namespace Donation.RestApi.Entrance.Middleware
 
         public DonationCounterMiddleware(RequestDelegate next)
         {
-            this._next = next;
-            
+            this._next = next;            
         }
 
         public async Task Invoke(HttpContext context)

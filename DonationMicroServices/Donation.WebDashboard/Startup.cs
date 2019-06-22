@@ -49,7 +49,8 @@ namespace Donation.WebDashboard
             }
             if (sa.Type == SystemActivityType.DashboardInfo)
             {
-                Controllers.SystemActivitiesController.AddDonationEnqueued(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+                var d = sa.DashboardInformation;
+                Controllers.SystemActivitiesController.AddDashboardResource(d.DashboardResource, d.TotalItemProcessed, d.JsonData, sa.MachineName);
             }
         }
 
