@@ -18,10 +18,9 @@ namespace fAzureHelper
 
         private AzurePubSubManager _pubSub;
 
-        public SystemActivityNotificationManager(string serviceBusConnectionString, string subscriptionName, bool purgeSubscription)
+        public SystemActivityNotificationManager(string serviceBusConnectionString, string subscriptionName)
         {
-            _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, serviceBusConnectionString, SystemActivityTopic, subscriptionName, purgeSubscription: purgeSubscription);
-
+            _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Subcribe, serviceBusConnectionString, SystemActivityTopic, subscriptionName);
             _pubSub.Subscribe(InternalOnMessageReceived);
         }
 
@@ -44,7 +43,12 @@ namespace fAzureHelper
 
         public SystemActivityNotificationManager(string serviceBusConnectionString)
         {
-            _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Publish, serviceBusConnectionString, SystemActivityTopic);
+            _pubSub = new AzurePubSubManager(AzurePubSubManagerType.Publish, serviceBusConnectionString, SystemActivityTopic);            
+        }
+
+        public async Task CloseAsync()
+        {
+            await this._pubSub.CloseAsync();
         }
 
         public async Task<string> NotifyPerformanceInfoAsync(SystemActivityPerformanceType performanceType, string action, int durationSecond, int itemProcessedPerSeconds, long totalItemProcessed, bool sendToConsole = true)
@@ -76,6 +80,21 @@ namespace fAzureHelper
         //    // Wait for the call so the notification are logged in the right order
         //    return NotifyAsync(message, type, sendToConsole).GetAwaiter().GetResult();
         //}
+
+        public async Task NotifyErrorAsync(string message, bool sendToConsole = true)
+        {
+            await this.NotifyAsync(message, SystemActivityType.Error, sendToConsole);
+        }
+
+        public async Task NotifyErrorAsync(System.Exception ex, bool sendToConsole = true)
+        {
+            await this.NotifyAsync(ex.Message, SystemActivityType.Error, sendToConsole);
+        }
+
+        public async Task NotifyInfoAsync(string message, bool sendToConsole = true)
+        {
+            await NotifyAsync(message, SystemActivityType.Info, sendToConsole);
+        }
 
         public async Task<string> NotifyAsync(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
         {

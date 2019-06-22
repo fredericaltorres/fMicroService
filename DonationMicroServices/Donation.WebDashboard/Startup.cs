@@ -36,7 +36,11 @@ namespace Donation.WebDashboard
 
         private static void SystemActivityNotificationSubscriber_OnMessageReveived(SystemActivity sa)
         {
-            if (sa.Type == SystemActivityType.PerformanceInfo)
+            if (sa.Type == SystemActivityType.Error)
+            {
+                Controllers.SystemActivitiesController.AddDonationError(sa.Message, sa.AppName, sa.MachineName);
+            }
+            else if (sa.Type == SystemActivityType.PerformanceInfo)
             {
                 if(sa.PerformanceInformation.PerformanceType == SystemActivityPerformanceType.DonationSentToEndPoint)
                 {
@@ -51,7 +55,7 @@ namespace Donation.WebDashboard
                     Controllers.SystemActivitiesController.AddDonationProcessed(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
                 }
             }
-            if (sa.Type == SystemActivityType.DashboardInfo)
+            else if (sa.Type == SystemActivityType.DashboardInfo)
             {
                 var d = sa.DashboardInformation;
                 Controllers.SystemActivitiesController.AddDashboardResource(d.DashboardResource, d.TotalItemProcessed, d.JsonData, sa.MachineName);
@@ -95,7 +99,7 @@ namespace Donation.WebDashboard
 
             RuntimeHelper.SetAppPath(env.ContentRootPath);
 
-            systemActivityNotificationSubscriber = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"), Environment.MachineName, false);
+            systemActivityNotificationSubscriber = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"), Environment.MachineName);
             systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;
         }
     }

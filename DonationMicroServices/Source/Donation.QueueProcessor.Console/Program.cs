@@ -81,20 +81,20 @@ namespace Donation.PersonSimulator.Console
                                     }
                                     else
                                     {
-                                        await saNotification.NotifyAsync(insertErrors.ToString(), SystemActivityType.Error);
+                                        await saNotification.NotifyErrorAsync(insertErrors.ToString());
                                         donationQueue.Release(donation);
                                     }
                                 }
                                 else
                                 {
-                                    await saNotification.NotifyAsync(convertionErrors.ToString(), SystemActivityType.Error);
+                                    await saNotification.NotifyErrorAsync(convertionErrors.ToString());
                                     donationQueue.Release(donation); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
                             }
                         }
                         else
                         {
-                            await saNotification.NotifyAsync($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}", SystemActivityType.Error);
+                            await saNotification.NotifyErrorAsync($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}");
                             donationQueue.Release(donations); // Release and will retry the messager after x time the message will go to dead letter queue                            
                         }
                         if (donationQueue.ItemCount % SystemActivityNotificationManager.NotifyEvery == 0)
@@ -105,14 +105,14 @@ namespace Donation.PersonSimulator.Console
                                 
                             donationAggregationService.Clear();
 
-                            await saNotification.NotifyAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
+                            await saNotification.NotifyInfoAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
                         }
                     }
                 }
             }
             catch(System.Exception ex)
             {
-                await saNotification.NotifyAsync($"Donation.QueueProcessor.Console process crashed on machine {Environment.MachineName}, ex:{ex}", SystemActivityType.Error );
+                await saNotification.NotifyErrorAsync($"{RuntimeHelper.GetAppName()} process crashed on machine {Environment.MachineName}, ex:{ex}");
             }
         }
     }

@@ -45,8 +45,21 @@ namespace Donation.WebDashboard.Controllers
                     Caption = "Donation Processed",
                     MachineName = machineName,
                     Total = total,
-                    ItemPerSecond = donationPerSeconds
-                });
+                    ItemPerSecond = donationPerSeconds,
+                }
+            );
+        }
+
+        public static void AddDonationError(string errorMessage, string appName, string machineName)
+        {
+            __systemActivitySummary.DonationErrorsSummaryDictionary.Add(
+                new DonationActivitySummary()
+                {
+                    Caption = "Errors",
+                    MachineName = machineName,
+                    Message = $"App:{appName}, {errorMessage}",
+                }
+            );
         }
 
         public static void AddDashboardResource(string dashboardResource, int total, string jsonData, string machineName)
@@ -74,6 +87,8 @@ namespace Donation.WebDashboard.Controllers
             public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
 
+            public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+
             public string LastMessage { get; set; }
             
         }
@@ -85,6 +100,7 @@ namespace Donation.WebDashboard.Controllers
             public string MachineName { get; set; }
             public string Caption { get; set; }
             public string JsonData { get; set; }
+            public string Message { get; set; }
         }
 
         /// <summary>

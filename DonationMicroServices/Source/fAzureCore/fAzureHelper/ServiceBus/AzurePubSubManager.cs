@@ -18,8 +18,7 @@ namespace AzureServiceBusSubHelper
         private string _subscriptionName;
         private ITopicClient _topicClient;
         private ISubscriptionClient _subscriptionClient;
-        private bool _mustCreateDeleteSubscription;
-
+        
         private OnMessageReceived _onMessageReceived;
 
         public long MessagePublishedCounter = 0;
@@ -30,31 +29,29 @@ namespace AzureServiceBusSubHelper
 
         public delegate bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber);
 
-        public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null, bool mustCreateSubscription = true, bool purgeSubscription = false)
+        public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null
+            // , bool mustCreateSubscription = true, bool purgeSubscription = false
+            )
         {
             _type = type;
             _connectionString = connectionString;
             _topic = topic;
 
-            _mustCreateDeleteSubscription = mustCreateSubscription;
-
             if (type == AzurePubSubManagerType.Publish)
             {
                 _topicClient = new TopicClient(_connectionString, _topic);
             }
-            else if(type ==AzurePubSubManagerType.Subcribe)
+            else if(type == AzurePubSubManagerType.Subcribe)
             {
                 _subscriptionName = subscriptionName.Substring(0, Math.Min(MAX_SUBSCRIPTION_NAME_LENGTH, subscriptionName.Length));
-                if (mustCreateSubscription)
-                {
-                    this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
-                }
+                
+                this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
 
-                if (purgeSubscription)
-                {
-                    this.DeleteSubscription().GetAwaiter().GetResult();
-                    this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
-                }
+                //if (purgeSubscription)
+                //{
+                //    this.DeleteSubscription().GetAwaiter().GetResult();
+                //    this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
+                //}
 
                 _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
             }
@@ -92,15 +89,20 @@ namespace AzureServiceBusSubHelper
             }
         }
 
-        public async Task Close()
+        public async Task CloseAsync()
         {
             if (_type == AzurePubSubManagerType.Subcribe) {
                 await this.StopSubscribingAsync();
-                if (_mustCreateDeleteSubscription)
-                {
-                    var managementClient = new ManagementClient(_connectionString);
-                    await managementClient.DeleteSubscriptionAsync(_topic, _subscriptionName);
-                }
+                //if (_mustCreateDeleteSubscription)
+                //{
+                //    var managementClient = new ManagementClient(_connectionString);
+                //    await managementClient.DeleteSubscriptionAsync(_topic, _subscriptionName);
+                //}
+                await _subscriptionClient.CloseAsync();
+            }
+            if (_type == AzurePubSubManagerType.Subcribe)
+            {
+                await _topicClient.CloseAsync();
             }
         }
 

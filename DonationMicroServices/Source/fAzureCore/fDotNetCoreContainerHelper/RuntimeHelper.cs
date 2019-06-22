@@ -93,6 +93,8 @@ namespace fDotNetCoreContainerHelper
             d.Add("SystemDirectory", Environment.SystemDirectory);
             d.Add("NewLine.Length", Environment.NewLine.Length);
             d.Add("IsRunningContainerMode", IsRunningContainerMode());
+            d.Add("AppName", GetAppName());
+            d.Add("AppVersion", GetAppVersion());
 
             foreach (DictionaryEntry e in Environment.GetEnvironmentVariables())
             {
@@ -160,6 +162,11 @@ namespace fDotNetCoreContainerHelper
         public static string GetAppVersion()
         {
             return Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        }
+
+        public static string GetAppName()
+        {
+            return Assembly.GetEntryAssembly().FullName;
         }
 
         public static string _AppPath = null;
