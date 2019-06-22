@@ -53,6 +53,7 @@ export class Home extends Component {
             donationSentToEndPointActivitySummaryDictionary: {},
             donationEnqueuedActivitySummaryDictionary: {},
             dashboardResourceActivitySummaryDictionary: {},
+            donationProcessedActivitySummaryDictionary: {}, // FINISH TO IMPLEMENT
             lastMessage: "No message yet",
         }
     };
@@ -139,6 +140,39 @@ export class Home extends Component {
         });
         return r;
     }
+    
+    getDashboardResourceActivitySummaryTable = () => {
+        let sTotal = 0;
+        let sItemPerSecond = 0;
+        let sCaption = null;
+        const machineNames = Object.keys(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
+        const r = machineNames.map((machineName) => {
+
+            const machineInfo = this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary[machineName];
+            sTotal += machineInfo.total;
+            sItemPerSecond += machineInfo.itemPerSecond;
+            if (sCaption === null) sCaption = machineInfo.caption;
+            return {
+                machineName: machineInfo.machineName,
+                caption: machineInfo.caption,
+                total: machineInfo.total,
+                jsonData: machineInfo.jsonData,
+            };
+        });
+
+        if (machineNames.length > 0) {
+            sItemPerSecond = sItemPerSecond / machineNames.length; // compute average
+        }
+
+        r.push({ // Add summation row
+            machineName: 'Total',
+            caption: sCaption,
+            total: sTotal,
+            itemPerSecond: sItemPerSecond,
+        });
+        return r;
+    }
+
 
     // https://www.npmjs.com/package/react-table
     // https://codesandbox.io/s/react-table-simple-table-hpduw
@@ -210,6 +244,42 @@ export class Home extends Component {
         );
     }
 
+    // https://www.npmjs.com/package/react-table
+    // https://codesandbox.io/s/react-table-simple-table-hpduw
+    // With colors
+    // https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
+    renderDashboardResourceActivitySummaryTable = () => {
+        const data = this.getDashboardResourceActivitySummaryTable();
+        if (data.length === 0)
+            return null
+
+        return (
+            <ReactTable
+                data={data}
+                columns={[
+                    {
+                        Header: "Dashboard Country Aggregate",
+                        columns: [
+                            {
+                                Header: "Machine Name",
+                                id: "machineName",
+                                accessor: d => d.machineName.replace("person", ""),
+                                // minWidth: 150
+                            },
+                            //{ Header: "Activity", accessor: "caption" },
+                            { Header: "Total", accessor: "total" },
+                            { Header: "Json Data", accessor: "jsonData" }
+                        ]
+                    }
+                ]}
+                defaultPageSize={3}
+                className="-striped -highlight"
+                showPagination={false}
+            />
+        );
+    }
+
+
     render() {
 
         const donationProcessedPerSecChart = (
@@ -264,7 +334,6 @@ export class Home extends Component {
                     </h4> </div>
                 </div>
 
-
                 <div className="card">
                     <div className="card-header">Donation Enqueued</div>
                     <div className="card-body"> <h4 className="card-title">
@@ -272,7 +341,13 @@ export class Home extends Component {
                     </h4> </div>
                 </div>
 
-                renderDonationEnqueuedActivitySummaryTable
+                <div className="card">
+                    <div className="card-header">Donation Enqueued</div>
+                    <div className="card-body"> <h4 className="card-title">
+                        {this.renderDashboardResourceActivitySummaryTable()}
+                    </h4> </div>
+                </div>
+
                 <div className="card">
                     <div className="card-header">Total Donation Processed</div>
                     <div className="card-body"> <h4 className="card-title">

@@ -30,10 +30,22 @@ namespace Donation.WebDashboard.Controllers
             __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Add(
                 new DonationActivitySummary()
                 {
-                    Caption = "Pushed Enqueued",
+                    Caption = "Donation Enqueued",
                     MachineName = machineName,
                     Total = totalDonationPushed,
                     ItemPerSecond = donationPushedPerSecond
+                });
+        }
+
+        public static void AddDonationProcessed(long total, int donationPerSeconds, string machineName)
+        {
+            __systemActivitySummary.DonationProcessedActivitySummaryDictionary.Add(
+                new DonationActivitySummary()
+                {
+                    Caption = "Donation Processed",
+                    MachineName = machineName,
+                    Total = total,
+                    ItemPerSecond = donationPerSeconds
                 });
         }
 
@@ -60,7 +72,10 @@ namespace Donation.WebDashboard.Controllers
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+            public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+
             public string LastMessage { get; set; }
+            
         }
 
         public class DonationActivitySummary
