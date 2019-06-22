@@ -37,7 +37,7 @@ namespace Donation.PersonSimulator.Console
         static async Task ProcessDonationQueue()
         {
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
-            await saNotification.NotifyAsync($"Donation.QueueProcessor.Console Running");
+            await saNotification.NotifyInfoAsync($"{RuntimeHelper.GetAppName()} Running");
             try
             {
                 // Settings come frm the appsettings.json file

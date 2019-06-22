@@ -6,25 +6,9 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace fDotNetCoreContainerHelper
 {
-    public class HttpHelper
-    {
-        public async Task<(bool succeeded, string location, HttpResponseMessage httpResponseMessage)> PostJson(Uri uri, string json)
-        {
-            using (var client = new HttpClient())
-            {
-                HttpResponseMessage hrp = await client.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"));                
-                if(hrp.IsSuccessStatusCode)
-                    return (hrp.IsSuccessStatusCode, hrp.Headers.Location.ToString(), hrp);
-                else
-                    return (hrp.IsSuccessStatusCode, null, hrp);
-            }
-        }
-    }
 
     public class RuntimeHelper
     {
@@ -166,7 +150,14 @@ namespace fDotNetCoreContainerHelper
 
         public static string GetAppName()
         {
-            return Assembly.GetEntryAssembly().FullName;
+            var s = Assembly.GetEntryAssembly().FullName;
+            var parts = s.Split(',');
+            if (parts.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(parts[0]))
+                    return parts[0].Trim();
+            }
+            return s;
         }
 
         public static string _AppPath = null;

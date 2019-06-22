@@ -38,7 +38,11 @@ namespace Donation.WebDashboard
         {
             if (sa.Type == SystemActivityType.Error)
             {
-                Controllers.SystemActivitiesController.AddDonationError(sa.Message, sa.AppName, sa.MachineName);
+                Controllers.SystemActivitiesController.AddDonationInfo(sa.Message, sa.AppName, sa.MachineName);
+            }
+            if (sa.Type == SystemActivityType.Info)
+            {
+                Controllers.SystemActivitiesController.AddDonationInfo(sa.Message, sa.AppName, sa.MachineName);
             }
             else if (sa.Type == SystemActivityType.PerformanceInfo)
             {

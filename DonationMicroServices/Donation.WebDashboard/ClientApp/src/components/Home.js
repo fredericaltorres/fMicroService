@@ -32,29 +32,56 @@ export class Home extends Component {
             donationEnqueuedActivitySummaryDictionary: {},
             dashboardResourceActivitySummaryDictionary: {},
             donationProcessedActivitySummaryDictionary: {},
+            donationInfoSummaryDictionary: {},
             donationErrorsSummaryDictionary: {},
             lastMessage: "No message yet",
+            autoRefreshOn : true,
         }
     };
 
+    reloadData = () => {
+
+        console.log(`About to refresh...`);
+
+        fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
+            .then(data => {
+                console.log(`data:${JSON.stringify(data)}`);
+                this.updateState('systemActivitySummary', data);
+            });
+    }
+
     componentDidMount() {
-        this.timerId = setInterval(() => {
-            console.log(`About to refresh...`);
 
-            fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
-                .then(data => {
-                    console.log(`data:${JSON.stringify(data)}`);
-                    this.updateState('systemActivitySummary', data);
-                });
-
-        }, this.refreshTimeOut)
+        this.setAutoRefresh(true);
     }
 
     updateState = (property, value) => {
+
         this.setState({ ...this.state, [property]: value }, () => {
             //console.log(`state: ${JSON.stringify(this.state)}`);
         });
     }
+
+    reverseAutoRefresh = () => {
+
+        this.setAutoRefresh(!this.state.autoRefreshOn);
+    }
+
+    getAutoRefreshStatus = () => {
+
+        return this.state.autoRefreshOn ? "On" : "Off";
+    }
+
+    setAutoRefresh = (on) => {
+
+        if (on) {
+            this.timerId = setInterval(this.reloadData, this.refreshTimeOut);
+        }
+        else {
+            clearTimeout(this.timerId);
+        }
+        this.updateState('autoRefreshOn', on);
+    }    
 
     getActivitySummaryTable = (activitySummaryDictionary) => {
         let sTotal = 0;
@@ -76,7 +103,7 @@ export class Home extends Component {
                 total: machineInfo.total,
                 itemPerSecond: machineInfo.itemPerSecond,
                 jsonData: machineInfo.jsonData,
-                message: machineInfo.message,
+                message: machineInfo.message, // This is an array of string
             };
         });
 
@@ -91,6 +118,11 @@ export class Home extends Component {
             itemPerSecond: sItemPerSecond,
         });
         return r;
+    }
+
+    getDonationInfoActivitySummaryTable = () => {
+
+        return this.getActivitySummaryTable(this.state.systemActivitySummary.donationInfoSummaryDictionary);
     }
 
     getDonationErrorsActivitySummaryTable = () => {
@@ -118,6 +150,50 @@ export class Home extends Component {
         return this.getActivitySummaryTable(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
     }
 
+    renderDonationInfoActivitySummaryTable = () => {
+
+        const data = this.getDonationInfoActivitySummaryTable();
+        if (data.length === 0)
+            return null
+
+        return (
+            <ReactTable
+                data={data}
+                columns={[
+                    {
+                        Header: "Donation Info",
+                        columns: [
+                            {
+                                Header: "Machine Name",
+                                id: "machineName",
+                                accessor: d => d.machineName,
+                            },
+                            //{ Header: "Activity", accessor: "caption" },
+                            { Header: "Total", accessor: "total" },
+                            { Header: "Messages", accessor: "message" } // ++++
+                        ]
+                    }
+                ]}
+                defaultPageSize={3}
+                className="-striped -highlight"
+                showPagination={false}
+                SubComponent={row => {
+                    var messages = row.original.message;
+                    var messagesHtml = messages.map((message, index) => {
+                        return <li key={index}>{message}</li>;
+                    });                    
+                    return (
+                        <ul style={{ padding: "20px" }}>
+                            {messagesHtml}
+                        </ul>
+                    );
+                }}
+            />
+        );
+    }
+
+
+
     renderDonationErrorsActivitySummaryTable = () => {
 
         const data = this.getDonationErrorsActivitySummaryTable();
@@ -138,7 +214,7 @@ export class Home extends Component {
                             },
                             //{ Header: "Activity", accessor: "caption" },
                             { Header: "Total", accessor: "total" },
-                            { Header: "Donation/S", accessor: "itemPerSecond" }
+                            { Header: "Messages", accessor: "message" }
                         ]
                     }
                 ]}
@@ -307,7 +383,7 @@ export class Home extends Component {
 
         return (
             <div>
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.onClear} > Clear </button>
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} </button>
                 {/*
                 <div className="card">
                     <div className="card-header">Donation Received Per Second</div>
@@ -356,6 +432,15 @@ export class Home extends Component {
                     <div className="card-body">
                         <h4 className="card-title">
                             {this.renderDonationProcessedActivitySummaryTable()}
+                        </h4>
+                    </div>
+                </div>
+                
+                <div className="card">
+                    <div className="card-header">Donation Info</div>
+                    <div className="card-body">
+                        <h4 className="card-title">
+                            {this.renderDonationInfoActivitySummaryTable()}
                         </h4>
                     </div>
                 </div>

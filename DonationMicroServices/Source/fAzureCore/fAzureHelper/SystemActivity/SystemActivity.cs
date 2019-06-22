@@ -1,4 +1,5 @@
-﻿using System;
+﻿using fDotNetCoreContainerHelper;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -27,7 +28,7 @@ namespace fAzureHelper
         public SystemActivity(string message, SystemActivityType type) : base()
         {
             this.UtcDateTime = DateTime.UtcNow;
-            this.AppName = Assembly.GetEntryAssembly().FullName;
+            this.AppName = RuntimeHelper.GetAppName();
             this.Type = type;
             this.Message = message;
         }

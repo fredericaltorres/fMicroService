@@ -57,7 +57,19 @@ namespace Donation.WebDashboard.Controllers
                 {
                     Caption = "Errors",
                     MachineName = machineName,
-                    Message = $"App:{appName}, {errorMessage}",
+                    Message = new List<string>() { $"App:{appName}, {errorMessage}" },
+                }
+            );
+        }
+
+        public static void AddDonationInfo(string errorMessage, string appName, string machineName)
+        {
+            __systemActivitySummary.DonationInfoSummaryDictionary.Add(
+                new DonationActivitySummary()
+                {
+                    Caption = "Errors",
+                    MachineName = machineName,
+                    Message = new List<string>() { $"App:{appName}, {errorMessage}" },
                 }
             );
         }
@@ -86,8 +98,8 @@ namespace Donation.WebDashboard.Controllers
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-
             public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+            public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
 
             public string LastMessage { get; set; }
             
@@ -100,7 +112,7 @@ namespace Donation.WebDashboard.Controllers
             public string MachineName { get; set; }
             public string Caption { get; set; }
             public string JsonData { get; set; }
-            public string Message { get; set; }
+            public List<string> Message { get; set; } = new List<string>();
         }
 
         /// <summary>
@@ -117,6 +129,8 @@ namespace Donation.WebDashboard.Controllers
                     this[key].Total = das.Total;
                     this[key].ItemPerSecond = das.ItemPerSecond;
                     this[key].Caption = das.Caption;
+                    this[key].JsonData = das.JsonData;
+                    this[key].Message.AddRange(das.Message);
                 }
                 else
                 {
