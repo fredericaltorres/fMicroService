@@ -25,25 +25,29 @@ export class Home extends Component {
 
     timerId = null;
     refreshTimeOut = 1000 * 4;
+    
 
     state = {
         systemActivitySummary: {
+            donationSentToEndPointActivitySummaryTotals: [],
             donationSentToEndPointActivitySummaryDictionary: {},
+
             donationEnqueuedActivitySummaryDictionary: {},
             dashboardResourceActivitySummaryDictionary: {},
             donationProcessedActivitySummaryDictionary: {},
             donationInfoSummaryDictionary: {},
             donationErrorsSummaryDictionary: {},
             lastMessage: "No message yet",
-            autoRefreshOn : true,
+            autoRefreshOn : false,
         }
     };
 
+    // Return a promise
     reloadData = () => {
 
         console.log(`About to refresh...`);
 
-        fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
+        return fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
             .then(data => {
                 console.log(`data:${JSON.stringify(data)}`);
                 this.updateState('systemActivitySummary', data);
@@ -51,8 +55,11 @@ export class Home extends Component {
     }
 
     componentDidMount() {
+        
+        this.reloadData().then(() => {
 
-        this.setAutoRefresh(true);
+            this.setAutoRefresh(true);
+        });        
     }
 
     updateState = (property, value) => {
@@ -84,37 +91,34 @@ export class Home extends Component {
     }    
 
     getActivitySummaryTable = (activitySummaryDictionary) => {
-        let sTotal = 0;
+
+        let sTotal         = 0;
         let sItemPerSecond = 0;
-        let sCaption = null;
+        let sCaption       = null;
         const machineNames = Object.keys(activitySummaryDictionary);
 
         const r = machineNames.map((machineName) => {
 
-            const machineInfo = activitySummaryDictionary[machineName];
-            sTotal += machineInfo.total;
-            sItemPerSecond += machineInfo.itemPerSecond;
+            const machineInfo  = activitySummaryDictionary[machineName];
+            sTotal            += machineInfo.total;
+            sItemPerSecond    += machineInfo.itemPerSecond;
 
             if (sCaption === null) sCaption = machineInfo.caption;
 
             return {
-                machineName: machineInfo.machineName,
-                caption: machineInfo.caption,
-                total: machineInfo.total,
+                machineName  : machineInfo.machineName,
+                caption      : machineInfo.caption,
+                total        : machineInfo.total,
                 itemPerSecond: machineInfo.itemPerSecond,
-                jsonData: machineInfo.jsonData,
-                message: machineInfo.message, // This is an array of string
+                jsonData     : machineInfo.jsonData,
+                message      : machineInfo.message, // This is an array of string
             };
         });
 
-        if (machineNames.length > 0) {
-            sItemPerSecond = sItemPerSecond;//  / machineNames.length; // compute average
-        }
-
         r.push({ // Add summation row
-            machineName: 'Total',
-            caption: sCaption,
-            total: sTotal,
+            machineName  : 'Total',
+            caption      : sCaption,
+            total        : sTotal,
             itemPerSecond: sItemPerSecond,
         });
         return r;
@@ -159,21 +163,10 @@ export class Home extends Component {
         return (
             <ReactTable
                 data={data}
-                columns={[
-                    {
-                        Header: "Donation Info",
-                        columns: [
-                            {
-                                Header: "Machine Name",
-                                id: "machineName",
-                                accessor: d => d.machineName,
-                            },
-                            //{ Header: "Activity", accessor: "caption" },
-                            { Header: "Total", accessor: "total" },
-                            { Header: "Messages", accessor: "message" } // 
-                        ]
-                    }
-                ]}
+                columns={[{
+                    Header: "Donation Info",
+                    columns: this.getColumnsForMessagesTable()                        
+                }]}
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
@@ -192,8 +185,6 @@ export class Home extends Component {
         );
     }
 
-
-
     renderDonationErrorsActivitySummaryTable = () => {
 
         const data = this.getDonationErrorsActivitySummaryTable();
@@ -203,27 +194,36 @@ export class Home extends Component {
         return (
             <ReactTable
                 data={data}
-                columns={[
-                    {
+                columns={[{
                         Header: "Donation Errors",
-                        columns: [
-                            {
-                                Header: "Machine Name",
-                                id: "machineName",
-                                accessor: d => d.machineName,
-                            },
-                            //{ Header: "Activity", accessor: "caption" },
-                            { Header: "Total", accessor: "total" },
-                            { Header: "Messages", accessor: "message" }
-                        ]
-                    }
-                ]}
+                        columns: this.getColumnsForMessagesTable()
+                }]}                
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
             />
         );
     }
+
+    getColumnsForMessagesTable = () => [
+        {
+            Header: "Machine Name",
+            id: "machineName",
+            accessor: d => d.machineName,
+        },
+        { Header: "Total", accessor: "total" },
+        { Header: "Messages", accessor: "message" }
+    ]
+
+    getColumnsForDonationPerSecondTable = () => [
+        {
+            Header: "Machine Name",
+            id: "machineName",
+            accessor: d => d.machineName,
+        },
+        { Header: "Total", accessor: "total" },
+        { Header: "Donation/S", accessor: "itemPerSecond" }
+    ];
 
     renderDonationProcessedActivitySummaryTable = () => {
 
@@ -234,28 +234,16 @@ export class Home extends Component {
         return (
             <ReactTable
                 data={data}
-                columns={[
-                    {
+                columns={[{
                         Header: "Donation Processed",
-                        columns: [
-                            {
-                                Header: "Machine Name",
-                                id: "machineName",
-                                accessor: d => d.machineName,
-                            },
-                            //{ Header: "Activity", accessor: "caption" },
-                            { Header: "Total", accessor: "total" },
-                            { Header: "Donation/S", accessor: "itemPerSecond" }
-                        ]
-                    }
-                ]}
+                        columns: this.getColumnsForDonationPerSecondTable()
+                }]}                
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
             />
         );
     }
-
 
     renderDonationSentToEndpointActivitySummaryTable = () => {
         const data = this.getDonationSentToEndpointActivitySummaryTable();
@@ -265,22 +253,10 @@ export class Home extends Component {
         return (
             <ReactTable
                 data={data}
-                columns={[
-                    {
+                columns={[{
                         Header: "Donation Sent To Endpoint",
-                        columns: [
-                            {
-                                Header: "Machine Name",
-                                id: "machineName",
-                                accessor: d => d.machineName.replace("person", ""),
-                                // minWidth: 150
-                            },
-                            //{ Header: "Activity", accessor: "caption" },
-                            { Header: "Total", accessor: "total" },
-                            { Header: "Donation/S", accessor: "itemPerSecond" }
-                        ]
-                    }
-                ]}
+                        columns: this.getColumnsForDonationPerSecondTable()
+                }]}                
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
@@ -300,22 +276,10 @@ export class Home extends Component {
         return (
             <ReactTable
                 data={data}
-                columns={[
-                    {
-                        Header: "Donation Enqueued",
-                        columns: [
-                            {
-                                Header: "Machine Name",
-                                id: "machineName",
-                                accessor: d => d.machineName.replace("donation-restapi-entrance-", ""),
-                                // minWidth: 230
-                            },
-                            //{ Header: "Activity", accessor: "caption" },
-                            { Header: "Total", accessor: "total" },
-                            { Header: "Donation/S", accessor: "itemPerSecond" }
-                        ]
-                    }
-                ]}
+                columns={[{
+                    Header: "Donation Enqueued",
+                    columns: this.getColumnsForDonationPerSecondTable()                            
+                }]}
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
@@ -323,11 +287,18 @@ export class Home extends Component {
         );
     }
 
-    // https://www.npmjs.com/package/react-table
-    // https://codesandbox.io/s/react-table-simple-table-hpduw
-    // With colors
-    // https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
+    getColumnsForJsonDataTable = () => [
+        {
+            Header: "Machine Name",
+            id: "machineName",
+            accessor: d => d.machineName.replace("person", ""),
+        },
+        { Header: "Total", accessor: "total" },
+        { Header: "Json Data", accessor: "jsonData" }
+    ];
+    
     renderDashboardResourceActivitySummaryTable = () => {
+
         const data = this.getDashboardResourceActivitySummaryTable();
         if (data.length === 0)
             return null
@@ -335,22 +306,10 @@ export class Home extends Component {
         return (
             <ReactTable
                 data={data}
-                columns={[
-                    {
-                        Header: "Dashboard Country Aggregate",
-                        columns: [
-                            {
-                                Header: "Machine Name",
-                                id: "machineName",
-                                accessor: d => d.machineName.replace("person", ""),
-                                // minWidth: 150
-                            },
-                            //{ Header: "Activity", accessor: "caption" },
-                            { Header: "Total", accessor: "total" },
-                            { Header: "Json Data", accessor: "jsonData" }
-                        ]
-                    }
-                ]}
+                columns={[{
+                    Header: "Dashboard Country Aggregate",
+                    columns: this.getColumnsForJsonDataTable()
+                }]}
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
@@ -358,12 +317,20 @@ export class Home extends Component {
         );
     }
 
+    getDonationSentToEndPointChartData = () => {
+
+        const data = [];
+        const totals = this.state.systemActivitySummary.donationSentToEndPointActivitySummaryTotals;
+        totals.forEach((info, index) => {
+            data.push({ timeStamp: info.label, value: info.value });
+        });
+        return data;
+    };
 
     render() {
-
-        const donationProcessedPerSecChart = (
-            <LineChart width={500} height={200} data={getDonationProcessedPerSecChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <Line type="monotone" dataKey="donationProcessedPerSec" stroke="#8884d8" />
+        const donationSentToEndPointChart = (
+            <LineChart width={500} height={200} data={this.getDonationSentToEndPointChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
                 <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                 <XAxis dataKey="timeStamp" />
                 <YAxis />
@@ -386,14 +353,15 @@ export class Home extends Component {
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} </button>
                 &nbsp;
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh </button>
-                {/*
+                
                 <div className="card">
-                    <div className="card-header">Donation Received Per Second</div>
+                    <div className="card-header">Donation Sent</div>
                     <div className="card-body">
-                        {donationReceivedPerSecChart}
+                        {donationSentToEndPointChart}
                     </div>
                 </div>
 
+                {/*
                 <div className="card">
                     <div className="card-header">Donation Processed Per Second</div>
                     <div className="card-body">
@@ -410,7 +378,8 @@ export class Home extends Component {
                         </h4>
                     </div>
                 </div>
-              
+                <br /><br />
+
                 {this.renderDonationSentToEndpointActivitySummaryTable()}
                 <br /><br />
                 {this.renderDonationEnqueuedActivitySummaryTable()}

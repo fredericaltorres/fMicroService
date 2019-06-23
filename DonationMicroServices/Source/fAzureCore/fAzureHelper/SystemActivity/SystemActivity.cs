@@ -20,15 +20,14 @@ namespace fAzureHelper
         /// <summary>
         /// Needed for deserialization
         /// </summary>
-        public SystemActivity()
-        {
-
-        }
-
-        public SystemActivity(string message, SystemActivityType type) : base()
+        public SystemActivity() : base()
         {
             this.UtcDateTime = DateTime.UtcNow;
             this.AppName = RuntimeHelper.GetAppName();
+        }
+
+        public SystemActivity(string message, SystemActivityType type) : this()
+        {
             this.Type = type;
             this.Message = message;
         }
@@ -64,6 +63,7 @@ namespace fAzureHelper
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
         }
+
         public static SystemActivity FromJson(string json)
         {
             try

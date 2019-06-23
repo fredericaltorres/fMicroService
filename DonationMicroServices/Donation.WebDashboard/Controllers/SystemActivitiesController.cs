@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using fAzureHelper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Donation.WebDashboard.Controllers
 {
@@ -14,64 +16,89 @@ namespace Donation.WebDashboard.Controllers
             LastMessage = "Nothing Recieved yet"
         };
 
-        public static void AddDonationSentToEndpoint(long totalDonationPushed, int donationPushedPerSecond, string machineName)
+        /// <summary>
+        /// The endpoint return the static global __systemActivitySummary
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public SystemActivitySummary GetSystemActivitySummary()
         {
+            __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals;
+            return __systemActivitySummary;
+        }
+
+
+        public static void AddDonationSentToEndpoint(SystemActivity sa)
+        {            
             __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Add(
                 new DonationActivitySummary() {
                     Caption = "Pushed Donation",
-                    MachineName = machineName,
-                    Total = totalDonationPushed,
-                    ItemPerSecond = donationPushedPerSecond
-                });
+                    MachineName = sa.MachineName,
+                    Total = sa.PerformanceInformation.TotalItemProcessed,
+                    ItemPerSecond = sa.PerformanceInformation.ItemProcessedPerSecond,
+                    UTCDateTime = sa.UtcDateTime,
+                }
+            );
         }
 
-        public static void AddDonationEnqueued(long totalDonationPushed, int donationPushedPerSecond, string machineName)
+        public static void AddDonationEnqueued(SystemActivity sa)
         {
             __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Add(
                 new DonationActivitySummary()
                 {
                     Caption = "Donation Enqueued",
-                    MachineName = machineName,
-                    Total = totalDonationPushed,
-                    ItemPerSecond = donationPushedPerSecond
-                });
+                    MachineName = sa.MachineName,
+                    Total = sa.PerformanceInformation.TotalItemProcessed,
+                    ItemPerSecond = sa.PerformanceInformation.ItemProcessedPerSecond,
+                    UTCDateTime = sa.UtcDateTime,
+                }
+            );
         }
 
-        public static void AddDonationProcessed(long total, int donationPerSeconds, string machineName)
+        public static void AddDonationProcessed(SystemActivity sa)
         {
             __systemActivitySummary.DonationProcessedActivitySummaryDictionary.Add(
                 new DonationActivitySummary()
                 {
                     Caption = "Donation Processed",
-                    MachineName = machineName,
-                    Total = total,
-                    ItemPerSecond = donationPerSeconds,
+                    MachineName = sa.MachineName,
+                    Total = sa.PerformanceInformation.TotalItemProcessed,
+                    ItemPerSecond = sa.PerformanceInformation.ItemProcessedPerSecond,
+                    UTCDateTime = sa.UtcDateTime,
                 }
             );
         }
 
-        public static void AddDonationError(string errorMessage, string appName, string machineName)
+        public static void AddDonationError(SystemActivity sa)
         {
             __systemActivitySummary.DonationErrorsSummaryDictionary.Add(
                 new DonationActivitySummary()
                 {
                     Caption = "Errors",
-                    MachineName = machineName,
-                    Message = new List<string>() { $"App:{appName}, {errorMessage}" },
+                    MachineName = sa.MachineName,
+                    Message = new List<string>() { sa.Message },
+                    UTCDateTime = sa.UtcDateTime,
                 }
             );
+            // Update the DonationActivitySummary with the error message count
+            var e = __systemActivitySummary.DonationErrorsSummaryDictionary[sa.MachineName.ToLowerInvariant()];
+            e.Total = e.Message.Count;
         }
 
-        public static void AddDonationInfo(string errorMessage, string appName, string machineName)
+        public static void AddDonationInfo(SystemActivity sa)
         {
             __systemActivitySummary.DonationInfoSummaryDictionary.Add(
                 new DonationActivitySummary()
                 {
-                    Caption = "Errors",
-                    MachineName = machineName,
-                    Message = new List<string>() { $"App:{appName}, {errorMessage}" },
+                    Caption = "Info",
+                    MachineName = sa.MachineName,
+                    Message = new List<string>() { sa.Message },
+                    UTCDateTime = sa.UtcDateTime,
                 }
             );
+            // Update the DonationActivitySummary with the error message count
+            var e = __systemActivitySummary.DonationInfoSummaryDictionary[sa.MachineName.ToLowerInvariant()];
+            e.Total = e.Message.Count;
         }
 
         public static void AddDashboardResource(string dashboardResource, int total, string jsonData, string machineName)
@@ -86,15 +113,17 @@ namespace Donation.WebDashboard.Controllers
                 });
         }
 
-        [HttpGet("[action]")]
-        public SystemActivitySummary GetSystemActivitySummary()
+        public class ChartData
         {
-            return __systemActivitySummary;
+            public string Label { get; set; }
+            public long Value { get; set; }
         }
 
         public class SystemActivitySummary
         {
+            public List<ChartData> DonationSentToEndPointActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
@@ -107,6 +136,7 @@ namespace Donation.WebDashboard.Controllers
 
         public class DonationActivitySummary
         {
+            public DateTime UTCDateTime { get; set; }
             public int ItemPerSecond { get; set; }
             public long Total { get; set; }
             public string MachineName { get; set; }
@@ -122,6 +152,8 @@ namespace Donation.WebDashboard.Controllers
         /// </summary>
         public class DonationActivitySummaryDictionary: Dictionary<string, DonationActivitySummary>
         {
+            public List<ChartData> Totals = new List<ChartData>();
+
             public void Add(DonationActivitySummary das)
             {
                 var key = das.MachineName.ToLowerInvariant();
@@ -130,12 +162,16 @@ namespace Donation.WebDashboard.Controllers
                     this[key].ItemPerSecond = das.ItemPerSecond;
                     this[key].Caption = das.Caption;
                     this[key].JsonData = das.JsonData;
-                    this[key].Message.AddRange(das.Message);
+                    this[key].Message.AddRange(das.Message);                    
                 }
                 else
                 {
                     this[key] = das;
                 }
+                this.Totals.Add(new ChartData {
+                    Value = this[key].Total, 
+                    Label = $"{this[key].UTCDateTime.ToShortTimeString()}",
+                });
             }
         }
     }

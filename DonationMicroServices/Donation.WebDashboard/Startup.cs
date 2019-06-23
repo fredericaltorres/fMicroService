@@ -38,25 +38,25 @@ namespace Donation.WebDashboard
         {
             if (sa.Type == SystemActivityType.Error)
             {
-                Controllers.SystemActivitiesController.AddDonationInfo(sa.Message, sa.AppName, sa.MachineName);
+                Controllers.SystemActivitiesController.AddDonationError(sa);
             }
             if (sa.Type == SystemActivityType.Info)
             {
-                Controllers.SystemActivitiesController.AddDonationInfo(sa.Message, sa.AppName, sa.MachineName);
+                Controllers.SystemActivitiesController.AddDonationInfo(sa);
             }
             else if (sa.Type == SystemActivityType.PerformanceInfo)
             {
                 if(sa.PerformanceInformation.PerformanceType == SystemActivityPerformanceType.DonationSentToEndPoint)
                 {
-                    Controllers.SystemActivitiesController.AddDonationSentToEndpoint(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+                    Controllers.SystemActivitiesController.AddDonationSentToEndpoint(sa);
                 }
                 if (sa.PerformanceInformation.PerformanceType == SystemActivityPerformanceType.DonationEnqueued)
                 {
-                    Controllers.SystemActivitiesController.AddDonationEnqueued(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+                    Controllers.SystemActivitiesController.AddDonationEnqueued(sa);
                 }
                 if (sa.PerformanceInformation.PerformanceType == SystemActivityPerformanceType.DonationProcessed)
                 {
-                    Controllers.SystemActivitiesController.AddDonationProcessed(sa.PerformanceInformation.TotalItemProcessed, sa.PerformanceInformation.ItemProcessedPerSecond, sa.MachineName);
+                    Controllers.SystemActivitiesController.AddDonationProcessed(sa);
                 }
             }
             else if (sa.Type == SystemActivityType.DashboardInfo)
