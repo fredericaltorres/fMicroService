@@ -75,20 +75,20 @@ namespace fAzureHelper
                 await this.NotifyAsync(message, type, sendToConsole);
         }
 
-        //public string Notify(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
-        //{
-        //    // Wait for the call so the notification are logged in the right order
-        //    return NotifyAsync(message, type, sendToConsole).GetAwaiter().GetResult();
-        //}
+        public async Task NotifyErrorAsync(Errors errors, bool sendToConsole = true)
+        {
+            foreach(var error in errors)
+                await this.NotifyAsync(error.Reason, SystemActivityType.Error, sendToConsole);
+        }
 
         public async Task NotifyErrorAsync(string message, bool sendToConsole = true)
         {
             await this.NotifyAsync(message, SystemActivityType.Error, sendToConsole);
         }
 
-        public async Task NotifyErrorAsync(System.Exception ex, bool sendToConsole = true)
+        public async Task NotifyErrorAsync(string message, System.Exception ex, bool sendToConsole = true)
         {
-            await this.NotifyAsync(ex.Message, SystemActivityType.Error, sendToConsole);
+            await this.NotifyAsync(message, SystemActivityType.Error, sendToConsole);
         }
 
         public async Task NotifyInfoAsync(string message, Dictionary<string, object> properties, bool sendToConsole = true)

@@ -24,7 +24,7 @@ namespace Donation.Table.Lib
             }
             catch(System.Exception ex)
             {
-                r.Add(new Error($"Cannot insert DonationAggregateAzureTableRecord {entity.Guid} in azure table ${TABLE_NAME} - ex:{ex}"));
+                r.Add(new Error($"Cannot insert DonationAggregateAzureTableRecord {entity.Guid} in azure table ${TABLE_NAME} - ex:{ex.Message}", ex));
             }
             return r;
         }

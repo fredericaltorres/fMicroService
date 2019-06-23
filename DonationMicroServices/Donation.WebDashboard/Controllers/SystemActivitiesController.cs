@@ -109,7 +109,8 @@ namespace Donation.WebDashboard.Controllers
                     Caption = $"Dashboard:{dashboardResource}",
                     MachineName = machineName,
                     Total = total,
-                    JsonData = jsonData
+                    //JsonData = jsonData
+                    JsonData = "No data for now"
                 });
         }
 

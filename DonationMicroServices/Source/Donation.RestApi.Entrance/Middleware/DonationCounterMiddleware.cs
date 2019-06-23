@@ -28,7 +28,7 @@ namespace Donation.RestApi.Entrance.Middleware
             }
             catch (System.Exception ex)
             {
-                NotifyError(context, ex);
+                await NotifyError(context, ex);
             }
             await _next(context); // Call the next delegate/middleware in the pipeline
         }

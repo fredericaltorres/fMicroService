@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceName": {
+            "value": "fkubernetes7"
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "dnsPrefix": {
+            "value": "fkubernetes7-dns"
+        },
+        "agentCount": {
+            "value": 2
+        },
+        "agentVMSize": {
+            "value": "Standard_DS1_v2"
+        },
+        "servicePrincipalClientId": {
+            "value": null
+        },
+        "servicePrincipalClientSecret": {
+            "value": null
+        },
+        "kubernetesVersion": {
+            "value": "1.12.8"
+        },
+        "networkPlugin": {
+            "value": "kubenet"
+        },
+        "enableRBAC": {
+            "value": true
+        },
+        "enableHttpApplicationRouting": {
+            "value": true
+        },
+        "workspaceName": {
+            "value": "DefaultWorkspace-57646804-986c-47e8-af66-a3abec32e52a-EUS"
+        },
+        "omsWorkspaceId": {
+            "value": "/subscriptions/57646804-986c-47e8-af66-a3abec32e52a/resourcegroups/defaultresourcegroup-eus/providers/microsoft.operationalinsights/workspaces/defaultworkspace-57646804-986c-47e8-af66-a3abec32e52a-eus"
+        },
+        "workspaceRegion": {
+            "value": "eastus"
+        },
+        "principalId": {
+            "value": "b5c0c6f9-700a-4ea8-a628-15c1dc9cf6e3"
+        }
+    }
+}

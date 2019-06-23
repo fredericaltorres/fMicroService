@@ -43,7 +43,7 @@ namespace Donation.Table.Lib
                 }
                 catch(System.Exception ex)
                 {
-                    r.Add(new Error($"Cannot copy property {e.Key} from DonationDTO to DonationAzureTableRecord - ex:{ex}"));
+                    r.Add(new Error($"Cannot copy property {e.Key} from DonationDTO to DonationAzureTableRecord - ex:{ex.Message}", ex));
                 }
             }
             this.SetIdentification();

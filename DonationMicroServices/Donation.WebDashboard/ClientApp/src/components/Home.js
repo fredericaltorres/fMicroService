@@ -3,9 +3,6 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import {
-    // generate2DigitNumber,
-    // generateTimeStamp,
-    // getRandomInt,
     getDonationProcessedPerSecChartData,
     getDonationReceivedPerSecChartData
 } from './generateDashboardData'
@@ -24,8 +21,7 @@ export class Home extends Component {
     static displayName = Home.name;
 
     timerId = null;
-    refreshTimeOut = 1000 * 4;
-    
+    refreshTimeOut = 1000 * 4;    
 
     state = {
         systemActivitySummary: {
@@ -45,8 +41,6 @@ export class Home extends Component {
     // Return a promise
     reloadData = () => {
 
-        console.log(`About to refresh...`);
-
         return fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
             .then(data => {
                 console.log(`data:${JSON.stringify(data)}`);
@@ -64,9 +58,7 @@ export class Home extends Component {
 
     updateState = (property, value) => {
 
-        this.setState({ ...this.state, [property]: value }, () => {
-            //console.log(`state: ${JSON.stringify(this.state)}`);
-        });
+        this.setState({ ...this.state, [property]: value });
     }
 
     reverseAutoRefresh = () => {
@@ -165,7 +157,7 @@ export class Home extends Component {
                 data={data}
                 columns={[{
                     Header: "Donation Info",
-                    columns: this.getColumnsForMessagesTable()                        
+                    columns: this.getColumnsForMessagesTable()
                 }]}
                 defaultPageSize={3}
                 className="-striped -highlight"
@@ -212,7 +204,7 @@ export class Home extends Component {
             accessor: d => d.machineName,
         },
         { Header: "Total", accessor: "total" },
-        { Header: "Messages", accessor: "message" }
+        { Header: "Messages", id: "message", accessor: d => d.message ? d.message[d.message.length - 1] : '' } // Return the last message that arrived
     ]
 
     getColumnsForDonationPerSecondTable = () => [
@@ -246,6 +238,7 @@ export class Home extends Component {
     }
 
     renderDonationSentToEndpointActivitySummaryTable = () => {
+
         const data = this.getDonationSentToEndpointActivitySummaryTable();
         if (data.length === 0)
             return null
@@ -263,12 +256,9 @@ export class Home extends Component {
             />
         );
     }
-
-    // https://www.npmjs.com/package/react-table
-    // https://codesandbox.io/s/react-table-simple-table-hpduw
-    // With colors
-    // https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
+    
     renderDonationEnqueuedActivitySummaryTable = () => {
+
         const data = this.getDonationEnqueuedActivitySummaryTable();
         if (data.length === 0)
             return null
@@ -328,6 +318,7 @@ export class Home extends Component {
     };
 
     render() {
+
         const donationSentToEndPointChart = (
             <LineChart width={500} height={200} data={this.getDonationSentToEndPointChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />

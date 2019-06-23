@@ -26,7 +26,7 @@ namespace Donation.Table.Lib
             }
             catch (System.Exception ex)
             {
-                r.Add(new Error($"Cannot insert {entities.ToList().Count} donation batch in azure table ${TABLE_NAME} - ex:{ex}"));
+                r.Add(new Error($"Cannot insert {entities.ToList().Count} donation batch in azure table ${TABLE_NAME} - ex:{ex.Message}", ex));
             }
             return r;
         }
@@ -40,7 +40,7 @@ namespace Donation.Table.Lib
             }
             catch(System.Exception ex)
             {
-                r.Add(new Error($"Cannot insert donation {entity.Guid} in azure table ${TABLE_NAME} - ex:{ex}"));
+                r.Add(new Error($"Cannot insert donation {entity.Guid} in azure table ${TABLE_NAME} - ex:{ex.Message}", ex));
             }
             return r;
         }

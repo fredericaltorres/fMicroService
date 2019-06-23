@@ -76,7 +76,10 @@ namespace AzureServiceBusSubHelper
             var managementClient = new ManagementClient(_connectionString);
             if(!await managementClient.SubscriptionExistsAsync(_topic, subscriptionName))
             {
-                var subscriptionDescription = await managementClient.CreateSubscriptionAsync(_topic, subscriptionName);
+                var sd = new SubscriptionDescription(_topic, subscriptionName);
+                sd.DefaultMessageTimeToLive = new TimeSpan(24, 0, 0); // 1 day
+                sd.MaxDeliveryCount = 4;
+                var subscriptionDescription = await managementClient.CreateSubscriptionAsync(sd);
             }
         }
 

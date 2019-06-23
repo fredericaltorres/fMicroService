@@ -144,17 +144,7 @@ switch($action) {
     }
     deleteDeployments {
 
-        deleteRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***" $deployService
-        <#
-        Write-Host "Delete deployment"
-        $deploymentName = "$appName-deployment-$appVersion"
-        $kubernetesManager.deleteDeployment($deploymentName)
-
-        if($deployService) {
-
-            $serviceName = "$appName-service-prod"
-            $kubernetesManager.deleteService($serviceName)
-        }#>
+        deleteRelease $context "`r`n*** Delete version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***" $deployService
     }
     getLogs {
 

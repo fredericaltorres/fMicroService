@@ -81,13 +81,13 @@ namespace Donation.PersonSimulator.Console
                                     }
                                     else
                                     {
-                                        await saNotification.NotifyErrorAsync(insertErrors.ToString());
+                                        await saNotification.NotifyErrorAsync(insertErrors);
                                         donationQueue.Release(donation);
                                     }
                                 }
                                 else
                                 {
-                                    await saNotification.NotifyErrorAsync(convertionErrors.ToString());
+                                    await saNotification.NotifyErrorAsync(convertionErrors);
                                     donationQueue.Release(donation); // Release and will retry the messager after x time the message will go to dead letter queue
                                 }
                             }
@@ -111,7 +111,7 @@ namespace Donation.PersonSimulator.Console
             }
             catch(System.Exception ex)
             {
-                await saNotification.NotifyErrorAsync($"Process crashed on machine {Environment.MachineName}, ex:{ex}");
+                await saNotification.NotifyErrorAsync($"Process crashed on machine {Environment.MachineName}, ex:{ex.Message}", ex);
             }
         }
     }

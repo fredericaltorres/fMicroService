@@ -1,4 +1,5 @@
 ﻿using Donation.Model;
+using fAzureHelper;
 using System;
 using System.Collections.Generic;
 using System.JSON;
@@ -48,11 +49,11 @@ namespace Donation.Service
                 {
                     if (e.Value == null && !CanBeNull(e.Key))
                     {
-                        donnationErrors.Add(new Error(VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL + e.Key));
+                        donnationErrors.Add(new Error(VALIDATION_ERROR_PROPERTY_CANNOT_BE_NULL + e.Key, null));
                     }
                     else if (IsOfTypeString(e.Value) && string.IsNullOrEmpty(e.Value.ToString()))
                     {
-                        donnationErrors.Add(new Error(VALIDATION_ERROR_PROPERTY_IS_REQUIRED+ e.Key));
+                        donnationErrors.Add(new Error(VALIDATION_ERROR_PROPERTY_IS_REQUIRED+ e.Key, null));
                     }
                 }
                 donation.ProcessState = donnationErrors.Count == 0 ? DonationDataProcessState.ApprovedForSubmission : DonationDataProcessState.NotApprovedForSubmission;

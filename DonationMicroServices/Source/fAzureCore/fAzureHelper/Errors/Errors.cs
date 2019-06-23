@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Donation.Model
+namespace fAzureHelper
 {
     public class Errors : List<Error>
     {
