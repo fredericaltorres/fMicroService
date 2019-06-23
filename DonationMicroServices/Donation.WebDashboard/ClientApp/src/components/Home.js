@@ -108,7 +108,7 @@ export class Home extends Component {
         });
 
         if (machineNames.length > 0) {
-            sItemPerSecond = sItemPerSecond / machineNames.length; // compute average
+            sItemPerSecond = sItemPerSecond;//  / machineNames.length; // compute average
         }
 
         r.push({ // Add summation row
@@ -170,7 +170,7 @@ export class Home extends Component {
                             },
                             //{ Header: "Activity", accessor: "caption" },
                             { Header: "Total", accessor: "total" },
-                            { Header: "Messages", accessor: "message" } // ++++
+                            { Header: "Messages", accessor: "message" } // 
                         ]
                     }
                 ]}
@@ -384,6 +384,8 @@ export class Home extends Component {
         return (
             <div>
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} </button>
+                &nbsp;
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh </button>
                 {/*
                 <div className="card">
                     <div className="card-header">Donation Received Per Second</div>
@@ -408,60 +410,20 @@ export class Home extends Component {
                         </h4>
                     </div>
                 </div>
-
-                <div className="card">
-                    <div className="card-header">Donation Sent To Endpoint</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.renderDonationSentToEndpointActivitySummaryTable()}
-                        </h4>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <div className="card-header">Donation Enqueued</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.renderDonationEnqueuedActivitySummaryTable()}
-                        </h4>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <div className="card-header">Donation Processed</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.renderDonationProcessedActivitySummaryTable()}
-                        </h4>
-                    </div>
-                </div>
-                
-                <div className="card">
-                    <div className="card-header">Donation Info</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.renderDonationInfoActivitySummaryTable()}
-                        </h4>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <div className="card-header">Donation Errors</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.renderDonationErrorsActivitySummaryTable()}
-                        </h4>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <div className="card-header">Donation Data Dashboard</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.renderDashboardResourceActivitySummaryTable()}
-                        </h4>
-                    </div>
-                </div>
+              
+                {this.renderDonationSentToEndpointActivitySummaryTable()}
+                <br /><br />
+                {this.renderDonationEnqueuedActivitySummaryTable()}
+                <br /><br />
+                {this.renderDonationProcessedActivitySummaryTable()}
+                <br /><br />
+                {this.renderDonationInfoActivitySummaryTable()}
+                <br /><br />
+                {this.renderDonationErrorsActivitySummaryTable()}
+                <br /><br />
+                {this.renderDashboardResourceActivitySummaryTable()}
+                <br /><br />
+                  
             </div>
         );
     }

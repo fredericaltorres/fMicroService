@@ -36,8 +36,8 @@ namespace Donation.PersonSimulator.Console
 
         static async Task ProcessDonationQueue()
         {
-            var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
-            await saNotification.NotifyInfoAsync($"{RuntimeHelper.GetAppName()} Running");
+            var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());            
+            await saNotification.NotifyInfoAsync($"starting");
             try
             {
                 // Settings come frm the appsettings.json file
@@ -97,22 +97,21 @@ namespace Donation.PersonSimulator.Console
                             await saNotification.NotifyErrorAsync($"Error validating {donations.Count} donations, errors:{validationErrors.ToString()}");
                             donationQueue.Release(donations); // Release and will retry the messager after x time the message will go to dead letter queue                            
                         }
+
                         if (donationQueue.ItemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                         {
                             await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationProcessed, "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
                             await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));
                             await saNotification.NotifySetDashboardInfoInfoAsync("CountryAggregate", donationAggregationService.CountryAggregateData.ToJSON(), donationAggregationService.AggregatedRecordCount);
-                                
-                            donationAggregationService.Clear();
-
                             await saNotification.NotifyInfoAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
+                            donationAggregationService.Clear();
                         }
                     }
                 }
             }
             catch(System.Exception ex)
             {
-                await saNotification.NotifyErrorAsync($"{RuntimeHelper.GetAppName()} process crashed on machine {Environment.MachineName}, ex:{ex}");
+                await saNotification.NotifyErrorAsync($"Process crashed on machine {Environment.MachineName}, ex:{ex}");
             }
         }
     }

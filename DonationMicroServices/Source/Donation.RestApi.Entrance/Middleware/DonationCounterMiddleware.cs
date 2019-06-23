@@ -42,7 +42,7 @@ namespace Donation.RestApi.Entrance.Middleware
                 if (__perfTracker.ItemCountThreadSafe % SystemActivityNotificationManager.NotifyEvery == 0)
                 {
                     var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
-                    await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, "DonationEnqueued", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
+                    await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, "<!>", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
                     await saNotificationPublisher.CloseAsync();
                 }
             }
@@ -59,6 +59,38 @@ namespace Donation.RestApi.Entrance.Middleware
             catch(System.Exception ex)
             {
                 var m = $"Exception:{ex.Message}, when NotifyError:{exception.Message}";
+                System.Console.WriteLine(m);
+                System.Diagnostics.Trace.WriteLine(m);
+            }
+        }
+
+        public static async Task NotifyInfoAsync(string message, Dictionary<string, object> properties, bool sendToConsole = true)
+        {
+            try
+            {
+                var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));                
+                await saNotificationPublisher.NotifyInfoAsync(message, properties, sendToConsole);
+                await saNotificationPublisher.CloseAsync();
+            }
+            catch (System.Exception ex)
+            {
+                var m = $"Exception:{ex.Message}";
+                System.Console.WriteLine(m);
+                System.Diagnostics.Trace.WriteLine(m);
+            }
+        }
+
+        public static async Task NotifyInfoAsync(string message)
+        {
+            try
+            {
+                var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
+                await saNotificationPublisher.NotifyInfoAsync(message);
+                await saNotificationPublisher.CloseAsync();
+            }
+            catch (System.Exception ex)
+            {
+                var m = $"Exception:{ex.Message}";
                 System.Console.WriteLine(m);
                 System.Diagnostics.Trace.WriteLine(m);
             }

@@ -91,6 +91,14 @@ namespace fAzureHelper
             await this.NotifyAsync(ex.Message, SystemActivityType.Error, sendToConsole);
         }
 
+        public async Task NotifyInfoAsync(string message, Dictionary<string, object> properties, bool sendToConsole = true)
+        {
+            var propertiesContent = new StringBuilder();
+            foreach (var e in properties)
+                propertiesContent.Append($"{e.Key}:{e.Value}; ");
+            await NotifyAsync($"{message} [{propertiesContent}]", SystemActivityType.Info, sendToConsole);
+        }
+
         public async Task NotifyInfoAsync(string message, bool sendToConsole = true)
         {
             await NotifyAsync(message, SystemActivityType.Info, sendToConsole);

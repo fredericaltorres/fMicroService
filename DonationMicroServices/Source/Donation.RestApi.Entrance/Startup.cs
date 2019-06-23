@@ -19,8 +19,6 @@ namespace Donation.RestApi.Entrance
 {
     public class Startup
     {
-        
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -50,13 +48,17 @@ namespace Donation.RestApi.Entrance
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Console.WriteLine($"Startup Configure env ContentRootPath:{env.ContentRootPath}");
-            Console.WriteLine($"Startup Configure env EnvironmentName:{env.EnvironmentName}");
-            Console.WriteLine($"Startup Configure env ApplicationName:{env.ApplicationName}");
-            Console.WriteLine($"Startup Configure env WebRootPath:{env.WebRootPath}");
-
             var ASPNETCORE_URLS = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-            Console.WriteLine($"Startup Configure env ASPNETCORE_URLS:{ASPNETCORE_URLS}");
+
+            DonationCounterMiddleware.NotifyInfoAsync(
+                $"{RuntimeHelper.GetAppName()} starting",
+                new Dictionary<string, object>() {
+                { "ContentRootPath", env.ContentRootPath },
+                { "EnvironmentName", env.EnvironmentName },
+                { "ApplicationName", env.ApplicationName },
+                { "WebRootPath"    , env.WebRootPath },
+                { "ASPNETCORE_URLS", ASPNETCORE_URLS },
+            }, sendToConsole: true).GetAwaiter().GetResult();
 
             RuntimeHelper.SetAppPath(env.ContentRootPath);
             Console.WriteLine(RuntimeHelper.GetContextInformation());
@@ -81,3 +83,4 @@ namespace Donation.RestApi.Entrance
         }
     }
 }
+

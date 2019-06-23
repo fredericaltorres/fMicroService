@@ -85,6 +85,9 @@ namespace Donation.PersonSimulator.Console
 
         static async Task Publish(int generationIndex, string donationEndPointIP, string donationEndPointPort)
         {
+            var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
+            await saNotification.NotifyAsync($"starting");
+
             var donationJsonFile = GetGeneratedDonationDataFile(generationIndex);
             if (File.Exists(donationJsonFile))
                 System.Console.WriteLine($"JSON File {donationJsonFile} ");
@@ -94,9 +97,8 @@ namespace Donation.PersonSimulator.Console
 
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
             var donationTotalCount = donations.Count;
-            var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());
-
-            await saNotification.NotifyAsync($"Start sending Donation from file {donationJsonFile}");
+            
+            await saNotification.NotifyAsync($"{RuntimeHelper.GetAppName()} start sending {donationTotalCount} Donations from file {donationJsonFile}");
 
             var groupCount = 10;
             var perfTracker = new PerformanceTracker();
@@ -122,9 +124,9 @@ namespace Donation.PersonSimulator.Console
                     await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationSentToEndPoint, $"Posted to Entrance endpoint ({percentDone}% done)", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
                 }
             }
-
+            
             await saNotification.NotifyAsync(DS.List(
-                $"{donations.Count} donations sent",
+                $"{donationTotalCount} donations sent",
                 $"End sending donation from file {donationJsonFile}"
             ));
         }
