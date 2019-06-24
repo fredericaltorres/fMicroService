@@ -193,6 +193,17 @@ export class Home extends Component {
                 defaultPageSize={3}
                 className="-striped -highlight"
                 showPagination={false}
+                SubComponent={row => {
+                    var messages = row.original.message;
+                    var messagesHtml = messages.map((message, index) => {
+                        return <li key={index}>{message}</li>;
+                    });
+                    return (
+                        <ul style={{ padding: "20px" }}>
+                            {messagesHtml}
+                        </ul>
+                    );
+                }}
             />
         );
     }

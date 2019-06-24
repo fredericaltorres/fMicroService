@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs')]
+    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs', 'initData')]
     [string]$action = "build"
 )
 
@@ -26,7 +26,13 @@ Write-Host "$scriptTitle -- ALL" -ForegroundColor Yellow
 Write-Host "Action: $action" -ForegroundColor DarkYellow
 
 switch($action) {
-    build {        
+    initData {
+        Write-host "Delete donation azure tables" -ForegroundColor DarkYellow
+        Set-Location "Donation.Monitor.Console"
+        dotnet run -deleteTable true
+        Set-Location ..
+    }
+    build {
         $appFolders | ForEach-Object -Process { executeCommandInFolder $_ $action }
     }
     push {

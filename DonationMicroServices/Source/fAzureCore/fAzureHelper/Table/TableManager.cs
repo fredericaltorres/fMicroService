@@ -43,6 +43,10 @@ namespace fAzureHelper
             _table = _tableClient.GetTableReference(this.TableName);
             _table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
         }
+        public async Task DeleteAsync()
+        {
+            await _table.DeleteIfExistsAsync();
+        }
 
         public async Task InsertAsync(ITableEntity entity)
         {

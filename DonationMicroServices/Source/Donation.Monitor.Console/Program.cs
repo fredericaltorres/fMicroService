@@ -23,8 +23,13 @@ namespace Donation.PersonSimulator.Console
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
-
-            Monitor().GetAwaiter().GetResult();
+            if(RuntimeHelper.GetCommandLineParameterBool("-deleteTable", args))
+            {
+                GetDonationTableManager().DeleteAsync().GetAwaiter().GetResult();
+                GetDonationAggregateTableManager().DeleteAsync().GetAwaiter().GetResult();
+                System.Console.WriteLine("Tables deleted");
+            }
+            else Monitor().GetAwaiter().GetResult();
         }
 
         static string GetServiceBusConnectionString()
@@ -56,30 +61,31 @@ namespace Donation.PersonSimulator.Console
             try
             {
                 var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                var donationTableManager = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                GetDonationTableManager();
                 System.Console.Title = $"Donation.Monitor.Console Q)uit C)ls P)ause";
                 var goOn = true;
                 // var pausedMode = false;
                 while (goOn)
                 {
                     Wait(waitSeconds);
-                    if(System.Console.KeyAvailable)
+                    if (System.Console.KeyAvailable)
                     {
-                        switch(System.Console.ReadKey(true).Key)
+                        switch (System.Console.ReadKey(true).Key)
                         {
-                            case ConsoleKey.Q: goOn = false;  break;
+                            case ConsoleKey.Q: goOn = false; break;
                             case ConsoleKey.C: System.Console.Clear(); break;
-                            case ConsoleKey.P: {
-                                systemActivityNotificationSubscriber.PauseOnMessageReceived = true;
-                                System.Console.WriteLine("Monitoring paused - hit any key to continue");
-                                System.Console.ReadKey();
-                                systemActivityNotificationSubscriber.PauseOnMessageReceived = false;
-                            }
-                            break;
+                            case ConsoleKey.P:
+                                {
+                                    systemActivityNotificationSubscriber.PauseOnMessageReceived = true;
+                                    System.Console.WriteLine("Monitoring paused - hit any key to continue");
+                                    System.Console.ReadKey();
+                                    systemActivityNotificationSubscriber.PauseOnMessageReceived = false;
+                                }
+                                break;
                         }
                     }
                     var queueCount = await donationQueue.ApproximateMessageCountAsync();
-                    if(previousQueueCount != queueCount)
+                    if (previousQueueCount != queueCount)
                     {
                         System.Console.Write($"{queueCount} messages in queue {donationQueue.QueueName}");
                         if (previousQueueCount > queueCount)
@@ -91,14 +97,21 @@ namespace Donation.PersonSimulator.Console
                         System.Console.WriteLine("");
                     }
                     previousQueueCount = queueCount;
-                }                
+                }
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 System.Console.WriteLine(ex);
             }
         }
 
-
+        private static DonationTableManager GetDonationTableManager()
+        {
+            return new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+        }
+        private static DonationAggregateTableManager GetDonationAggregateTableManager()
+        {
+            return new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+        }
     }
 }

@@ -111,7 +111,7 @@ namespace Donation.PersonSimulator.Console
             }
             catch(System.Exception ex)
             {
-                await saNotification.NotifyErrorAsync($"Process crashed on machine {Environment.MachineName}, ex:{ex.Message}", ex);
+                await saNotification.NotifyErrorAsync($"Process crashed on machine {RuntimeHelper.GetMachineName()}, ex:{ex.Message}", ex);
             }
         }
     }

@@ -78,7 +78,7 @@ namespace fAzureHelper
         public async Task NotifyErrorAsync(Errors errors, bool sendToConsole = true)
         {
             foreach(var error in errors)
-                await this.NotifyAsync(error.Reason, SystemActivityType.Error, sendToConsole);
+                await this.NotifyErrorAsync(error.Reason,error.Exception, sendToConsole);
         }
 
         public async Task NotifyErrorAsync(string message, bool sendToConsole = true)
@@ -88,7 +88,7 @@ namespace fAzureHelper
 
         public async Task NotifyErrorAsync(string message, System.Exception ex, bool sendToConsole = true)
         {
-            await this.NotifyAsync(message, SystemActivityType.Error, sendToConsole);
+            await this.NotifyAsync($"{message} - ex:{ex}", SystemActivityType.Error, sendToConsole);
         }
 
         public async Task NotifyInfoAsync(string message, Dictionary<string, object> properties, bool sendToConsole = true)
@@ -104,18 +104,17 @@ namespace fAzureHelper
             await NotifyAsync(message, SystemActivityType.Info, sendToConsole);
         }
 
-        public async Task<string> NotifyAsync(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
+        public async Task NotifyAsync(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
         {
             var systemActivity = new SystemActivity(message, type);
-            await NotifyAsync(systemActivity);
-            if (sendToConsole)
-                System.Console.WriteLine($"[san:{type}]{message}");
-            return message;
+            await NotifyAsync(systemActivity, sendToConsole);
         }
 
-        public async Task NotifyAsync(SystemActivity sa)
+        public async Task NotifyAsync(SystemActivity sa, bool sendToConsole = true)
         {
             await _pubSub.PublishAsync(sa.ToJSON());
+            if (sendToConsole)
+                System.Console.WriteLine($"[san:{sa.Type}]{sa.Message}");
         }
     }
 }

@@ -17,6 +17,11 @@ namespace Donation.Table.Lib
             _tableManager = new TableManager(storageAccountName, storageAccessKey, TABLE_NAME);
         }
 
+        public async Task DeleteAsync()
+        {
+            await this._tableManager.DeleteAsync();
+        }
+
         public async Task<Errors> InsertAsync(IEnumerable<DonationAzureTableRecord> entities)
         {
             var r = new Errors();
