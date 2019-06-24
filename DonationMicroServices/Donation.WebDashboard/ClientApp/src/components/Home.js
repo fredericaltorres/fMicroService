@@ -28,8 +28,12 @@ export class Home extends Component {
             donationSentToEndPointActivitySummaryTotals: [],
             donationSentToEndPointActivitySummaryDictionary: {},
 
+            donationEnqueuedActivitySummaryTotals: [],
             donationEnqueuedActivitySummaryDictionary: {},
+
             dashboardResourceActivitySummaryDictionary: {},
+
+            donationProcessedActivitySummaryTotals:[],
             donationProcessedActivitySummaryDictionary: {},
             donationInfoSummaryDictionary: {},
             donationErrorsSummaryDictionary: {},
@@ -37,6 +41,16 @@ export class Home extends Component {
             autoRefreshOn : false,
         }
     };
+
+    // Return a promise
+    clearAllErrors = () => {
+
+        return fetch('api/SystemActivities/GetSystemActivityClearError').then(response => response.json())
+            .then(data => {
+                console.log(`data:${JSON.stringify(data)}`);
+                this.updateState('systemActivitySummary', data);
+            });
+    }
 
     // Return a promise
     reloadData = () => {
@@ -318,6 +332,16 @@ export class Home extends Component {
         );
     }
 
+    getDonationProcessedChartData = () => {
+
+        const data = [];
+        const totals = this.state.systemActivitySummary.donationProcessedActivitySummaryTotals;
+        totals.forEach((info, index) => {
+            data.push({ timeStamp: info.label, value: info.value });
+        });
+        return data;
+    };
+
     getDonationSentToEndPointChartData = () => {
 
         const data = [];
@@ -328,10 +352,43 @@ export class Home extends Component {
         return data;
     };
 
+    getDonationEnqueuedChartData = () => {
+        
+        const data = [];
+        const totals = this.state.systemActivitySummary.donationEnqueuedActivitySummaryTotals;
+        totals.forEach((info, index) => {
+            data.push({ timeStamp: info.label, value: info.value });
+        });
+        return data;
+    };
+
     render() {
 
+        const chartWidth = 401;
+        const chartHeight = 175;
+
+        const donationProcessedChart = (
+            <LineChart width={chartWidth} height={chartHeight} data={this.getDonationProcessedChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                <XAxis dataKey="timeStamp" />
+                <YAxis />
+                <Tooltip />
+            </LineChart>
+        );
+
+        const donationEnqueuedChart = (
+            <LineChart width={chartWidth} height={chartHeight} data={this.getDonationEnqueuedChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                <XAxis dataKey="timeStamp" />
+                <YAxis />
+                <Tooltip />
+            </LineChart>
+        );
+
         const donationSentToEndPointChart = (
-            <LineChart width={500} height={200} data={this.getDonationSentToEndPointChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+            <LineChart width={chartWidth} height={chartHeight} data={this.getDonationSentToEndPointChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />
                 <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                 <XAxis dataKey="timeStamp" />
@@ -355,11 +412,27 @@ export class Home extends Component {
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} </button>
                 &nbsp;
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh </button>
+                &nbsp;
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Error </button>
                 
                 <div className="card">
                     <div className="card-header">Donation Sent</div>
                     <div className="card-body">
                         {donationSentToEndPointChart}
+                    </div>
+                </div>
+
+                <div className="card">
+                    <div className="card-header">Donation Enqueued</div>
+                    <div className="card-body">
+                        {donationEnqueuedChart}
+                    </div>
+                </div>
+
+                <div className="card">
+                    <div className="card-header">Donation Processed</div>
+                    <div className="card-body">
+                        {donationProcessedChart}
                     </div>
                 </div>
 
@@ -372,6 +445,7 @@ export class Home extends Component {
                 </div>
                 */}
 
+                {/*
                 <div className="card">
                     <div className="card-header">Message</div>
                     <div className="card-body">
@@ -380,7 +454,9 @@ export class Home extends Component {
                         </h4>
                     </div>
                 </div>
+                */}
                 <br /><br />
+
 
                 {this.renderDonationSentToEndpointActivitySummaryTable()}
                 <br /><br />

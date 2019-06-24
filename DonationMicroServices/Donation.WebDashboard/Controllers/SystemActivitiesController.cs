@@ -16,6 +16,13 @@ namespace Donation.WebDashboard.Controllers
             LastMessage = "Nothing Recieved yet"
         };
 
+        [HttpGet("[action]")]
+        public SystemActivitySummary GetSystemActivityClearError()
+        {
+            __systemActivitySummary.DonationErrorsSummaryDictionary.Clear();
+            return __systemActivitySummary;
+        }
+
         /// <summary>
         /// The endpoint return the static global __systemActivitySummary
         /// </summary>
@@ -24,6 +31,8 @@ namespace Donation.WebDashboard.Controllers
         public SystemActivitySummary GetSystemActivitySummary()
         {
             __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals;
+            __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals;
+            __systemActivitySummary.DonationProcessedActivitySummaryTotals = __systemActivitySummary.DonationProcessedActivitySummaryDictionary.Totals;
             return __systemActivitySummary;
         }
 
@@ -125,9 +134,17 @@ namespace Donation.WebDashboard.Controllers
             public List<ChartData> DonationSentToEndPointActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
 
+            public List<ChartData> DonationEnqueuedActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+
+
+            public List<ChartData> DonationProcessedActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+
+
+            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+
+            
             public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
 
@@ -163,7 +180,8 @@ namespace Donation.WebDashboard.Controllers
                     this[key].ItemPerSecond = das.ItemPerSecond;
                     this[key].Caption = das.Caption;
                     this[key].JsonData = das.JsonData;
-                    this[key].Message.AddRange(das.Message);                    
+                    this[key].Message.AddRange(das.Message);
+                    this[key].UTCDateTime = das.UTCDateTime;
                 }
                 else
                 {
@@ -171,7 +189,7 @@ namespace Donation.WebDashboard.Controllers
                 }
                 this.Totals.Add(new ChartData {
                     Value = this[key].Total, 
-                    Label = $"{this[key].UTCDateTime.ToShortTimeString()}",
+                    Label = $"{this[key].UTCDateTime.ToString("T")}",
                 });
             }
         }
