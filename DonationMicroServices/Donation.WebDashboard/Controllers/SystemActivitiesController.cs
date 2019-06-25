@@ -30,12 +30,41 @@ namespace Donation.WebDashboard.Controllers
         [HttpGet("[action]")]
         public SystemActivitySummary GetSystemActivitySummary()
         {
-            __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals;
-            __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals;
-            __systemActivitySummary.DonationProcessedActivitySummaryTotals = __systemActivitySummary.DonationProcessedActivitySummaryDictionary.Totals;
+            __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals);
+            __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals);
+            __systemActivitySummary.DonationProcessedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationProcessedActivitySummaryDictionary.Totals);
             return __systemActivitySummary;
         }
 
+        private static List<ChartData> MergeMachineNameChartDataList(List<ChartData> chartDataListWithMultipleMachineName)
+        {
+            var r = new List<ChartData>();
+            if (chartDataListWithMultipleMachineName.Count == 0)
+                return r;
+
+            var machineNames = chartDataListWithMultipleMachineName.Select(c => c.MachineName).Distinct();
+            var maxValue = chartDataListWithMultipleMachineName.Max(c => c.Value);
+            for(var v = 500; v <= maxValue; v += 500)
+            {
+                var cdTotal = new ChartData();
+                foreach(var m in machineNames)
+                {
+                    var cd = chartDataListWithMultipleMachineName.FirstOrDefault(c => c.MachineName == m && c.Value == v);
+                    if (cd == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Cannot find chart data for machineName:{m}, value:{v}");
+                    }
+                    else {
+                        cdTotal.Value += cd.Value;
+                        cdTotal.Label = cd.Label;
+                    }                    
+                }
+                if (cdTotal.Value > 0)
+                    r.Add(cdTotal);
+            }
+
+            return r;
+        }
 
         public static void AddDonationSentToEndpoint(SystemActivity sa)
         {            
@@ -127,7 +156,9 @@ namespace Donation.WebDashboard.Controllers
         {
             public string Label { get; set; }
             public long Value { get; set; }
+            public string MachineName { get; set; }
         }
+        
 
         public class SystemActivitySummary
         {
@@ -147,7 +178,6 @@ namespace Donation.WebDashboard.Controllers
             
             public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-
             public string LastMessage { get; set; }
             
         }
@@ -190,6 +220,7 @@ namespace Donation.WebDashboard.Controllers
                 this.Totals.Add(new ChartData {
                     Value = this[key].Total, 
                     Label = $"{this[key].UTCDateTime.ToString("T")}",
+                    MachineName = this[key].MachineName,
                 });
             }
         }

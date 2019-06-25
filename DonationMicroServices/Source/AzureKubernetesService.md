@@ -25,7 +25,8 @@ az account set -s <YOUR-CHOSEN-SUBSCRIPTION-NAME>
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 [Kubernetes walkthrough](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough)
 ```powershell
-az group create -n fkubernetes6 -l eastus2 # Create a resource group fkubernetes6
+az group create -n fkubernetes3 -l eastus2 # Create a resource group fkubernetes3
++++
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
@@ -35,19 +36,20 @@ az aks create help # return all parameters
 #$vmSize = "Standard_D2s_v2" # 2 cpu, 7 Gb Ram
 #$vmSize = "Standard_D4s_v3" # 4 cpu, 17 Gb Ram
 $vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
+$vmSize = "Standard_D2s_v2" # 1 cpu, 3.5 Gb Ram
 $vmCount = 2
-az aks create --name fkubernetes6 --resource-group fkubernetes6 --kubernetes-version 1.12.8 --enable-addons monitoring  --generate-ssh-keys --enable-rbac --node-count $vmCount --node-vm-size $vmSize 
+az aks create --name fkubernetes3 --resource-group fkubernetes3 --kubernetes-version 1.12.8 --enable-addons monitoring  --generate-ssh-keys --enable-rbac --node-count $vmCount --node-vm-size $vmSize
 
 
 # More on how to create a AKS -> https://msdn.microsoft.com/en-us/magazine/mt846465.aspx?f=255&MSPPError=-2147217396
 
 # See https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest
 # to remove the yes/no confirmation
-az aks delete -n fkubernetes6 -g fkubernetes6 # How to delete a cluster
-az group delete -n fkubernetes6 # Delete the resource group - always delete the Kubernetes service 
+az aks delete -n fkubernetes3 -g fkubernetes3 # How to delete a cluster
+az group delete -n fkubernetes3 # Delete the resource group - always delete the Kubernetes service 
 
 ```
-* A resource group named MC_fkubernetes6_fkubernetes6_eastus2 will be created containing all resources (vm, disk, load balancer).
+* A resource group named MC_fkubernetes3_fkubernetes3_eastus2 will be created containing all resources (vm, disk, load balancer).
 
 ### Learning more about your AKS (Azure Kubernetes Service)
 ```powershell
@@ -59,7 +61,7 @@ az aks list -o table # Get the list of clusters
   - To apply a fine level of security access to the cluster AKS require a Azure AD.
   - The default mode is the owner of the subscription can do every thing.
 ```powershell
-az aks get-credentials --resource-group fkubernetes6 --name fkubernetes6 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes3 --name fkubernetes3 # Switch to cluster
 ```
 
 ### Kuster info
@@ -87,14 +89,14 @@ kubectl version # Get version of client and server Kubernetes
 ```powershell
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-az aks browse --resource-group fkubernetes6 --name fkubernetes6 # Start web server dashboard and open in browser
-az aks browse -n fkubernetes6 -g fkubernetes6  # open dashboard # Start web server dashboard and open in browser
+az aks browse --resource-group fkubernetes3 --name fkubernetes3 # Start web server dashboard and open in browser
+az aks browse -n fkubernetes3 -g fkubernetes3  # open dashboard # Start web server dashboard and open in browser
 ```
 ### Adding more node (VM) to the cluster
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
-az aks scale --resource-group fkubernetes6 -n fkubernetes6 --agent-count 2
+az aks scale --resource-group fkubernetes3 -n fkubernetes3 --agent-count 2
 ```
 
 ### Kubernetes Version
@@ -107,7 +109,7 @@ kubectl version # Get version of client and server Kubernetes - server 1.12.8 cl
 
 ### Switch to a specific cluster
 ```powershell
-C:\> kubectl config use-context fkubernetes6 # Switch to cluster
+C:\> kubectl config use-context fkubernetes3 # Switch to cluster
 C:\> kubectl get services
 ```
 

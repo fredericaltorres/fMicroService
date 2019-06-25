@@ -94,7 +94,6 @@ namespace Donation.PersonSimulator.Console
             else
                 throw new InvalidDataException($"Cannot find file {Path.GetFileName(donationJsonFile)}");
 
-
             var donations = DonationDTOs.FromJsonFile(donationJsonFile);
             var donationTotalCount = donations.Count;
             
@@ -122,6 +121,7 @@ namespace Donation.PersonSimulator.Console
                     System.Console.WriteLine("");
                     var percentDone = 1.0 * perfTracker.ItemCount / donationTotalCount;
                     await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationSentToEndPoint, $"Posted to Entrance endpoint ({percentDone}% done)", perfTracker.Duration, perfTracker.ItemPerSecond, perfTracker.ItemCount);
+                    await saNotification.NotifyInfoAsync(perfTracker.GetTrackedInformation("Donation sent to send point"));
                 }
             }
             
