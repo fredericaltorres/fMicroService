@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using fAzureHelper;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+
 
 namespace Donation.WebDashboard.Controllers
 {
@@ -20,7 +21,14 @@ namespace Donation.WebDashboard.Controllers
         public SystemActivitySummary GetSystemActivityClearError()
         {
             __systemActivitySummary.DonationErrorsSummaryDictionary.Clear();
-            return __systemActivitySummary;
+            return GetSystemActivitySummaryPreparedToBeSentToWebDashboard();
+        }
+
+        [HttpGet("[action]")]
+        public SystemActivitySummary GetSystemActivityClearInfo()
+        {
+            __systemActivitySummary.DonationInfoSummaryDictionary.Clear();
+            return GetSystemActivitySummaryPreparedToBeSentToWebDashboard();
         }
 
         /// <summary>
@@ -29,6 +37,22 @@ namespace Donation.WebDashboard.Controllers
         /// <returns></returns>
         [HttpGet("[action]")]
         public SystemActivitySummary GetSystemActivitySummary()
+        {
+            var sa = GetSystemActivitySummaryPreparedToBeSentToWebDashboard();
+            WriteOutputJsonFile(sa);
+            return sa;
+        }
+
+        private static void WriteOutputJsonFile(SystemActivitySummary sa)
+        {
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(sa, Newtonsoft.Json.Formatting.Indented);
+            var outputFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "SystemActivitySummary.json");
+            if (System.IO.File.Exists(outputFile))
+                System.IO.File.Delete(outputFile);
+            System.IO.File.WriteAllText(outputFile, json);
+        }
+
+        private static SystemActivitySummary GetSystemActivitySummaryPreparedToBeSentToWebDashboard()
         {
             __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals);
             __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals);
@@ -42,7 +66,7 @@ namespace Donation.WebDashboard.Controllers
             if (chartDataListWithMultipleMachineName.Count == 0)
                 return r;
 
-            var machineNames = chartDataListWithMultipleMachineName.Select(c => c.MachineName).Distinct();
+            var machineNames = chartDataListWithMultipleMachineName.Select(c => c.MachineName).Distinct().ToList();
             var maxValue = chartDataListWithMultipleMachineName.Max(c => c.Value);
             for(var v = 500; v <= maxValue; v += 500)
             {

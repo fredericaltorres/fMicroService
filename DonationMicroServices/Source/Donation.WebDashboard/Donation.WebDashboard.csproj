@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Source\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
-    <ProjectReference Include="..\Source\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
+    <ProjectReference Include="..\..\Source\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
+    <ProjectReference Include="..\..\Source\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

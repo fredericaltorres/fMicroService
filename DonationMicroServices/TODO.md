@@ -1,5 +1,9 @@
 # Donation-MicroService TODO list
 
+## Donation-QueueProcessor-Console
+- queueprocessor-1-0-43-sfs-1 is logging donation info
+- queueprocessor-1-0-43-sfs-1 is not logging donation info
+
 ## Donation-PersonSimulator-Console
 
 - Handle better http post error [DONE]

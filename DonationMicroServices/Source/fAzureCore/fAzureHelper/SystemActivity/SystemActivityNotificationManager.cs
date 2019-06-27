@@ -106,15 +106,14 @@ namespace fAzureHelper
 
         public async Task NotifyAsync(string message, SystemActivityType type = SystemActivityType.Info, bool sendToConsole = true)
         {
-            var systemActivity = new SystemActivity(message, type);
-            await NotifyAsync(systemActivity, sendToConsole);
+            await NotifyAsync(new SystemActivity(message, type), sendToConsole);
         }
 
         public async Task NotifyAsync(SystemActivity sa, bool sendToConsole = true)
         {
             await _pubSub.PublishAsync(sa.ToJSON());
             if (sendToConsole)
-                System.Console.WriteLine($"[san:{sa.Type}]{sa.Message}");
+                System.Console.WriteLine($"[san:{sa.Type}, {sa.MachineName}]{sa.Message}");
         }
     }
 }

@@ -26,7 +26,7 @@ az account set -s <YOUR-CHOSEN-SUBSCRIPTION-NAME>
 [Kubernetes walkthrough](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough)
 ```powershell
 az group create -n fkubernetes3 -l eastus2 # Create a resource group fkubernetes3
-+++
+
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
@@ -36,7 +36,7 @@ az aks create help # return all parameters
 #$vmSize = "Standard_D2s_v2" # 2 cpu, 7 Gb Ram
 #$vmSize = "Standard_D4s_v3" # 4 cpu, 17 Gb Ram
 $vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
-$vmSize = "Standard_D2s_v2" # 1 cpu, 3.5 Gb Ram
+#$vmSize = "Standard_D2_v2" # 1 cpu, 3.5 Gb Ram
 $vmCount = 2
 az aks create --name fkubernetes3 --resource-group fkubernetes3 --kubernetes-version 1.12.8 --enable-addons monitoring  --generate-ssh-keys --enable-rbac --node-count $vmCount --node-vm-size $vmSize
 
