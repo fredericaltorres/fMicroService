@@ -43,6 +43,7 @@ namespace Donation.RestApi.Entrance.Middleware
                 {
                     var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
                     await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, "<!>", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
+                    await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation("Donations received by endpoint"));
                     await saNotificationPublisher.CloseAsync();
                 }
             }

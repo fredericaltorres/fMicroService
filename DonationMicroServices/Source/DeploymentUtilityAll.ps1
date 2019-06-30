@@ -10,6 +10,21 @@ param(
     [string]$app = "all"
 )
 
+<#
+write-host "Clean System"
+.\DeploymentUtilityAll.ps1 -a deleteDeployment -app all
+.\DeploymentUtilityAll.ps1 -a initData
+write-host "done"
+
+write-host "Restart System"
+.\DeploymentUtilityAll.ps1 -a deploy -app Donation.RestApi.Entrance
+.\DeploymentUtilityAll.ps1 -a deploy -app Donation.PersonSimulator.Console
+.\DeploymentUtilityAll.ps1 -a deploy -app Donation.QueueProcessor.Console
+write-host "done - Running"
+
+
+#>
+
 if($null -eq (Get-Module Util)) {
     Write-Host "PSScriptRoot: $PSScriptRoot"
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force

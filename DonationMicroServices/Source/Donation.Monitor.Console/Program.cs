@@ -94,7 +94,7 @@ namespace Donation.PersonSimulator.Console
                         {
                             var msgProcessedInInterval = previousQueueCount - queueCount;
                             var msgProcessedPerSecond = 1.0 * msgProcessedInInterval / waitSeconds;
-                            System.Console.Write($" {msgProcessedInInterval} donations processed in {waitSeconds}, {msgProcessedPerSecond} donations processed per second (From queue)");
+                            System.Console.Write($" {msgProcessedInInterval} donations processed in {waitSeconds} S, {msgProcessedPerSecond} donations processed per second (From queue)");
                         }
                         System.Console.WriteLine("");
                     }

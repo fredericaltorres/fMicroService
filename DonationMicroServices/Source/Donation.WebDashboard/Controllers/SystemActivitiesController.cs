@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using fAzureHelper;
 using Microsoft.AspNetCore.Mvc;
@@ -43,13 +44,25 @@ namespace Donation.WebDashboard.Controllers
             return sa;
         }
 
-        private static void WriteOutputJsonFile(SystemActivitySummary sa)
+        private static void WriteOutputJsonFile(SystemActivitySummary sa, int recursionIndex = 0)
         {
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(sa, Newtonsoft.Json.Formatting.Indented);
-            var outputFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "SystemActivitySummary.json");
-            if (System.IO.File.Exists(outputFile))
-                System.IO.File.Delete(outputFile);
-            System.IO.File.WriteAllText(outputFile, json);
+            try
+            {
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(sa, Newtonsoft.Json.Formatting.Indented);
+                var outputFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "SystemActivitySummary.json");
+                if (System.IO.File.Exists(outputFile))
+                    System.IO.File.Delete(outputFile);
+                System.IO.File.WriteAllText(outputFile, json);
+            }
+            catch(System.Exception ex)
+            {
+                if (recursionIndex == 0)
+                {
+                    Thread.Sleep(100);
+                    WriteOutputJsonFile(sa, recursionIndex + 1);
+                }
+                else throw;
+            }
         }
 
         private static SystemActivitySummary GetSystemActivitySummaryPreparedToBeSentToWebDashboard()
@@ -231,15 +244,29 @@ namespace Donation.WebDashboard.Controllers
             public List<ChartData> Totals = new List<ChartData>();
 
             public void Add(DonationActivitySummary das)
-            {
+            {                
                 var key = das.MachineName.ToLowerInvariant();
                 if (this.ContainsKey(key)) {
-                    this[key].Total = das.Total;
-                    this[key].ItemPerSecond = das.ItemPerSecond;
-                    this[key].Caption = das.Caption;
-                    this[key].JsonData = das.JsonData;
-                    this[key].Message.AddRange(das.Message);
-                    this[key].UTCDateTime = das.UTCDateTime;
+
+                    if (
+                        // Make sure we only store the last total count, service bus message can be out of order
+                        //das.Total >= this[key].Total ||
+
+                        // Make sure we only store the newest one service bus message can be out of order
+                        das.UTCDateTime > this[key].UTCDateTime
+                        )
+                    {
+                        this[key].Total = das.Total;
+                        this[key].ItemPerSecond = das.ItemPerSecond;
+                        this[key].Caption = das.Caption;
+                        this[key].JsonData = das.JsonData;
+                        this[key].Message.AddRange(das.Message);
+                        this[key].UTCDateTime = das.UTCDateTime;
+                    }
+                    else {
+                        // We already recorded a newer value
+                        // This instance of DonationActivitySummary came to later via Service Bus
+                    }
                 }
                 else
                 {

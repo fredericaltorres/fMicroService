@@ -22,6 +22,7 @@ export class Home extends Component {
 
     timerId = null;
     refreshTimeOut = 1000 * 4;    
+    summaryTableDefaultPageSize = 6;
 
     state = {
         systemActivitySummary: {
@@ -173,7 +174,7 @@ export class Home extends Component {
                     Header: "Donation Info",
                     columns: this.getColumnsForMessagesTable()
                 }]}
-                defaultPageSize={3}
+                defaultPageSize={this.summaryTableDefaultPageSize}
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {
@@ -204,7 +205,7 @@ export class Home extends Component {
                         Header: "Donation Errors",
                         columns: this.getColumnsForMessagesTable()
                 }]}                
-                defaultPageSize={3}
+                defaultPageSize={this.summaryTableDefaultPageSize}
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {
@@ -255,7 +256,7 @@ export class Home extends Component {
                         Header: "Donation Processed",
                         columns: this.getColumnsForDonationPerSecondTable()
                 }]}                
-                defaultPageSize={3}
+                defaultPageSize={this.summaryTableDefaultPageSize}
                 className="-striped -highlight"
                 showPagination={false}
             />
@@ -275,7 +276,7 @@ export class Home extends Component {
                         Header: "Donation Sent To Endpoint",
                         columns: this.getColumnsForDonationPerSecondTable()
                 }]}                
-                defaultPageSize={3}
+                defaultPageSize={this.summaryTableDefaultPageSize}
                 className="-striped -highlight"
                 showPagination={false}
             />
@@ -295,7 +296,7 @@ export class Home extends Component {
                     Header: "Donation Enqueued",
                     columns: this.getColumnsForDonationPerSecondTable()                            
                 }]}
-                defaultPageSize={3}
+                defaultPageSize={this.summaryTableDefaultPageSize}
                 className="-striped -highlight"
                 showPagination={false}
             />
@@ -325,7 +326,7 @@ export class Home extends Component {
                     Header: "Dashboard Country Aggregate",
                     columns: this.getColumnsForJsonDataTable()
                 }]}
-                defaultPageSize={3}
+                defaultPageSize={this.summaryTableDefaultPageSize}
                 className="-striped -highlight"
                 showPagination={false}
             />
