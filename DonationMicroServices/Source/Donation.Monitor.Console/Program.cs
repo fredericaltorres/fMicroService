@@ -17,13 +17,15 @@ namespace Donation.PersonSimulator.Console
 {
     class Program
     {
+        private const string deleteTableCommandLineParameter = "-deleteTable";
+
         /// <summary>
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
-            if(RuntimeHelper.GetCommandLineParameterBool("-deleteTable", args))
+            if(RuntimeHelper.ExistsCommandLineParameterString(deleteTableCommandLineParameter, args) && RuntimeHelper.GetCommandLineParameterBool(deleteTableCommandLineParameter, args))
             {
                 GetDonationTableManager().DeleteAsync().GetAwaiter().GetResult();
                 GetDonationAggregateTableManager().DeleteAsync().GetAwaiter().GetResult();

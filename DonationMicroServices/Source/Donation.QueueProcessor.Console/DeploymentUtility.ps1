@@ -2,14 +2,13 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs')]
+    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs','info')]
     [string]$action = "deploy"
 )
 
 if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\..\Util.psm1" -Force
 }
-
 
 $appName = GetAppNameFromProject
 $dockerFilName = ".\Source\$appName\Dockerfile"
@@ -38,6 +37,8 @@ function deploy() {
     ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $deployService
 }
 switch($action) {
+	info {
+    }
     build {
         buildContainer
     }

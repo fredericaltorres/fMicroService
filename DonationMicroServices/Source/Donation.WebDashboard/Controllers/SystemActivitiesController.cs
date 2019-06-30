@@ -54,13 +54,14 @@ namespace Donation.WebDashboard.Controllers
 
         private static SystemActivitySummary GetSystemActivitySummaryPreparedToBeSentToWebDashboard()
         {
-            __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals);
-            __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals);
-            __systemActivitySummary.DonationProcessedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationProcessedActivitySummaryDictionary.Totals);
+            //  To avoid the Totals collection to be modified while processing we execute a .ToList()
+            __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals.ToList());
+            __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals.ToList());
+            __systemActivitySummary.DonationProcessedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationProcessedActivitySummaryDictionary.Totals.ToList());
             return __systemActivitySummary;
         }
 
-        private static List<ChartData> MergeMachineNameChartDataList(List<ChartData> chartDataListWithMultipleMachineName)
+        private static List<ChartData> MergeMachineNameChartDataList(List<ChartData> chartDataListWithMultipleMachineName, int recursionCounter = 0)
         {
             var r = new List<ChartData>();
             if (chartDataListWithMultipleMachineName.Count == 0)
@@ -68,20 +69,22 @@ namespace Donation.WebDashboard.Controllers
 
             var machineNames = chartDataListWithMultipleMachineName.Select(c => c.MachineName).Distinct().ToList();
             var maxValue = chartDataListWithMultipleMachineName.Max(c => c.Value);
-            for(var v = 500; v <= maxValue; v += 500)
+            for (var v = 500; v <= maxValue; v += 500)
             {
-                var cdTotal = new ChartData();
-                foreach(var m in machineNames)
+                var cdTotal = new ChartData() { AllMachineFound = true };
+                foreach (var m in machineNames)
                 {
                     var cd = chartDataListWithMultipleMachineName.FirstOrDefault(c => c.MachineName == m && c.Value == v);
                     if (cd == null)
                     {
+                        cdTotal.AllMachineFound = false;
                         System.Diagnostics.Debug.WriteLine($"Cannot find chart data for machineName:{m}, value:{v}");
                     }
-                    else {
+                    else
+                    {
                         cdTotal.Value += cd.Value;
                         cdTotal.Label = cd.Label;
-                    }                    
+                    }
                 }
                 if (cdTotal.Value > 0)
                     r.Add(cdTotal);
@@ -181,6 +184,7 @@ namespace Donation.WebDashboard.Controllers
             public string Label { get; set; }
             public long Value { get; set; }
             public string MachineName { get; set; }
+            public bool AllMachineFound { get; set; }
         }
         
 

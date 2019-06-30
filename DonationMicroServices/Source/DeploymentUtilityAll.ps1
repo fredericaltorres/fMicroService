@@ -1,9 +1,13 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$true)]
     [Alias('a')]
-    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs', 'initData')]
-    [string]$action = "build"
+    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs', 'initData', 'info')]
+    [string]$action = "initData",
+
+    [Parameter(Mandatory=$false)]
+    [ValidateSet('all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console')]
+    [string]$app = "all"
 )
 
 if($null -eq (Get-Module Util)) {
@@ -11,16 +15,20 @@ if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
 }
 
-
 function executeCommandInFolder($folder, $theAction) {
     cd "$folder"
     Write-Host ""
     .\DeploymentUtility.ps1 -a $theAction
     cd ..
 }
-
+cls
 $scriptTitle = "Donation Automation Deployment Utility"
-$appFolders = @("Donation.RestApi.Entrance", "Donation.QueueProcessor.Console", "Donation.PersonSimulator.Console")
+if($app -eq "all") {
+    $appFolders = @("Donation.RestApi.Entrance", "Donation.QueueProcessor.Console", "Donation.PersonSimulator.Console")
+}
+else {
+    $appFolders = @($app)
+}
 
 Write-Host "$scriptTitle -- ALL" -ForegroundColor Yellow
 Write-Host "Action: $action" -ForegroundColor DarkYellow
@@ -31,6 +39,9 @@ switch($action) {
         Set-Location "Donation.Monitor.Console"
         dotnet run -deleteTable true
         Set-Location ..
+    }
+    info {
+        $appFolders | ForEach-Object -Process { executeCommandInFolder $_ $action }
     }
     build {
         $appFolders | ForEach-Object -Process { executeCommandInFolder $_ $action }
@@ -52,4 +63,4 @@ switch($action) {
     }    
 }
 
-Write-HostColor "$scriptTitle -- done" Yellow
+Write-Host "`r`n$scriptTitle -- ALL" -ForegroundColor Yellow

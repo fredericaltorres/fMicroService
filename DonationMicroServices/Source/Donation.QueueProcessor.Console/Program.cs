@@ -38,6 +38,10 @@ namespace Donation.PersonSimulator.Console
         {
             var saNotification = new SystemActivityNotificationManager(GetServiceBusConnectionString());            
             await saNotification.NotifyInfoAsync($"starting");
+            Thread.Sleep(2 * 1000);
+            await saNotification.NotifyInfoAsync($"starting A");
+            Thread.Sleep(2 * 1000);
+            await saNotification.NotifyInfoAsync($"starting B");
             try
             {
                 // Settings come frm the appsettings.json file
@@ -46,13 +50,14 @@ namespace Donation.PersonSimulator.Console
                 var donationAggregateTableManager = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
                 var donationAggregationService = new DonationsAggregationService();
                 const int queuBatchSize = 10;
+                const int sleepDurationWhenNoItemInQueue = 4;
 
                 while (true)
                 {
                     var donations = await donationQueue.DequeueAsync(queuBatchSize);
                     if (donations.Count == 0)
                     {
-                        Thread.Sleep(2 * 1000);
+                        Thread.Sleep(sleepDurationWhenNoItemInQueue * 1000);
                     }
                     else
                     {

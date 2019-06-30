@@ -40,6 +40,11 @@ namespace fDotNetCoreContainerHelper
             throw new InvalidProgramException($"Cannot find parameter:{name} in command line or environment");
         }
 
+        public static bool ExistsCommandLineParameterString(string name, string[] args)
+        {
+            return GetCommandLineParameterString(name, args) != null;
+        }
+
         public static string GetCommandLineParameterString(string name, string[] args)
         {
             var envName = name;

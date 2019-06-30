@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs')]
+    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs','info')]
     [string]$action = "deleteDeployment"
 )
 
@@ -63,6 +63,8 @@ function deploy() {
 }
 
 switch($action) {
+    info {
+    }
     build {
         buildContainer
     }

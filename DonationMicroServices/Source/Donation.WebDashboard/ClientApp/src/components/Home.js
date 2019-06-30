@@ -414,6 +414,8 @@ export class Home extends Component {
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh </button>
                 &nbsp;
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Error </button>
+                &nbsp;
+                {new Date().toString()}
                 
                 <div className="card">
                     <div className="card-header">Donation Sent</div>

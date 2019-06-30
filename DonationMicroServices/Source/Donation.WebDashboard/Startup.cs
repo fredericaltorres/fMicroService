@@ -103,7 +103,7 @@ namespace Donation.WebDashboard
 
             RuntimeHelper.SetAppPath(env.ContentRootPath);
 
-            systemActivityNotificationSubscriber = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"), Environment.MachineName);
+            systemActivityNotificationSubscriber = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"), $"{Environment.MachineName}_WebDashBoard");
             systemActivityNotificationSubscriber.OnMessageReceived += SystemActivityNotificationSubscriber_OnMessageReveived;
         }
     }
