@@ -28,6 +28,7 @@ namespace Donation.RestApi.Entrance.Middleware
             }
             catch (System.Exception ex)
             {
+                Console.WriteLine($"DonationCounterMiddleware ex:${ex.Message}");
                 await NotifyError(context, ex);
             }
             await _next(context); // Call the next delegate/middleware in the pipeline
@@ -35,18 +36,22 @@ namespace Donation.RestApi.Entrance.Middleware
 
         private async Task Notify(HttpContext context)
         {
-            if (context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path == "/api/Donation")
+            if (context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path.ToString().ToLowerInvariant() == "/api/donation")
             {
                 __perfTracker.TrackNewItemThreadSafe();
-
                 if (__perfTracker.ItemCountThreadSafe % SystemActivityNotificationManager.NotifyEvery == 0)
-                {
-                    var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
-                    await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, "<!>", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
-                    await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation("Donations received by endpoint"));
-                    await saNotificationPublisher.CloseAsync();
-                }
+                    await NotifyAll(false);
             }
+            if (context.Request.Method.ToLowerInvariant() == "get" && context.Request.Path.ToString().ToLowerInvariant() == "/api/info/getflushnotification")
+                await NotifyAll(true);
+        }
+
+        private static async Task NotifyAll(bool final)
+        {
+            var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
+            await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
+            await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
+            await saNotificationPublisher.CloseAsync();
         }
 
         private async Task NotifyError(HttpContext context, System.Exception exception)

@@ -11,13 +11,23 @@ namespace Donation.RestApi.Entrance.Controllers
     [ApiController]
     public class InfoController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public JsonResult Get()
+        // GET api/info/getinfo
+        [HttpGet("[action]")]
+        public JsonResult GetInfo()
         {
             var s = RuntimeHelper.GetAppSettings("AllowedHosts");
             return new JsonResult(RuntimeHelper.GetContextInformationDictionary());
         }
+
+        // GET api/info/getflushnotification
+        // This api call does nothing but is monitored by DonationCounterMiddleware
+        // To force a flush of the monitored info
+        [HttpGet("[action]")]
+        public JsonResult GetFlushNotification()
+        {            
+            return new JsonResult(RuntimeHelper.GetContextInformationDictionary());
+        }
+
 
         //// GET api/values/5
         //[HttpGet("{id}")]

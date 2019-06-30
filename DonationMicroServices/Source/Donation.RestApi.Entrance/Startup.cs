@@ -49,6 +49,7 @@ namespace Donation.RestApi.Entrance
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var ASPNETCORE_URLS = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+            RuntimeHelper.SetAppPath(env.ContentRootPath);
 
             DonationCounterMiddleware.NotifyInfoAsync(
                 $"{RuntimeHelper.GetAppName()} starting",
@@ -59,8 +60,7 @@ namespace Donation.RestApi.Entrance
                 { "WebRootPath"    , env.WebRootPath },
                 { "ASPNETCORE_URLS", ASPNETCORE_URLS },
             }, sendToConsole: true).GetAwaiter().GetResult();
-
-            RuntimeHelper.SetAppPath(env.ContentRootPath);
+                        
             Console.WriteLine(RuntimeHelper.GetContextInformation());
             if (env.IsDevelopment())
             {

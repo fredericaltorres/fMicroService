@@ -12,7 +12,7 @@ param(
     [string]$appVersion = "1.0.4", #  1.0.3
 
     [Parameter(Mandatory=$false)]
-    [string]$appUrl = "/api/info",
+    [string]$appUrl = "/api/getinfo",
 
     [Parameter(Mandatory=$false)] 
     [bool]$deployService = $true,

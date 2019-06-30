@@ -61,6 +61,23 @@ namespace Donation.PersonSimulator.Console
             return $"{protocol}://{hostOrIp}:{port}/api/Donation";
         }
 
+        static async Task<bool> SendFlushNotificationToEndpoint(string donationEndPointIP, string donationEndPointPort)
+        {
+            try
+            {
+                System.Console.WriteLine("About to send flush notification");
+                var (succeeded, _) = await RuntimeHelper.HttpHelper.Get(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)));
+                System.Console.WriteLine($"About to send flush notification succeeded:{succeeded}");
+                if (succeeded)
+                    return true;
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine($"PostDonation failed, ex:{ex.Message}");
+            }
+            return false;
+        }
+
         static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, int recursiveCallCount = 0)
         {
             try
@@ -124,7 +141,9 @@ namespace Donation.PersonSimulator.Console
                     await saNotification.NotifyInfoAsync(perfTracker.GetTrackedInformation("Donation sent to send endpoint"));
                 }
             }
-            
+
+            await SendFlushNotificationToEndpoint(donationEndPointIP, donationEndPointPort);
+
             await saNotification.NotifyAsync(DS.List(
                 $"{donationTotalCount} donations sent",
                 $"End sending donation from file {donationJsonFile}"

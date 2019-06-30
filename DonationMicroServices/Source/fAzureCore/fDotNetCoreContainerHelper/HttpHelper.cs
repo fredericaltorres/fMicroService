@@ -18,5 +18,18 @@ namespace fDotNetCoreContainerHelper
                     return (hrp.IsSuccessStatusCode, null, hrp);
             }
         }
+
+        public async Task<(bool succeeded, HttpResponseMessage httpResponseMessage)> Get(Uri uri)
+        {
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage hrp = await client.GetAsync(uri);
+                if (hrp.IsSuccessStatusCode)
+                    return (hrp.IsSuccessStatusCode, hrp);
+                else
+                    return (hrp.IsSuccessStatusCode, hrp);
+            }
+        }
+
     }
 }
