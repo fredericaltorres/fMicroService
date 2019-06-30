@@ -60,13 +60,21 @@ namespace Donation.PersonSimulator.Console
 
             return $"{protocol}://{hostOrIp}:{port}/api/Donation";
         }
+        static string GetFlushNotificationUrl(string hostOrIp, string port)
+        {
+            var protocol = "http";
+            if (port == "443")
+                protocol = "htttps";
+
+            return $"{protocol}://{hostOrIp}:{port}/api/info/GetFlushNotification";
+        }
 
         static async Task<bool> SendFlushNotificationToEndpoint(string donationEndPointIP, string donationEndPointPort)
         {
             try
             {
                 System.Console.WriteLine("About to send flush notification");
-                var (succeeded, _) = await RuntimeHelper.HttpHelper.Get(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)));
+                var (succeeded, _) = await RuntimeHelper.HttpHelper.Get(new Uri(GetFlushNotificationUrl(donationEndPointIP, donationEndPointPort)));
                 System.Console.WriteLine($"About to send flush notification succeeded:{succeeded}");
                 if (succeeded)
                     return true;
@@ -142,6 +150,8 @@ namespace Donation.PersonSimulator.Console
                 }
             }
 
+            // Call specific end point to flush notification.
+            // So far I am always missing the last 500 donation processed notification in one pod
             await SendFlushNotificationToEndpoint(donationEndPointIP, donationEndPointPort);
 
             await saNotification.NotifyAsync(DS.List(
