@@ -11,6 +11,7 @@ param(
 )
 
 <#
+
 write-host "Clean System"
 .\DeploymentUtilityAll.ps1 -a deleteDeployment -app all
 .\DeploymentUtilityAll.ps1 -a initData
@@ -22,6 +23,9 @@ write-host "Restart System"
 .\DeploymentUtilityAll.ps1 -a deploy -app Donation.QueueProcessor.Console
 write-host "done - Running"
 
+.\DeploymentUtilityAll.ps1 -a buildAndPush -app Donation.RestApi.Entrance
+.\DeploymentUtilityAll.ps1 -a buildAndPush -app Donation.PersonSimulator.Console
+write-host "done"
 
 #>
 
@@ -50,7 +54,6 @@ Write-Host "Action: $action" -ForegroundColor DarkYellow
 
 switch($action) {
     initData {
-        Write-host "Delete donation azure tables" -ForegroundColor DarkYellow
         Set-Location "Donation.Monitor.Console"
         dotnet run -deleteTable true
         Set-Location ..

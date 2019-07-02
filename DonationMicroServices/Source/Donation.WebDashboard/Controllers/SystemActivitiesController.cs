@@ -97,6 +97,11 @@ namespace Donation.WebDashboard.Controllers
                     {
                         cdTotal.Value += cd.Value;
                         cdTotal.Label = cd.Label;
+
+                        // Just store the detail to trouble shoot losing some messages
+                        if(cdTotal.Children == null)
+                            cdTotal.Children = new Dictionary<string, ChartData>();
+                        cdTotal.Children.Add(cd.MachineName, cd);
                     }
                 }
                 if (cdTotal.Value > 0)
@@ -198,6 +203,8 @@ namespace Donation.WebDashboard.Controllers
             public long Value { get; set; }
             public string MachineName { get; set; }
             public bool AllMachineFound { get; set; }
+
+            public Dictionary<string, ChartData> Children { get; set; }
         }
         
 

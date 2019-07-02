@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Donation.RestApi.Entrance.Middleware
@@ -12,6 +13,11 @@ namespace Donation.RestApi.Entrance.Middleware
     public class DonationCounterMiddleware
     {
         static PerformanceTracker __perfTracker = new PerformanceTracker();
+        /// <summary>
+        /// https://blog.cdemi.io/async-waiting-inside-c-sharp-locks/
+        /// Protect NotifyAll with a semaphone as we were losing some messages
+        /// </summary>
+        static SemaphoreSlim _notificationSemaphore = new SemaphoreSlim(1, 1);
 
         private readonly RequestDelegate _next;
 
@@ -48,10 +54,18 @@ namespace Donation.RestApi.Entrance.Middleware
 
         private static async Task NotifyAll(bool final)
         {
-            var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
-            await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
-            await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
-            await saNotificationPublisher.CloseAsync();
+            await _notificationSemaphore.WaitAsync();
+            try
+            {
+                var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
+                await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
+                await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
+                await saNotificationPublisher.CloseAsync();
+            }
+            finally
+            {
+                _notificationSemaphore.Release();
+            }
         }
 
         private async Task NotifyError(HttpContext context, System.Exception exception)

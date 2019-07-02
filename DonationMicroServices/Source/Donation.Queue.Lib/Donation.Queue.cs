@@ -59,8 +59,13 @@ namespace Donation.Queue.Lib
         }
 
         public async Task DeleteAsync(DonationDTO donation)
-        {
+        {            
             await _queueManager.DeleteAsync(donation.__QueueMessageID);
+        }
+
+        public async Task ClearAsync(int batchSize)
+        {
+            await _queueManager.ClearAsync(batchSize);
         }
 
         public void Release(DonationDTO donation)

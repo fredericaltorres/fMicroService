@@ -1,5 +1,8 @@
 # Donation-MicroService TODO list
 
+Implement waitForStatefulsets
+kubectl get statefulsets -o json
+
 ## Donation-QueueProcessor-Console
 - queueprocessor-1-0-43-sfs-1 is logging donation info
 - queueprocessor-1-0-43-sfs-1 is not logging donation info

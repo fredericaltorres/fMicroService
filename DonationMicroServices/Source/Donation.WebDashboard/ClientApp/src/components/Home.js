@@ -365,7 +365,7 @@ export class Home extends Component {
 
     render() {
 
-        const chartWidth = 401;
+        const chartWidth = 501;
         const chartHeight = 175;
 
         const donationProcessedChart = (

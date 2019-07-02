@@ -27,9 +27,15 @@ namespace Donation.PersonSimulator.Console
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
             if(RuntimeHelper.ExistsCommandLineParameterString(deleteTableCommandLineParameter, args) && RuntimeHelper.GetCommandLineParameterBool(deleteTableCommandLineParameter, args))
             {
+                System.Console.WriteLine("Deleting tables...");
                 GetDonationTableManager().DeleteAsync().GetAwaiter().GetResult();
                 GetDonationAggregateTableManager().DeleteAsync().GetAwaiter().GetResult();
                 System.Console.WriteLine("Tables deleted");
+
+                System.Console.WriteLine("Clearing queue...");
+                DonationQueue donationQueue = GetDonationQueue();                
+                donationQueue.ClearAsync(32).GetAwaiter().GetResult();
+                System.Console.WriteLine("Queue cleared");
             }
             else Monitor().GetAwaiter().GetResult();
         }
@@ -62,7 +68,7 @@ namespace Donation.PersonSimulator.Console
             int previousQueueCount = -1;
             try
             {
-                var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                DonationQueue donationQueue = GetDonationQueue();
                 GetDonationTableManager();
                 System.Console.Title = $"Donation.Monitor.Console Q)uit C)ls P)ause";
                 var goOn = true;
@@ -105,6 +111,11 @@ namespace Donation.PersonSimulator.Console
             {
                 System.Console.WriteLine(ex);
             }
+        }
+
+        private static DonationQueue GetDonationQueue()
+        {
+            return new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
         }
 
         private static DonationTableManager GetDonationTableManager()

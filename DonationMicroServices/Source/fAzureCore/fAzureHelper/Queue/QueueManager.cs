@@ -68,7 +68,10 @@ namespace fAzureHelper
 
         public async Task<List<QueueMessage>> DequeueAsync(int count)
         {
-            var waitTimeForAllMessageToArraiveInQueue = new TimeSpan(0, 0, 0, 0, 500);
+            var timeOutIsMilliSeconds = 500;
+            if(count > 32)
+                timeOutIsMilliSeconds = 100;
+            var waitTimeForAllMessageToArraiveInQueue = new TimeSpan(0, 0, 0, 0, timeOutIsMilliSeconds);
             IEnumerable<CloudQueueMessage> messages = await this._queue.GetMessagesAsync(
                 count, 
                 waitTimeForAllMessageToArraiveInQueue, 
@@ -102,12 +105,12 @@ namespace fAzureHelper
             await this._queue.DeleteMessageAsync(cloudMessage);
         }
 
-        public async Task<List<QueueMessage>> ClearAsync()
+        public async Task<List<QueueMessage>> ClearAsync(int batchSize = 1)
         {
             var l = new List<QueueMessage>();
             while(await ApproximateMessageCountAsync() > 0)
             {
-                var messages = await DequeueAsync(1);
+                var messages = await DequeueAsync(batchSize);
                 l.AddRange(messages);
                 foreach(var m in messages)
                     await this.DeleteAsync(m.Id);

@@ -25,7 +25,23 @@ az account set -s <YOUR-CHOSEN-SUBSCRIPTION-NAME>
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 [Kubernetes walkthrough](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough)
 ```powershell
-az group create -n fkubernetes3 -l eastus2 # Create a resource group fkubernetes3
+
+$kubernetesClusterName = "fkubernetes3"
+write-host "Creating Azure Resource Group $kubernetesClusterName"
+az group create -n $kubernetesClusterName -l eastus2 # Create a resource group fkubernetes3
+
+write-host "Creating Kubernetes Cluster $kubernetesClusterName"
+#$vmSize = "Standard_D2s_v2" # 2 cpu, 7 Gb Ram
+#$vmSize = "Standard_D4s_v3" # 4 cpu, 17 Gb Ram
+$vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
+#$vmSize = "Standard_D2_v2" # 1 cpu, 3.5 Gb Ram
+$vmCount = 2
+az aks create --name $kubernetesClusterName --resource-group $kubernetesClusterName --kubernetes-version 1.12.8 --enable-addons monitoring  --generate-ssh-keys --enable-rbac --node-count $vmCount --node-vm-size $vmSize
+
+az aks get-credentials --resource-group $kubernetesClusterName --name $kubernetesClusterName # Switch to cluster
+
+kubectl config use-context $kubernetesClusterName # Switch to cluster
+
 
 
 # Create the cluster
