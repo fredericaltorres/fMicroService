@@ -50,7 +50,7 @@ else {
 }
 
 Write-Host "$scriptTitle -- ALL" -ForegroundColor Yellow
-Write-Host "Action: $action" -ForegroundColor DarkYellow
+Write-Host "Action: $action, App: $app" -ForegroundColor DarkYellow
 
 switch($action) {
     initData {

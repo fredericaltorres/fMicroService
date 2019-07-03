@@ -149,11 +149,9 @@ namespace Donation.PersonSimulator.Console
                     await saNotification.NotifyInfoAsync(perfTracker.GetTrackedInformation("Donation sent to send endpoint"));
                 }
             }
-            
-            // Call specific end point to flush notification.
-            // So far I am always missing the last 500 donation processed notification in one pod
-            // DO NOT CALL THIS BECAUSE THE FLUSHING MAY OCCUR WITH A 500 BATCH ENQUEUED
-            // await SendFlushNotificationToEndpoint(saNotification, donationEndPointIP, donationEndPointPort);
+
+            Thread.Sleep(10 * 1000); // Give sometime to the endpoint
+            await SendFlushNotificationToEndpoint(saNotification, donationEndPointIP, donationEndPointPort);
 
             await saNotification.NotifyAsync(DS.List(
                 $"{donationTotalCount} donations sent",
