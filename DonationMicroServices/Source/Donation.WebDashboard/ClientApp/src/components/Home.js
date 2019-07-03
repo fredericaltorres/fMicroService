@@ -26,15 +26,10 @@ export class Home extends Component {
 
     state = {
         systemActivitySummary: {
-            donationSentToEndPointActivitySummaryTotals: [],
             donationSentToEndPointActivitySummaryDictionary: {},
-
-            donationEnqueuedActivitySummaryTotals: [],
             donationEnqueuedActivitySummaryDictionary: {},
-
             dashboardResourceActivitySummaryDictionary: {},
-
-            donationProcessedActivitySummaryTotals:[],
+            
             donationProcessedActivitySummaryDictionary: {},
             donationInfoSummaryDictionary: {},
             donationErrorsSummaryDictionary: {},
@@ -118,7 +113,7 @@ export class Home extends Component {
                 total        : machineInfo.total,
                 itemPerSecond: machineInfo.itemPerSecond,
                 jsonData     : machineInfo.jsonData,
-                message      : machineInfo.message, // This is an array of string
+                messages     : machineInfo.messages, // This is an array of string
             };
         });
 
@@ -151,11 +146,6 @@ export class Home extends Component {
         return this.getActivitySummaryTable(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary);
     }
 
-    getDonationEnqueuedActivitySummaryTable = () => {
-
-        return this.getActivitySummaryTable(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary);
-    }
-
     getDashboardResourceActivitySummaryTable = () => {
 
         return this.getActivitySummaryTable(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
@@ -178,7 +168,8 @@ export class Home extends Component {
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {
-                    var messages = row.original.message;
+                    
+                    var messages = row.original.messages;
                     var messagesHtml = messages.map((message, index) => {
                         return <li key={index}>{message}</li>;
                     });                    
@@ -283,26 +274,6 @@ export class Home extends Component {
         );
     }
     
-    renderDonationEnqueuedActivitySummaryTable = () => {
-
-        const data = this.getDonationEnqueuedActivitySummaryTable();
-        if (data.length === 0)
-            return null
-
-        return (
-            <ReactTable
-                data={data}
-                columns={[{
-                    Header: "Donation Enqueued",
-                    columns: this.getColumnsForDonationPerSecondTable()                            
-                }]}
-                defaultPageSize={this.summaryTableDefaultPageSize}
-                className="-striped -highlight"
-                showPagination={false}
-            />
-        );
-    }
-
     getColumnsForJsonDataTable = () => [
         {
             Header: "Machine Name",
@@ -332,81 +303,46 @@ export class Home extends Component {
             />
         );
     }
-
-    getDonationProcessedChartData = () => {
-
-        const data = [];
-        const totals = this.state.systemActivitySummary.donationProcessedActivitySummaryTotals;
-        totals.forEach((info, index) => {
-            data.push({ timeStamp: info.label, value: info.value });
-        });
-        return data;
-    };
-
-    getDonationSentToEndPointChartData = () => {
-
-        const data = [];
-        const totals = this.state.systemActivitySummary.donationSentToEndPointActivitySummaryTotals;
-        totals.forEach((info, index) => {
-            data.push({ timeStamp: info.label, value: info.value });
-        });
-        return data;
-    };
-
-    getDonationEnqueuedChartData = () => {
         
-        const data = [];
-        const totals = this.state.systemActivitySummary.donationEnqueuedActivitySummaryTotals;
-        totals.forEach((info, index) => {
-            data.push({ timeStamp: info.label, value: info.value });
-        });
-        return data;
+    getDonationSentToEndPointChartData = (machineIndex) => {
+
+        const dictionary = this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary;
+        const machineNames = Object.keys(dictionary);
+        if (machineNames.length) {
+            const machineName = machineNames[machineIndex];
+            const history = dictionary[machineName].History;
+            const data = history.map((e) => {
+                return { timeStamp: e.chartLabel, value: e.Total };
+            });
+            return data;
+        }
+        else return [];
     };
 
     render() {
 
         const chartWidth = 501;
         const chartHeight = 175;
-
-        const donationProcessedChart = (
-            <LineChart width={chartWidth} height={chartHeight} data={this.getDonationProcessedChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+        
+        const getDonationSentToEndPointMachineName = (machineIndex) => {
+            return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationSentToEndPointChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />
                 <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                 <XAxis dataKey="timeStamp" />
                 <YAxis />
                 <Tooltip />
-            </LineChart>
-        );
+            </LineChart>;
+        };
 
-        const donationEnqueuedChart = (
-            <LineChart width={chartWidth} height={chartHeight} data={this.getDonationEnqueuedChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <XAxis dataKey="timeStamp" />
-                <YAxis />
-                <Tooltip />
-            </LineChart>
-        );
-
-        const donationSentToEndPointChart = (
-            <LineChart width={chartWidth} height={chartHeight} data={this.getDonationSentToEndPointChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <XAxis dataKey="timeStamp" />
-                <YAxis />
-                <Tooltip />
-            </LineChart>
-        );
-
-        const donationReceivedPerSecChart = (
-            <LineChart width={500} height={200} data={getDonationReceivedPerSecChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <Line type="monotone" dataKey="donatioReceivedPerSec" stroke="#8884d8" />
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <XAxis dataKey="timeStamp" />
-                <YAxis />
-                <Tooltip />
-            </LineChart>
-        );
+        //const donationReceivedPerSecChart = (
+        //    <LineChart width={500} height={200} data={getDonationReceivedPerSecChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+        //        <Line type="monotone" dataKey="donatioReceivedPerSec" stroke="#8884d8" />
+        //        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+        //        <XAxis dataKey="timeStamp" />
+        //        <YAxis />
+        //        <Tooltip />
+        //    </LineChart>
+        //);
 
         return (
             <div>
@@ -419,34 +355,20 @@ export class Home extends Component {
                 {new Date().toString()}
                 
                 <div className="card">
-                    <div className="card-header">Donation Sent</div>
+                    <div className="card-header">Donation Sent Machine 0</div>
                     <div className="card-body">
-                        {donationSentToEndPointChart}
+                        {getDonationSentToEndPointMachineName(0)}
                     </div>
-                </div>
+                </div>                
 
                 <div className="card">
-                    <div className="card-header">Donation Enqueued</div>
+                    <div className="card-header">Donation Sent Machine 1</div>
                     <div className="card-body">
-                        {donationEnqueuedChart}
+                        {getDonationSentToEndPointMachineName(1)}
                     </div>
-                </div>
-
-                <div className="card">
-                    <div className="card-header">Donation Processed</div>
-                    <div className="card-body">
-                        {donationProcessedChart}
-                    </div>
-                </div>
-
-                {/*
-                <div className="card">
-                    <div className="card-header">Donation Processed Per Second</div>
-                    <div className="card-body">
-                        {donationProcessedPerSecChart}
-                    </div>
-                </div>
-                */}
+                </div>                
+                
+                
 
                 {/*
                 <div className="card">
@@ -463,7 +385,7 @@ export class Home extends Component {
 
                 {this.renderDonationSentToEndpointActivitySummaryTable()}
                 <br /><br />
-                {this.renderDonationEnqueuedActivitySummaryTable()}
+                
                 <br /><br />
                 {this.renderDonationProcessedActivitySummaryTable()}
                 <br /><br />

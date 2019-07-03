@@ -66,49 +66,8 @@ namespace Donation.WebDashboard.Controllers
         }
 
         private static SystemActivitySummary GetSystemActivitySummaryPreparedToBeSentToWebDashboard()
-        {
-            //  To avoid the Totals collection to be modified while processing we execute a .ToList()
-            __systemActivitySummary.DonationSentToEndPointActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Totals.ToList());
-            __systemActivitySummary.DonationEnqueuedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Totals.ToList());
-            __systemActivitySummary.DonationProcessedActivitySummaryTotals = MergeMachineNameChartDataList(__systemActivitySummary.DonationProcessedActivitySummaryDictionary.Totals.ToList());
+        {            
             return __systemActivitySummary;
-        }
-
-        private static List<ChartData> MergeMachineNameChartDataList(List<ChartData> chartDataListWithMultipleMachineName, int recursionCounter = 0)
-        {
-            var r = new List<ChartData>();
-            if (chartDataListWithMultipleMachineName.Count == 0)
-                return r;
-
-            var machineNames = chartDataListWithMultipleMachineName.Select(c => c.MachineName).Distinct().ToList();
-            var maxValue = chartDataListWithMultipleMachineName.Max(c => c.Value);
-            for (var v = 500; v <= maxValue; v += 500)
-            {
-                var cdTotal = new ChartData() { AllMachineFound = true };
-                foreach (var m in machineNames)
-                {
-                    var cd = chartDataListWithMultipleMachineName.FirstOrDefault(c => c.MachineName == m && c.Value == v);
-                    if (cd == null)
-                    {
-                        cdTotal.AllMachineFound = false;
-                        System.Diagnostics.Debug.WriteLine($"Cannot find chart data for machineName:{m}, value:{v}");
-                    }
-                    else
-                    {
-                        cdTotal.Value += cd.Value;
-                        cdTotal.Label = cd.Label;
-
-                        // Just store the detail to trouble shoot losing some messages
-                        if(cdTotal.Children == null)
-                            cdTotal.Children = new Dictionary<string, ChartData>();
-                        cdTotal.Children.Add(cd.MachineName, cd);
-                    }
-                }
-                if (cdTotal.Value > 0)
-                    r.Add(cdTotal);
-            }
-
-            return r;
         }
 
         public static void AddDonationSentToEndpoint(SystemActivity sa)
@@ -159,13 +118,13 @@ namespace Donation.WebDashboard.Controllers
                 {
                     Caption = "Errors",
                     MachineName = sa.MachineName,
-                    Message = new List<string>() { sa.Message },
+                    Messages = new List<string>() { sa.Message },
                     UTCDateTime = sa.UtcDateTime,
                 }
             );
             // Update the DonationActivitySummary with the error message count
             var e = __systemActivitySummary.DonationErrorsSummaryDictionary[sa.MachineName.ToLowerInvariant()];
-            e.Total = e.Message.Count;
+            e.Total = e.Messages.Count;
         }
 
         public static void AddDonationInfo(SystemActivity sa)
@@ -175,13 +134,13 @@ namespace Donation.WebDashboard.Controllers
                 {
                     Caption = "Info",
                     MachineName = sa.MachineName,
-                    Message = new List<string>() { sa.Message },
+                    Messages = new List<string>() { sa.Message },
                     UTCDateTime = sa.UtcDateTime,
                 }
             );
             // Update the DonationActivitySummary with the error message count
             var e = __systemActivitySummary.DonationInfoSummaryDictionary[sa.MachineName.ToLowerInvariant()];
-            e.Total = e.Message.Count;
+            e.Total = e.Messages.Count;
         }
 
         public static void AddDashboardResource(string dashboardResource, int total, string jsonData, string machineName)
@@ -197,40 +156,19 @@ namespace Donation.WebDashboard.Controllers
                 });
         }
 
-        public class ChartData
-        {
-            public string Label { get; set; }
-            public long Value { get; set; }
-            public string MachineName { get; set; }
-            public bool AllMachineFound { get; set; }
-
-            public Dictionary<string, ChartData> Children { get; set; }
-        }
-        
-
         public class SystemActivitySummary
         {
-            public List<ChartData> DonationSentToEndPointActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-
-            public List<ChartData> DonationEnqueuedActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-
-
-            public List<ChartData> DonationProcessedActivitySummaryTotals { get; set; } = new List<ChartData>();
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-
-
             public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-
             
             public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
             public string LastMessage { get; set; }
-            
         }
 
-        public class DonationActivitySummary
+        public class DonationActivityItem
         {
             public DateTime UTCDateTime { get; set; }
             public int ItemPerSecond { get; set; }
@@ -238,7 +176,30 @@ namespace Donation.WebDashboard.Controllers
             public string MachineName { get; set; }
             public string Caption { get; set; }
             public string JsonData { get; set; }
-            public List<string> Message { get; set; } = new List<string>();
+            public string ChartLabel { get; set; }
+            public List<string> Messages { get; set; } = new List<string>();
+        }
+        public class DonationActivitySummary : DonationActivityItem
+        {
+            public List<DonationActivityItem> History = new List<DonationActivityItem>();
+
+            internal DonationActivityItem Clone()
+            {
+                var newMessages = new List<string>();
+                newMessages.AddRange(this.Messages);
+
+                var n = new DonationActivityItem {
+                    UTCDateTime   = this.UTCDateTime,
+                    ItemPerSecond = this.ItemPerSecond,
+                    Total         = this.Total,
+                    MachineName   = this.MachineName,
+                    Caption       = this.Caption,
+                    JsonData      = this.JsonData,
+                    ChartLabel    = this.ChartLabel,
+                    Messages      = newMessages
+                };
+                return n;
+            }
         }
 
         /// <summary>
@@ -248,8 +209,6 @@ namespace Donation.WebDashboard.Controllers
         /// </summary>
         public class DonationActivitySummaryDictionary: Dictionary<string, DonationActivitySummary>
         {
-            public List<ChartData> Totals = new List<ChartData>();
-
             public void Add(DonationActivitySummary das)
             {                
                 var key = das.MachineName.ToLowerInvariant();
@@ -267,7 +226,7 @@ namespace Donation.WebDashboard.Controllers
                         this[key].ItemPerSecond = das.ItemPerSecond;
                         this[key].Caption = das.Caption;
                         this[key].JsonData = das.JsonData;
-                        this[key].Message.AddRange(das.Message);
+                        this[key].Messages.AddRange(das.Messages);
                         this[key].UTCDateTime = das.UTCDateTime;
                     }
                     else {
@@ -279,11 +238,9 @@ namespace Donation.WebDashboard.Controllers
                 {
                     this[key] = das;
                 }
-                this.Totals.Add(new ChartData {
-                    Value = this[key].Total, 
-                    Label = $"{this[key].UTCDateTime.ToString("T")}",
-                    MachineName = this[key].MachineName,
-                });
+                var historyDas = das.Clone();
+                historyDas.ChartLabel = $"{das.UTCDateTime.ToString("T")}";
+                this[key].History.Add(historyDas);
             }
         }
     }

@@ -39,7 +39,6 @@ namespace Donation.RestApi.Entrance.Middleware
             }
             await _next(context); // Call the next delegate/middleware in the pipeline
         }
-
         private async Task Notify(HttpContext context)
         {
             if (context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path.ToString().ToLowerInvariant() == "/api/donation")

@@ -6,7 +6,7 @@ param(
     [string]$action = "info",
 
     [Parameter(Mandatory=$false)]
-    [string]$kubernetesClusterName = "fkubernetes4"
+    [string]$kubernetesClusterName = "fkubernetes6"
 )
 
 
@@ -35,8 +35,9 @@ function createKubernetesCluster (
     write-host "Creating Kubernetes Cluster $kubernetesClusterName"
     az aks create --name $kubernetesClusterName --resource-group $kubernetesClusterName `
         --kubernetes-version 1.12.8 --enable-addons monitoring  `
-        --generate-ssh-keys --enable-rbac `
+        --generate-ssh-keys  `
         --node-count $vmCount --node-vm-size $vmSize
+    # --enable-rbac rbac is on by default
 
     write-host "Initialize credential"
     az aks get-credentials --resource-group $kubernetesClusterName --name $kubernetesClusterName
