@@ -44,28 +44,30 @@ namespace Donation.RestApi.Entrance.Middleware
         {
             if (context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path.ToString().ToLowerInvariant() == "/api/donation")
             {
-                __perfTracker.TrackNewItemThreadSafe();
-                if (__perfTracker.ItemCountThreadSafe % SystemActivityNotificationManager.NotifyEvery == 0)
-                    await NotifyAll(false);
+                var itemCount = __perfTracker.TrackNewItemThreadSafe();                
+                if (itemCount % SystemActivityNotificationManager.NotifyEvery == 0)
+                    await NotifyAll(itemCount, false);
             }
             if (context.Request.Method.ToLowerInvariant() == "get" && context.Request.Path.ToString().ToLowerInvariant() == "/api/info/getflushnotification")
-                await NotifyAll(true);
+                await NotifyAll(__perfTracker.ItemCountThreadSafe, true);
         }
 
-        private static async Task NotifyAll(bool final)
+        private static async Task NotifyAll(long itemCount, bool final)
         {
-            await _notificationSemaphore.WaitAsync();
-            try
-            {
+            //await _notificationSemaphore.WaitAsync();
+            //try
+            //{
                 var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
-                await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}", __perfTracker.Duration, __perfTracker.ItemPerSecond, __perfTracker.ItemCountThreadSafe);
+                await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}", 
+                    __perfTracker.Duration, __perfTracker.ItemPerSecond, itemCount
+                );
                 await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
                 await saNotificationPublisher.CloseAsync();
-            }
-            finally
-            {
-                _notificationSemaphore.Release();
-            }
+            //}
+            //finally
+            //{
+            //    _notificationSemaphore.Release();
+            //}
         }
 
         private async Task NotifyError(HttpContext context, System.Exception exception)

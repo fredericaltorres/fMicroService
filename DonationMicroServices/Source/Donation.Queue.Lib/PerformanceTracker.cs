@@ -29,13 +29,14 @@ namespace Donation.Queue.Lib
             this._itemCount += count;
         }
 
-        public void TrackNewItemThreadSafe(int count = 1)
+        public long TrackNewItemThreadSafe(int count = 1)
         {
             // TODO: Not protected
             if (ItemCount == 0) // Set MessageSentTimeStamp on the first message that we send
                 StartTimeStamp = DateTime.UtcNow;
 
             Interlocked.Add(ref _itemCount, count);
+            return _itemCount;
         }
 
         public void ResetTrackedInformation()
