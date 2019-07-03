@@ -44,9 +44,18 @@ namespace Donation.RestApi.Entrance.Middleware
         {
             if (context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path.ToString().ToLowerInvariant() == "/api/donation")
             {
-                var itemCount = __perfTracker.TrackNewItemThreadSafe();                
-                if (itemCount % SystemActivityNotificationManager.NotifyEvery == 0)
-                    await NotifyAll(itemCount, false);
+                // NOT A GOOD IDEA FOR PERFORMANCE
+                await _notificationSemaphore.WaitAsync();
+                try
+                {
+                    var itemCount = __perfTracker.TrackNewItemThreadSafe();
+                    if (itemCount % SystemActivityNotificationManager.NotifyEvery == 0)
+                        await NotifyAll(itemCount, false);
+                }
+                finally
+                {
+                    _notificationSemaphore.Release();
+                }
             }
             if (context.Request.Method.ToLowerInvariant() == "get" && context.Request.Path.ToString().ToLowerInvariant() == "/api/info/getflushnotification")
                 await NotifyAll(__perfTracker.ItemCountThreadSafe, true);
