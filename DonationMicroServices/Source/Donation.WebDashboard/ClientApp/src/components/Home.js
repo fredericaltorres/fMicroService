@@ -337,20 +337,79 @@ export class Home extends Component {
             />
         );
     }
-        
-    getDonationSentToEndPointChartData = (machineIndex) => {
-        
-        const dictionary = this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary;
+
+    getDonationMachineCount = (dictionary) => {
+
+        const machineNames = Object.keys(dictionary);
+        return machineNames.length;
+    };
+
+    getDonationMachineName = (dictionary, machineIndex) => {
+
         const machineNames = Object.keys(dictionary);
         if (machineNames.length) {
             const machineName = machineNames[machineIndex];
-            const history = dictionary[machineName].history;
-            const data = history.map((e) => {
-                return { timeStamp: e.chartLabel, value: e.total };
-            });
-            return data;
+            return machineName;
         }
-        else return [];
+        return null;
+    };
+
+    getDonationChartData = (dictionary, machineIndex) => {
+        
+        const machineNames = Object.keys(dictionary);
+        if (machineNames.length) {
+            const machineName = machineNames[machineIndex];
+            if (machineName) {
+                const history = dictionary[machineName].history;
+                const data = history.map((e) => {
+                    return { timeStamp: e.chartLabel, value: e.total };
+                });
+                return data;
+            }
+            else {
+                // Machine #2 may not be ready
+            }
+        }
+        return [];
+    };
+
+    getDonationSentToEndPointChartData = (machineIndex) => {
+
+        return this.getDonationChartData(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, machineIndex);
+    };
+
+    getDonationEnqueuedChartData = (machineIndex) => {
+
+        return this.getDonationChartData(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, machineIndex);
+    };
+
+    getDonationProcessedChartData = (machineIndex) => {
+
+        return this.getDonationChartData(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, machineIndex);
+    };
+
+    getDonationProcessedMachineName = (machineIndex) => {
+        const chartWidth = 501;
+        const chartHeight = 175;
+        return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationProcessedChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+            <XAxis dataKey="timeStamp" />
+            <YAxis />
+            <Tooltip />
+        </LineChart>;
+    };
+
+    getDonationEnqueuedMachineName = (machineIndex) => {
+        const chartWidth = 501;
+        const chartHeight = 175;
+        return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationEnqueuedChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+            <XAxis dataKey="timeStamp" />
+            <YAxis />
+            <Tooltip />
+        </LineChart>;
     };
 
     getDonationSentToEndPointMachineName = (machineIndex) => {
@@ -364,44 +423,39 @@ export class Home extends Component {
             <Tooltip />
         </LineChart>;
     };
+    
+    getDonationSentToEndpointChartsTR = (dictionary, title) => {
+        let max = this.getDonationMachineCount(dictionary);
+        let html = [];
+        for (let i = 0; i < max; i++) {
+            html.push(<td>
+                <div className="card">
+                    <div className="card-header">{title}, machine {i} {this.getDonationMachineName(dictionary, i)}</div>
+                    <div className="card-body">
+                        {this.getDonationSentToEndPointMachineName(i)}
+                    </div>
+                </div>
+            </td>);
+        }
+        return html;
+    }
 
     getDonationSentToEndpointCharts = () => {
         return <table>
             <tr>
-                <td>
-                    <div className="card">
-                        <div className="card-header">Donation Sent Machine 0</div>
-                        <div className="card-body">
-                            {this.getDonationSentToEndPointMachineName(0)}
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div className="card">
-                        <div className="card-header">Donation Sent Machine 1</div>
-                        <div className="card-body">
-                            {this.getDonationSentToEndPointMachineName(1)}
-                        </div>
-                    </div>
-                </td>
+                {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent')}
             </tr>
+            <tr>
+                {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued')}
+            </tr>
+            <tr>
+                {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ')}
+            </tr>
+ 
         </table >
     }
 
     render() {
-
-      
-        
-
-        //const donationReceivedPerSecChart = (
-        //    <LineChart width={500} height={200} data={getDonationReceivedPerSecChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-        //        <Line type="monotone" dataKey="donatioReceivedPerSec" stroke="#8884d8" />
-        //        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-        //        <XAxis dataKey="timeStamp" />
-        //        <YAxis />
-        //        <Tooltip />
-        //    </LineChart>
-        //);
 
         return (
             <div>

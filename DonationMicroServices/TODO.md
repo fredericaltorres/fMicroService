@@ -3,6 +3,8 @@
 Implement waitForStatefulsets
 kubectl get statefulsets -o json
 
+try url output error expected on failure
+
 ## Donation-QueueProcessor-Console
 - queueprocessor-1-0-43-sfs-1 is logging donation info
 - queueprocessor-1-0-43-sfs-1 is not logging donation info
