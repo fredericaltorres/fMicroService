@@ -363,7 +363,7 @@ export class Home extends Component {
         const countries = Object.keys(donationCountryBreakdown);
         const data = [];
         countries.forEach((country) => {
-            const amount = donationCountryBreakdown[country];
+            const amount = Math.round(donationCountryBreakdown[country]);
             if (amount > this.state.donationCountryBreakdownMinimunAmountForDisplay) {
                 data.push({ country, amount });
             }            
@@ -454,7 +454,7 @@ export class Home extends Component {
         </LineChart>;
     };
     
-    getDonationSentToEndpointChartsTR = (dictionary, title) => {
+    getDonationPerformanceInfoChartsTR = (dictionary, title, generateChartCallBack) => {
         let max = this.getDonationMachineCount(dictionary);
         let html = [];
         for (let i = 0; i < max; i++) {
@@ -462,7 +462,7 @@ export class Home extends Component {
                 <div className="card">
                     <div className="card-header">{title}, machine {i} {this.getDonationMachineName(dictionary, i)}</div>
                     <div className="card-body">
-                        {this.getDonationSentToEndPointMachineName(i)}
+                        {generateChartCallBack(i)}                        
                     </div>
                 </div>
             </td>);
@@ -470,20 +470,25 @@ export class Home extends Component {
         return html;
     }
 
-    getDonationSentToEndpointCharts = () => {
+    getDonationPerformanceInfoCharts = () => {
         return <table>
             <tbody>
             <tr>
-                {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent')}
+                    {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent', this.getDonationSentToEndPointMachineName)}
             </tr>
             <tr>
-                {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued')}
+                    {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued', this.getDonationEnqueuedMachineName)}
             </tr>
             <tr>
-                {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ')}
+                    {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ', this.getDonationProcessedMachineName)}
             </tr>
             </tbody>
         </table >
+    }
+
+    onDonationCountryBreakdownMinimunAmountForDisplayChange = (e) => {
+
+        this.updateState('donationCountryBreakdownMinimunAmountForDisplay', e.target.value);
     }
 
     render() {
@@ -501,27 +506,22 @@ export class Home extends Component {
                 &nbsp;
                 {new Date().toString()}
 
-                {this.getDonationSentToEndpointCharts()}
+                {this.getDonationPerformanceInfoCharts()}
 
                 <div className="card">
-                    <div className="card-header">Countries Break Down (Minimun Amount:{this.state.donationCountryBreakdownMinimunAmountForDisplay})</div>
+                    <div className="card-header">Countries Break Down &nbsp;&nbsp;&nbsp;
+                        <small>
+                            ( Minimun Amount:&nbsp;
+                            <input id="donationCountryBreakdownMinimunAmountForDisplay" type="text" value={this.state.donationCountryBreakdownMinimunAmountForDisplay}
+                                onChange={this.onDonationCountryBreakdownMinimunAmountForDisplayChange}
+                            /> )
+                        </small>
+                    </div>
                     <div className="card-body">
                         {this.getDonationCountryBreakdownChart()}
                     </div>
                 </div>
 
-
-                {/*
-                <div className="card">
-                    <div className="card-header">Message</div>
-                    <div className="card-body">
-                        <h4 className="card-title">
-                            {this.state.systemActivitySummary.lastMessage}
-                        </h4>
-                    </div>
-                </div>
-                */}
-                <br /><br />
 
 
                 {this.renderDonationSentToEndpointActivitySummaryTable()}
