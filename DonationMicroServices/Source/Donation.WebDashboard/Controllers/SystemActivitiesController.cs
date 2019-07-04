@@ -6,18 +6,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using fAzureHelper;
 using Microsoft.AspNetCore.Mvc;
-
+using Newtonsoft.Json;
 
 namespace Donation.WebDashboard.Controllers
 {
     [Route("api/[controller]")]
     public class SystemActivitiesController : Controller
     {
-        public static SystemActivitySummary __systemActivitySummary = new SystemActivitySummary()
-        {
-            LastMessage = "Nothing Recieved yet"
-        };
-
+        public static SystemActivitySummary __systemActivitySummary = new SystemActivitySummary();
+        
         [HttpGet("[action]")]
         public SystemActivitySummary GetSystemActivityClearError()
         {
@@ -87,6 +84,19 @@ namespace Donation.WebDashboard.Controllers
             __systemActivitySummary.DashboardResourceActivitySummaryDictionary.PrepareDataForDisplay();
             __systemActivitySummary.DonationErrorsSummaryDictionary.PrepareDataForDisplay();
             __systemActivitySummary.DonationInfoSummaryDictionary.PrepareDataForDisplay();
+
+            // Aggregate in one dictionary <country, amount> all dashboard message with partial
+            // country, amount  information
+            var countryBreakDownHistory = new DonationCountryBreakdown();
+            var dashBoardDictionary = __systemActivitySummary.DashboardResourceActivitySummaryDictionary;
+            foreach (var machineCountryBreakDownInfo in dashBoardDictionary.Values)
+            {
+                foreach(var h in machineCountryBreakDownInfo.History)
+                {
+                    countryBreakDownHistory.Merge(h.JsonData);
+                }
+            }
+            __systemActivitySummary.DonationCountryBreakdown = countryBreakDownHistory;
 
             return __systemActivitySummary;
         }
@@ -172,20 +182,42 @@ namespace Donation.WebDashboard.Controllers
                     Caption = $"Dashboard:{dashboardResource}",
                     MachineName = machineName,
                     Total = total,
-                    //JsonData = jsonData
-                    JsonData = "No data for now"
+                    JsonData = jsonData //+++
                 });
         }
 
         public class SystemActivitySummary
         {
+            public DonationCountryBreakdown DonationCountryBreakdown;
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
-            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(false);            
+
             public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(false);
             public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(false);
-            public string LastMessage { get; set; }
+
+            [JsonIgnore]
+            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
+        }
+
+        public class DonationCountryBreakdown : Dictionary<string, double>
+        {
+            public void Merge(string json)
+            {
+                // Parse the json data
+                var dic = Newtonsoft.Json.JsonConvert.DeserializeObject<DonationCountryBreakdown>(json);
+
+                // Merge the json data with the current instance
+                foreach(var e in dic)
+                {
+                    if(this.ContainsKey(e.Key))
+                        this[e.Key] += e.Value;
+                    else
+                        this[e.Key] = e.Value;
+                }
+                if (this.ContainsKey("china"))
+                    this.Remove("china");
+            }
         }
 
         public class DonationActivityItem
@@ -195,6 +227,8 @@ namespace Donation.WebDashboard.Controllers
             public long Total { get; set; }
             public string MachineName { get; set; }
             public string Caption { get; set; }
+
+            [JsonIgnore]
             public string JsonData { get; set; }
             public string ChartLabel { get; set; }
             public List<string> Messages { get; set; } = new List<string>();

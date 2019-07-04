@@ -26,6 +26,7 @@ export class Home extends Component {
 
     state = {
         systemActivitySummary: {
+            donationCountryBreakdown                       : {},
             donationSentToEndPointActivitySummaryDictionary: {}, 
             donationEnqueuedActivitySummaryDictionary      : {},
             dashboardResourceActivitySummaryDictionary     : {},            
@@ -33,8 +34,10 @@ export class Home extends Component {
             donationInfoSummaryDictionary                  : {},
             donationErrorsSummaryDictionary                : {},
             lastMessage                                    : "No message yet",
-            autoRefreshOn                                  : false,
-        }
+            
+        },
+        autoRefreshOn: false,
+        donationCountryBreakdownMinimunAmountForDisplay: 1000,
     };
 
     // Return a promise
@@ -160,10 +163,10 @@ export class Home extends Component {
         return this.getActivitySummaryTable(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary);
     }
     
-    getDashboardResourceActivitySummaryTable = () => {
+    //getDashboardResourceActivitySummaryTable = () => {
 
-        return this.getActivitySummaryTable(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
-    }
+    //    return this.getActivitySummaryTable(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
+    //}
 
     renderDonationInfoActivitySummaryTable = () => {
 
@@ -318,25 +321,25 @@ export class Home extends Component {
         { Header: "Json Data", accessor: "jsonData" }
     ];
     
-    renderDashboardResourceActivitySummaryTable = () => {
+    //renderDashboardResourceActivitySummaryTable = () => {
 
-        const data = this.getDashboardResourceActivitySummaryTable();
-        if (data.length === 0)
-            return null
+    //    const data = this.getDashboardResourceActivitySummaryTable();
+    //    if (data.length === 0)
+    //        return null
 
-        return (
-            <ReactTable
-                data={data}
-                columns={[{
-                    Header: "Dashboard Country Aggregate",
-                    columns: this.getColumnsForJsonDataTable()
-                }]}
-                defaultPageSize={this.summaryTableDefaultPageSize}
-                className="-striped -highlight"
-                showPagination={false}
-            />
-        );
-    }
+    //    return (
+    //        <ReactTable
+    //            data={data}
+    //            columns={[{
+    //                Header: "Dashboard Country Aggregate",
+    //                columns: this.getColumnsForJsonDataTable()
+    //            }]}
+    //            defaultPageSize={this.summaryTableDefaultPageSize}
+    //            className="-striped -highlight"
+    //            showPagination={false}
+    //        />
+    //    );
+    //}
 
     getDonationMachineCount = (dictionary) => {
 
@@ -353,6 +356,21 @@ export class Home extends Component {
         }
         return null;
     };
+    
+    getCountryBreakDownChartData = () => {
+
+        const donationCountryBreakdown = this.state.systemActivitySummary.donationCountryBreakdown;
+        const countries = Object.keys(donationCountryBreakdown);
+        const data = [];
+        countries.forEach((country) => {
+            const amount = donationCountryBreakdown[country];
+            if (amount > this.state.donationCountryBreakdownMinimunAmountForDisplay) {
+                data.push({ country, amount });
+            }            
+        });
+        data.sort((a, b) => (a.amount < b.amount) ? 1 : -1);
+        return data;
+    }
 
     getDonationChartData = (dictionary, machineIndex) => {
         
@@ -423,12 +441,24 @@ export class Home extends Component {
             <Tooltip />
         </LineChart>;
     };
+
+    getDonationCountryBreakdownChart = () => {
+        const chartWidth = 1000;
+        const chartHeight = 175;
+        return <LineChart width={chartWidth} height={chartHeight} data={this.getCountryBreakDownChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+            <Line type="monotone" dataKey="amount" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+            <XAxis dataKey="country" />
+            <YAxis />
+            <Tooltip />
+        </LineChart>;
+    };
     
     getDonationSentToEndpointChartsTR = (dictionary, title) => {
         let max = this.getDonationMachineCount(dictionary);
         let html = [];
         for (let i = 0; i < max; i++) {
-            html.push(<td>
+            html.push(<td key={`${title}-${i}`}>
                 <div className="card">
                     <div className="card-header">{title}, machine {i} {this.getDonationMachineName(dictionary, i)}</div>
                     <div className="card-body">
@@ -442,6 +472,7 @@ export class Home extends Component {
 
     getDonationSentToEndpointCharts = () => {
         return <table>
+            <tbody>
             <tr>
                 {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent')}
             </tr>
@@ -451,11 +482,12 @@ export class Home extends Component {
             <tr>
                 {this.getDonationSentToEndpointChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ')}
             </tr>
- 
+            </tbody>
         </table >
     }
 
     render() {
+        // console.log(`getCountryBreakDownChartData: ${JSON.stringify(this.getCountryBreakDownChartData())}`);
 
         return (
             <div>
@@ -470,6 +502,13 @@ export class Home extends Component {
                 {new Date().toString()}
 
                 {this.getDonationSentToEndpointCharts()}
+
+                <div className="card">
+                    <div className="card-header">Countries Break Down (Minimun Amount:{this.state.donationCountryBreakdownMinimunAmountForDisplay})</div>
+                    <div className="card-body">
+                        {this.getDonationCountryBreakdownChart()}
+                    </div>
+                </div>
 
 
                 {/*
@@ -495,8 +534,11 @@ export class Home extends Component {
                 <br /><br />
                 {this.renderDonationErrorsActivitySummaryTable()}
                 <br /><br />
+
+                {/*
                 {this.renderDashboardResourceActivitySummaryTable()}
                 <br /><br />
+                */}
                   
             </div>
         );
