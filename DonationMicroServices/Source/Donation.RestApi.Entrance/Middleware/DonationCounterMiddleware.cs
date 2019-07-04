@@ -48,6 +48,14 @@ namespace Donation.RestApi.Entrance.Middleware
                 try
                 {
                     var itemCount = __perfTracker.TrackNewItemThreadSafe();
+
+                    // There is a triggering issue with this code when we reach the end of the dataset
+                    // Process 1 processed 50 000, and Process 2 processed 45 000
+                    // Now the 500 remaining are going be processed by both process, never reaching
+                    // out the number 500 for the modulo to trigger.
+                    // Not to mention that call to /api/info/getflushnotification can only hit
+                    // one of the 2 processes due to the load balancer.
+                    // For now I never get the right final count of donation processed
                     if (itemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                         await NotifyAll(itemCount, false);
                 }
@@ -62,20 +70,12 @@ namespace Donation.RestApi.Entrance.Middleware
 
         private static async Task NotifyAll(long itemCount, bool final)
         {
-            //await _notificationSemaphore.WaitAsync();
-            //try
-            //{
-                var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
-                await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}", 
-                    __perfTracker.Duration, __perfTracker.ItemPerSecond, itemCount
-                );
-                await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
-                await saNotificationPublisher.CloseAsync();
-            //}
-            //finally
-            //{
-            //    _notificationSemaphore.Release();
-            //}
+            var saNotificationPublisher = new SystemActivityNotificationManager(RuntimeHelper.GetAppSettings("connectionString:ServiceBusConnectionString"));
+            await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}",
+                __perfTracker.Duration, __perfTracker.ItemPerSecond, itemCount
+            );
+            await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
+            await saNotificationPublisher.CloseAsync();
         }
 
         private async Task NotifyError(HttpContext context, System.Exception exception)

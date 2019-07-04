@@ -150,8 +150,12 @@ namespace Donation.PersonSimulator.Console
                 }
             }
 
-            Thread.Sleep(10 * 1000); // Give sometime to the endpoint
-            await SendFlushNotificationToEndpoint(saNotification, donationEndPointIP, donationEndPointPort);
+            Thread.Sleep(1 * 1000); // Give sometime to the endpoint, not sure why
+            for(var i=0; i < 10; i++)
+            {
+                // Hopefully this 10 calls hit both processes behind the firewall
+                await SendFlushNotificationToEndpoint(saNotification, donationEndPointIP, donationEndPointPort);
+            }            
 
             await saNotification.NotifyAsync(DS.List(
                 $"{donationTotalCount} donations sent",

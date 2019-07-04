@@ -21,20 +21,19 @@ export class Home extends Component {
     static displayName = Home.name;
 
     timerId = null;
-    refreshTimeOut = 1000 * 4;    
+    refreshTimeOut = 1000 * 5;    
     summaryTableDefaultPageSize = 6;
 
     state = {
         systemActivitySummary: {
-            donationSentToEndPointActivitySummaryDictionary: {},
-            donationEnqueuedActivitySummaryDictionary: {},
-            dashboardResourceActivitySummaryDictionary: {},
-            
-            donationProcessedActivitySummaryDictionary: {},
-            donationInfoSummaryDictionary: {},
-            donationErrorsSummaryDictionary: {},
-            lastMessage: "No message yet",
-            autoRefreshOn : false,
+            donationSentToEndPointActivitySummaryDictionary: {}, 
+            donationEnqueuedActivitySummaryDictionary      : {},
+            dashboardResourceActivitySummaryDictionary     : {},            
+            donationProcessedActivitySummaryDictionary     : {},
+            donationInfoSummaryDictionary                  : {},
+            donationErrorsSummaryDictionary                : {},
+            lastMessage                                    : "No message yet",
+            autoRefreshOn                                  : false,
         }
     };
 
@@ -43,7 +42,17 @@ export class Home extends Component {
 
         return fetch('api/SystemActivities/GetSystemActivityClearError').then(response => response.json())
             .then(data => {
-                console.log(`data:${JSON.stringify(data)}`);
+                console.log(`clearAllErrors data:${JSON.stringify(data)}`);
+                this.updateState('systemActivitySummary', data);
+            });
+    }
+
+    // Return a promise
+    clearAll = () => {
+
+        return fetch('api/SystemActivities/GetSystemActivityClearAll').then(response => response.json())
+            .then(data => {
+                console.log(`clearAll data:${JSON.stringify(data)}`);
                 this.updateState('systemActivitySummary', data);
             });
     }
@@ -53,7 +62,7 @@ export class Home extends Component {
 
         return fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
             .then(data => {
-                console.log(`data:${JSON.stringify(data)}`);
+                console.log(`reloadData data:${JSON.stringify(data)}`);
                 this.updateState('systemActivitySummary', data);
             });
     }
@@ -146,6 +155,11 @@ export class Home extends Component {
         return this.getActivitySummaryTable(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary);
     }
 
+    getDonationEnqueuedActivitySummaryTable = () => {
+
+        return this.getActivitySummaryTable(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary);
+    }
+    
     getDashboardResourceActivitySummaryTable = () => {
 
         return this.getActivitySummaryTable(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
@@ -273,6 +287,26 @@ export class Home extends Component {
             />
         );
     }
+
+    renderDonationEnqueuedActivitySummaryTable = () => {
+
+        const data = this.getDonationEnqueuedActivitySummaryTable();
+        if (data.length === 0)
+            return null
+
+        return (
+            <ReactTable
+                data={data}
+                columns={[{
+                    Header: "Donation Enqueued",
+                    columns: this.getColumnsForDonationPerSecondTable()
+                }]}
+                defaultPageSize={this.summaryTableDefaultPageSize}
+                className="-striped -highlight"
+                showPagination={false}
+            />
+        );
+    }
     
     getColumnsForJsonDataTable = () => [
         {
@@ -305,34 +339,59 @@ export class Home extends Component {
     }
         
     getDonationSentToEndPointChartData = (machineIndex) => {
-
+        
         const dictionary = this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary;
         const machineNames = Object.keys(dictionary);
         if (machineNames.length) {
             const machineName = machineNames[machineIndex];
-            const history = dictionary[machineName].History;
+            const history = dictionary[machineName].history;
             const data = history.map((e) => {
-                return { timeStamp: e.chartLabel, value: e.Total };
+                return { timeStamp: e.chartLabel, value: e.total };
             });
             return data;
         }
         else return [];
     };
 
-    render() {
-
+    getDonationSentToEndPointMachineName = (machineIndex) => {
         const chartWidth = 501;
         const chartHeight = 175;
+        return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationSentToEndPointChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+            <XAxis dataKey="timeStamp" />
+            <YAxis />
+            <Tooltip />
+        </LineChart>;
+    };
+
+    getDonationSentToEndpointCharts = () => {
+        return <table>
+            <tr>
+                <td>
+                    <div className="card">
+                        <div className="card-header">Donation Sent Machine 0</div>
+                        <div className="card-body">
+                            {this.getDonationSentToEndPointMachineName(0)}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div className="card">
+                        <div className="card-header">Donation Sent Machine 1</div>
+                        <div className="card-body">
+                            {this.getDonationSentToEndPointMachineName(1)}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table >
+    }
+
+    render() {
+
+      
         
-        const getDonationSentToEndPointMachineName = (machineIndex) => {
-            return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationSentToEndPointChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <XAxis dataKey="timeStamp" />
-                <YAxis />
-                <Tooltip />
-            </LineChart>;
-        };
 
         //const donationReceivedPerSecChart = (
         //    <LineChart width={500} height={200} data={getDonationReceivedPerSecChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
@@ -350,25 +409,14 @@ export class Home extends Component {
                 &nbsp;
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh </button>
                 &nbsp;
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Error </button>
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Errors </button>
+                &nbsp;
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAll} > Clear All </button>
                 &nbsp;
                 {new Date().toString()}
-                
-                <div className="card">
-                    <div className="card-header">Donation Sent Machine 0</div>
-                    <div className="card-body">
-                        {getDonationSentToEndPointMachineName(0)}
-                    </div>
-                </div>                
 
-                <div className="card">
-                    <div className="card-header">Donation Sent Machine 1</div>
-                    <div className="card-body">
-                        {getDonationSentToEndPointMachineName(1)}
-                    </div>
-                </div>                
-                
-                
+                {this.getDonationSentToEndpointCharts()}
+
 
                 {/*
                 <div className="card">
@@ -385,7 +433,7 @@ export class Home extends Component {
 
                 {this.renderDonationSentToEndpointActivitySummaryTable()}
                 <br /><br />
-                
+                {this.renderDonationEnqueuedActivitySummaryTable()}                
                 <br /><br />
                 {this.renderDonationProcessedActivitySummaryTable()}
                 <br /><br />

@@ -57,6 +57,8 @@ switch($action) {
     delete {
         az aks delete -n $kubernetesClusterName -g $kubernetesClusterName
         az group delete -n $kubernetesClusterName
+#        az aks delete -n fkubernetes5 -g fkubernetes5
+        
     }
     info {
         & az aks list -o table # Get the list of clusters

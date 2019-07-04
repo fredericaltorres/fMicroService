@@ -26,6 +26,19 @@ namespace Donation.WebDashboard.Controllers
         }
 
         [HttpGet("[action]")]
+        public SystemActivitySummary GetSystemActivityClearAll()
+        {
+            __systemActivitySummary.DonationErrorsSummaryDictionary.Clear();
+            __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Clear();
+            __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Clear();
+            __systemActivitySummary.DonationProcessedActivitySummaryDictionary.Clear();
+            __systemActivitySummary.DashboardResourceActivitySummaryDictionary.Clear();
+            __systemActivitySummary.DonationErrorsSummaryDictionary.Clear();
+            __systemActivitySummary.DonationInfoSummaryDictionary.Clear();
+            return GetSystemActivitySummaryPreparedToBeSentToWebDashboard();
+        }
+
+        [HttpGet("[action]")]
         public SystemActivitySummary GetSystemActivityClearInfo()
         {
             __systemActivitySummary.DonationInfoSummaryDictionary.Clear();
@@ -66,7 +79,15 @@ namespace Donation.WebDashboard.Controllers
         }
 
         private static SystemActivitySummary GetSystemActivitySummaryPreparedToBeSentToWebDashboard()
-        {            
+        {
+            __systemActivitySummary.DashboardResourceActivitySummaryDictionary.PrepareDataForDisplay();
+            __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.PrepareDataForDisplay();
+            __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.PrepareDataForDisplay();
+            __systemActivitySummary.DonationProcessedActivitySummaryDictionary.PrepareDataForDisplay();
+            __systemActivitySummary.DashboardResourceActivitySummaryDictionary.PrepareDataForDisplay();
+            __systemActivitySummary.DonationErrorsSummaryDictionary.PrepareDataForDisplay();
+            __systemActivitySummary.DonationInfoSummaryDictionary.PrepareDataForDisplay();
+
             return __systemActivitySummary;
         }
 
@@ -158,13 +179,12 @@ namespace Donation.WebDashboard.Controllers
 
         public class SystemActivitySummary
         {
-            public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-            public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-            public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-            
-            public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
-            public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary();
+            public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
+            public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
+            public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
+            public DonationActivitySummaryDictionary DashboardResourceActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(false);            
+            public DonationActivitySummaryDictionary DonationErrorsSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(false);
+            public DonationActivitySummaryDictionary DonationInfoSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(false);
             public string LastMessage { get; set; }
         }
 
@@ -209,6 +229,19 @@ namespace Donation.WebDashboard.Controllers
         /// </summary>
         public class DonationActivitySummaryDictionary: Dictionary<string, DonationActivitySummary>
         {
+            private readonly bool _maintainHistory;
+
+            public DonationActivitySummaryDictionary(bool maintainHistory)
+            {
+                this._maintainHistory = maintainHistory;
+            }
+
+            public void PrepareDataForDisplay()
+            {
+                foreach(var v in this.Values)
+                    v.History = v.History.OrderBy(e => e.UTCDateTime).ToList();
+            }
+            
             public void Add(DonationActivitySummary das)
             {                
                 var key = das.MachineName.ToLowerInvariant();
@@ -238,9 +271,13 @@ namespace Donation.WebDashboard.Controllers
                 {
                     this[key] = das;
                 }
-                var historyDas = das.Clone();
-                historyDas.ChartLabel = $"{das.UTCDateTime.ToString("T")}";
-                this[key].History.Add(historyDas);
+
+                if (_maintainHistory)
+                {
+                    var historyDas = das.Clone();
+                    historyDas.ChartLabel = $"{das.UTCDateTime.ToString("T")}";
+                    this[key].History.Add(historyDas);
+                }                
             }
         }
     }
