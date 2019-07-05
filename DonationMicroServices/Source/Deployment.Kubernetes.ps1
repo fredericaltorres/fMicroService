@@ -17,6 +17,9 @@ param(
     [Parameter(Mandatory=$false)] 
     [bool]$deployService = $true,
 
+    [Parameter(Mandatory=$false)] 
+    [bool]$waitForStatefullsets = $false,
+
      # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
     [string]$acrName = "FredContainerRegistry", # Consider that the Azure Container `FredContainerRegistry` already exist
@@ -93,7 +96,7 @@ function deployRelease([Hashtable]$context, [string]$message, [bool]$deployServi
         updateJsonFileWithProperty (getAppMetadatJsonFileName) "EndPointPort" $loadBlancerPort
 
         $testUrl = "http://$loadBlancerIp`:$loadBlancerPort$($context.TEST_URL)"
-        urlMustReturnHtml $testUrl
+        validateUrl $testUrl
     }
 }
 

@@ -13,7 +13,7 @@ class KubernetesManager {
    
         $this.trace("Retreiving clusters information...")
         $ks = $this.getAllClusterInfo()
-        $k = $ks[1] ### <<<<<<<<<<<<< TO CHANGE TO 0 when azure mess is cleaned
+        $k = $ks[0]
         $this.ClusterName = $k.name
         $this.TraceKubernetesCommand = $traceKubernetesCommand
         

@@ -10,13 +10,15 @@ if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\..\Util.psm1" -Force
 }
 
-$appName = GetAppNameFromProject
-$dockerFilName = ".\Source\$appName\Dockerfile"
-$containerImageName = $appName
-$appVersion = GetProjectVersion
-$scriptTitle = "Donation Automation Deployment Utility -- $appName  $($appVersion)"
+$appName                = GetAppNameFromProject
+$dockerFilName          = ".\Source\$appName\Dockerfile"
+$containerImageName     = $appName
+$appVersion             = GetProjectVersion
+$scriptTitle            = "Donation Automation Deployment Utility -- $appName  $($appVersion)"
 $traceKubernetesCommand = $true
-$deployService = $false
+$deployService          = $false
+$waitForStatefullsets	= $true
+
 Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
 
@@ -59,7 +61,12 @@ function pushContainerImageToRegistry() {
 
 function deploy() {
 
-    ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $deployService -APP_ENDPOINT_IP (GetDonationRestApiEntranceLoadBalancerIP) -APP_ENDPOINT_PORT (GetDonationRestApiEntranceLoadBalancerPort)
+    ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false `
+								-traceKubernetesCommand $traceKubernetesCommand `
+								-deployService $deployService `
+								-waitForStatefullsets $waitForStatefullsets `
+								-APP_ENDPOINT_IP (GetDonationRestApiEntranceLoadBalancerIP) `
+								-APP_ENDPOINT_PORT (GetDonationRestApiEntranceLoadBalancerPort)
 }
 
 switch($action) {

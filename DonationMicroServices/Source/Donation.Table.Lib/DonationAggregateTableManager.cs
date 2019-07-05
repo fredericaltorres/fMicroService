@@ -7,7 +7,7 @@ namespace Donation.Table.Lib
 {
     public class DonationAggregateTableManager
     {
-        public const string TABLE_NAME = "DonationAggregateTable";
+        public const string TABLE_NAME = "DonationAggregate";
 
         TableManager _tableManager;
         public DonationAggregateTableManager(string storageAccountName, string storageAccessKey) 

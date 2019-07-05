@@ -18,7 +18,7 @@ metadata:
   name: queueprocessor-${APP_VERSION_UNDERSCORE}-sfs
 spec:
   serviceName: "queueprocessor-${APP_VERSION_UNDERSCORE}-svc"
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: queueprocessor-${APP_VERSION_UNDERSCORE}-sfs

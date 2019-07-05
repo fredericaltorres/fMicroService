@@ -56,7 +56,7 @@ namespace Donation.PersonSimulator.Console
         {
             var protocol = "http";
             if (port == "443")
-                protocol = "htttps";
+                protocol = "https";
 
             return $"{protocol}://{hostOrIp}:{port}/api/Donation";
         }

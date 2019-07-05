@@ -181,7 +181,7 @@ export class Home extends Component {
                     Header: "Donation Info",
                     columns: this.getColumnsForMessagesTable()
                 }]}
-                defaultPageSize={this.summaryTableDefaultPageSize}
+                defaultPageSize={this.summaryTableDefaultPageSize+2}
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {

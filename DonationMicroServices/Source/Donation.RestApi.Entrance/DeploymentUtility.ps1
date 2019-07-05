@@ -10,13 +10,14 @@ if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\..\Util.psm1" -Force
 }
 
-$appName = GetAppNameFromProject
-$dockerFilName = ".\Source\$appName\Dockerfile"
-$containerImageName = $appName
-$appVersion = GetProjectVersion
-$scriptTitle = "Donation Automation Deployment Utility -- $appName  $($appVersion)"
+$appName                = GetAppNameFromProject
+$dockerFilName          = ".\Source\$appName\Dockerfile"
+$containerImageName     = $appName
+$appVersion             = GetProjectVersion
+$scriptTitle            = "Donation Automation Deployment Utility -- $appName  $($appVersion)"
 $traceKubernetesCommand = $true
-$deployService = $true
+$deployService          = $true
+$appUrl                 = "/api/info/getinfo"
 
 Write-HostColor "$scriptTitle" Yellow
 Write-Host "$action appName:$($appName) - $($appVersion), containerImageName:$containerImageName" -ForegroundColor DarkYellow
@@ -36,8 +37,10 @@ function pushContainerImageToRegistry() {
 }
 
 function deploy() {
-
-    ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion -cls $false -traceKubernetesCommand $traceKubernetesCommand -deployService $deployService
+	
+    ..\Deployment.Kubernetes.ps1 -a deployToProd -appName $appName -appVersion $appVersion `
+		-appUrl $appUrl -cls $false -traceKubernetesCommand $traceKubernetesCommand `
+		-deployService $deployService	
 }
 
 switch($action) {

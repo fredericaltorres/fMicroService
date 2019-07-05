@@ -40,10 +40,11 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
             }
         }
         catch {            
-            Write-Output "`r`nRetry caugth an error for:$message"
+            
             $ErrorMessage = $_.Exception.Message
             $FailedItem = $_.Exception.ItemName
-            Write-Error $ErrorMessage
+            # Write-Error
+            Write-Output "`r`nRetry caugth an error for: $message, error: $ErrorMessage"
             Start-Sleep -s $wait
         }
     }
@@ -51,7 +52,7 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
     return $false
 }
 
-function urlMustReturnHtml($url) {
+function validateUrl($url) {
 
     Retry "Verifying url: $url succeed" {
 
@@ -73,15 +74,6 @@ function urlMustReturnHtml($url) {
                 return $true 
             }
         }
-
-        # if($homePage.ToLowerInvariant().Contains("<html")) {
-        #     return $true
-        # }
-        # else {
-        #     $m = "Url:$url does not return html" 
-        #     Write-Error $m
-        #     return $false
-        # }
     } -wait 10 -maxTry 3
 }
 
@@ -186,7 +178,7 @@ Export-ModuleMember -Function GetAppNameFromProject
 Export-ModuleMember -Function GetProjectName
 Export-ModuleMember -Function GetProjectVersion
 Export-ModuleMember -Function processFile
-Export-ModuleMember -Function urlMustReturnHtml
+Export-ModuleMember -Function validateUrl
 Export-ModuleMember -Function Retry
 Export-ModuleMember -Function JsonParse
 Export-ModuleMember -Function Write-HostColor

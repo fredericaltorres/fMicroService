@@ -3,7 +3,7 @@
 Implement waitForStatefulsets
 kubectl get statefulsets -o json
 
-try url output error expected on failure
+Try url output error expected on failure
 
 ## Donation-QueueProcessor-Console
 - queueprocessor-1-0-43-sfs-1 is logging donation info
@@ -15,7 +15,6 @@ try url output error expected on failure
     * HttpRequestException: Connection reset by peer
     * Retry once.
 
-
 ## Donation-RestApi-Entrance
 
 - Handle start error
@@ -26,3 +25,85 @@ try url output error expected on failure
 - Simulator should notify every 500 as info - [done]
 - Queue processor should notify starting - [done]
 https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings    
+
+## Video
+
+0. Initialization cleam the temp folder
+
+1. Let's create a Kubernetes cluster Create.Kubernetes.ps1, which will be
+named fkubernetes6
+* Let's look at the script and cluster configuration
+
+2. The build process
+- Let's build the different projects
+- Created the Docker container image
+- Publish the container images into a Azure Container Registry named FredContainerRegistry
+
+I have 3 C# projects
+- Simulator, is .NET core console that can read a JSON file containing 50 000 JSON
+donation and send them to an endpoint using an HTTP post. The console app execute 10
+HTTP post in paralele 
+
+- RestApi.Entrance, is .NET core REST API that receive JSON donations
+```json
+{"Guid":"eacf779c-e42d-47f3-8265-92d3c114feed","FirstName":"Rooney","LastName":"Shall","Email":"rshall0@fema.gov","Gender":"Male","Phone":"271-648-3024","IpAddress":"147.110.186.181","Country":"China","Amount":"$44.38","CC_Number":"6767595943679547","CC_ExpMonth":12,"CC_ExpYear":2016,"CC_SecCode":472},
+```
+with the following url 'http://HOST/api/Donation'.
+The endpoint first validate the data and store the updated JSON in a Azure queue.
+
+- The Queue.Processor is a .NET core console that read donations from the Azure queue,
+validate the data, compute in memory amount aggregation per country/amount and then store the data into an Azure Table named 'DonationTable'.
+
+`Notifications`, every 500 donations processed, the app notify via Azure Service Bus (Publish/Subscribe), 
+    * the total number of donation processed, 
+    * the number processed per second.
+    * the app also notify the details of the country/amount aggregation for the last 500 donations. 
+
+All this notification feed data for the real time web dashboard.
+The details of the country/amount aggregation is stored in an Azure table named 'DonationAggregate'
+
+3. Let's deploy
+
+- Web Dashboard, the web Dashboard allow me to monitor the system in pseudo real time,
+based on Azure Service Bus (Publish/Subscribe). The source code is located in the project
+fAzureHelper sub folders SystemActicity and ServiceBus.
+
+- RestApi.Entrance, The endpoint must be deployed first because we need to know
+the end point ip before we can send the data. I going to deploy 3 instances of
+container image and one load balancer usin Kubernetes deployment and service concepts.
+
+```powershell
+    .\DeploymentUtilityAll.ps1 -a deploy -app Donation.RestApi.Entrance
+    code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-restapi-entrance--Deployment.{Params}.yaml"
+    code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-restapi-entrance--Service.{Params}.yaml"
+
+    kubectl get deployment
+    kubectl get service
+    kubectl get pods
+```
+
+- The Queue.Processor, let's deploy the queue processor, I am goind to deploy
+2 instance of container image and using Kubernetes Statefullsets concepts.
+The concept of Statefullsets is need to have each container instance machine name or pod name to end with index like 'xxxx-0', 'xxx-1'.
+
+```powershell
+    .\DeploymentUtilityAll.ps1 -a deploy -app Donation.RestApi.Entrance
+    code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-queueprocessor-console--Deployment.{Params}.yaml"
+
+    kubectl get deployment
+    kubectl get service
+    kubectl get pods
+```
+
+- The Person.Simulator, let's deploy the Person Simulator, I am goind to deploy
+X instances of container image and using Kubernetes Statefullsets concepts.
+The concept of Statefullsets is need to have each container instance machine name or pod name to end with index like 'xxxx-0', 'xxx-1'. The index is used the load and send a specific JSON file. Each file contains 50 000 donation and I have up to 10 files.
+
+```powershell
+    .\DeploymentUtilityAll.ps1 -a deploy -app Donation.PersonSimulator.Console
+    code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-personsimulator-console--Deployment.{Params}.yaml"
+
+    kubectl get deployment
+    kubectl get service
+    kubectl get pods
+```
