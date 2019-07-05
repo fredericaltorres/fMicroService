@@ -76,6 +76,10 @@ function deployRelease([Hashtable]$context, [string]$message, [bool]$deployServi
     $kubernetesManager.printKubectlOutpuResourceInfos($json)
     #$kubernetesManager.waitForDeployment($deploymentName)
 
+    if($waitForStatefullsets) {
+        # $kubernetesManager.waitForStatefullsets() # not implemented
+    }
+
     if($deployService) {
 
         # Deploy service/loadBalancer for the x pods    

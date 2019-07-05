@@ -107,3 +107,16 @@ The concept of Statefullsets is need to have each container instance machine nam
     kubectl get service
     kubectl get pods
 ```
+
+4. Let's analyse the system while receiving donation
+- Using the Web Dashboard
+
+5. Let's clean up
+```powershell
+   .\DeploymentUtilityAll.ps1 -a deleteDeployment -app all
+   .\DeploymentUtilityAll.ps1 -a initData
+
+    kubectl get deployment
+    kubectl get service
+    kubectl get pods
+```

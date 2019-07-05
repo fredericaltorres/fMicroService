@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-import {
-    getDonationProcessedPerSecChartData,
-    getDonationReceivedPerSecChartData
-} from './generateDashboardData'
 
 /*
 recharts
@@ -16,12 +12,11 @@ React-Table
      https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
  */
 
-export class Home extends Component {
+ export class Home extends Component {
 
-    static displayName = Home.name;
-
-    timerId = null;
-    refreshTimeOut = 1000 * 5;    
+    static displayName          = Home.name;
+    timerId                     = null;
+    refreshTimeOut              = 1000 * 5;    
     summaryTableDefaultPageSize = 6;
 
     state = {
@@ -32,15 +27,12 @@ export class Home extends Component {
             dashboardResourceActivitySummaryDictionary     : {},            
             donationProcessedActivitySummaryDictionary     : {},
             donationInfoSummaryDictionary                  : {},
-            donationErrorsSummaryDictionary                : {},
-            lastMessage                                    : "No message yet",
-            
+            donationErrorsSummaryDictionary                : {},                        
         },
         autoRefreshOn: false,
         donationCountryBreakdownMinimunAmountForDisplay: 1000,
     };
 
-    // Return a promise
     clearAllErrors = () => {
 
         return fetch('api/SystemActivities/GetSystemActivityClearError').then(response => response.json())
@@ -50,7 +42,6 @@ export class Home extends Component {
             });
     }
 
-    // Return a promise
     clearAll = () => {
 
         return fetch('api/SystemActivities/GetSystemActivityClearAll').then(response => response.json())
@@ -60,7 +51,6 @@ export class Home extends Component {
             });
     }
 
-    // Return a promise
     reloadData = () => {
 
         return fetch('api/SystemActivities/GetSystemActivitySummary').then(response => response.json())
@@ -163,11 +153,6 @@ export class Home extends Component {
         return this.getActivitySummaryTable(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary);
     }
     
-    //getDashboardResourceActivitySummaryTable = () => {
-
-    //    return this.getActivitySummaryTable(this.state.systemActivitySummary.dashboardResourceActivitySummaryDictionary);
-    //}
-
     renderDonationInfoActivitySummaryTable = () => {
 
         const data = this.getDonationInfoActivitySummaryTable();
@@ -522,7 +507,7 @@ export class Home extends Component {
                     </div>
                 </div>
 
-
+                
 
                 {this.renderDonationSentToEndpointActivitySummaryTable()}
                 <br /><br />
@@ -534,18 +519,8 @@ export class Home extends Component {
                 <br /><br />
                 {this.renderDonationErrorsActivitySummaryTable()}
                 <br /><br />
-
-                {/*
-                {this.renderDashboardResourceActivitySummaryTable()}
-                <br /><br />
-                */}
-                  
             </div>
         );
     }
 }
 
-/*
-
-                          <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
- */
