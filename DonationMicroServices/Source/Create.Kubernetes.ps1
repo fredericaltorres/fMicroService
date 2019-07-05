@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory=$false)]
     [Alias('a')]
-    [ValidateSet('create', 'delete', 'info')]
+    [ValidateSet('create', 'delete', 'info','select')]
     [string]$action = "info",
 
     [Parameter(Mandatory=$false)]
@@ -22,6 +22,16 @@ $vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
 $vmCount = 2
 $kubernetesClusterRegion = "eastus2"
 
+
+function selectKubernetesCluster ([string]$kubernetesClusterName) {
+
+    write-host "Initialize credential"
+    az aks get-credentials --resource-group $kubernetesClusterName --name $kubernetesClusterName
+
+    write-host "Set $kubernetesClusterName as default"
+    kubectl config use-context $kubernetesClusterName # Switch to cluster
+}
+
 function createKubernetesCluster (
     [string]$kubernetesClusterName,
     [string]$vmSize,
@@ -39,11 +49,7 @@ function createKubernetesCluster (
         --node-count $vmCount --node-vm-size $vmSize
     # --enable-rbac rbac is on by default
 
-    write-host "Initialize credential"
-    az aks get-credentials --resource-group $kubernetesClusterName --name $kubernetesClusterName
-
-    write-host "Set $kubernetesClusterName as default"
-    kubectl config use-context $kubernetesClusterName # Switch to cluster
+    selectKubernetesCluster $kubernetesClusterName
 }
 
 $scriptTitle = "Kubernetes Cluster Management Utility"
@@ -57,8 +63,9 @@ switch($action) {
     delete {
         az aks delete -n $kubernetesClusterName -g $kubernetesClusterName
         az group delete -n $kubernetesClusterName
-#        az aks delete -n fkubernetes5 -g fkubernetes5
-        
+    }
+    select {
+        selectKubernetesCluster $kubernetesClusterName
     }
     info {
         & az aks list -o table # Get the list of clusters

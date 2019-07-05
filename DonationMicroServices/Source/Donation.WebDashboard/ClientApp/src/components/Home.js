@@ -3,6 +3,10 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
+// https://github.com/ayrton/react-key-handler
+// https://www.npmjs.com/package/react-key-handler
+import KeyHandler, { KEYPRESS, KEYDOWN, KEYUP } from 'react-key-handler'; 
+
 /*
 recharts
      http://recharts.org/en-US/examples/BiaxialLineChart
@@ -31,6 +35,8 @@ React-Table
         },
         autoRefreshOn: false,
         donationCountryBreakdownMinimunAmountForDisplay: 1000,
+        keyCounter: 0,
+        keyAltDown: false,
     };
 
     clearAllErrors = () => {
@@ -474,22 +480,62 @@ React-Table
     onDonationCountryBreakdownMinimunAmountForDisplayChange = (e) => {
 
         this.updateState('donationCountryBreakdownMinimunAmountForDisplay', e.target.value);
-    }
+     }
 
+     onKeyboardAutoRefresh = (event) => {         
+         event.preventDefault();
+         if (this.state.keyAltDown)
+             this.reverseAutoRefresh();
+     }
+
+     onKeyboardRefresh = (event) => {
+         event.preventDefault();
+         if (this.state.keyAltDown)
+             this.reloadData();
+     }
+
+     onKeyboardAltKey = (event, down) => {
+         if (this.state.keyAltDown !== down) {
+             console.log(`onKeyboardAltKey down:${down}`);
+             event.preventDefault();
+             this.updateState('keyAltDown', down);
+         }
+     }
+
+     // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values
+     
+     getKeyHandlers = () => {
+         return <span>
+             <KeyHandler keyEventName={KEYUP} code="KeyA" onKeyHandle={this.onKeyboardAutoRefresh} />
+             <KeyHandler keyEventName={KEYUP} code="KeyR" onKeyHandle={this.onKeyboardRefresh} />
+
+             <KeyHandler keyEventName={KEYDOWN} code="AltLeft" onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }} />
+             <KeyHandler keyEventName={KEYUP} code="AltLeft" onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }} />
+             <KeyHandler keyEventName={KEYDOWN} code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }} />
+             <KeyHandler keyEventName={KEYUP} code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }} />
+         </span>;
+    }
+    
     render() {
         // console.log(`getCountryBreakDownChartData: ${JSON.stringify(this.getCountryBreakDownChartData())}`);
 
         return (
+            <React.Fragment>
+
+                {this.getKeyHandlers()}
+
             <div>
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} </button>
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} (Alt+A)</button>
                 &nbsp;
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh </button>
+                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh (Alt+R)</button>
                 &nbsp;
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Errors </button>
                 &nbsp;
                 <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAll} > Clear All </button>
                 &nbsp;
                 {new Date().toString()}
+                    Counter: {this.state.keyCounter} - 
+                    keyAltDown: {this.state.keyAltDown}
 
                 {this.getDonationPerformanceInfoCharts()}
 
@@ -519,7 +565,8 @@ React-Table
                 <br /><br />
                 {this.renderDonationErrorsActivitySummaryTable()}
                 <br /><br />
-            </div>
+                </div>
+            </React.Fragment>
         );
     }
 }
