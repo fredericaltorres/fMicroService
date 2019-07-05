@@ -1,7 +1,11 @@
 # Donation-MicroService TODO list
 
+trigger last notification in queue.processor 
+-   if no new donation processed in the last 3 minutes, send current state notification
+
 Implement waitForStatefulsets
 kubectl get statefulsets -o json
+kubectl get statefulsets queueprocessor-1-0-50-sfs -o json
 
 Try url output error expected on failure
 
@@ -73,7 +77,7 @@ the end point ip before we can send the data. I going to deploy 3 instances of
 container image and one load balancer usin Kubernetes deployment and service concepts.
 
 ```powershell
-    .\DeploymentUtilityAll.ps1 -a deploy -app Donation.RestApi.Entrance
+    .\DeploymentUtilityMaster.ps1 -a deploy -app Donation.RestApi.Entrance
     code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-restapi-entrance--Deployment.{Params}.yaml"
     code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-restapi-entrance--Service.{Params}.yaml"
 
@@ -87,7 +91,7 @@ container image and one load balancer usin Kubernetes deployment and service con
 The concept of Statefullsets is need to have each container instance machine name or pod name to end with index like 'xxxx-0', 'xxx-1'.
 
 ```powershell
-    .\DeploymentUtilityAll.ps1 -a deploy -app Donation.RestApi.Entrance
+    .\DeploymentUtilityMaster.ps1 -a deploy -app Donation.RestApi.Entrance
     code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-queueprocessor-console--Deployment.{Params}.yaml"
 
     kubectl get deployment
@@ -100,7 +104,7 @@ X instances of container image and using Kubernetes Statefullsets concepts.
 The concept of Statefullsets is need to have each container instance machine name or pod name to end with index like 'xxxx-0', 'xxx-1'. The index is used the load and send a specific JSON file. Each file contains 50 000 donation and I have up to 10 files.
 
 ```powershell
-    .\DeploymentUtilityAll.ps1 -a deploy -app Donation.PersonSimulator.Console
+    .\DeploymentUtilityMaster.ps1 -a deploy -app Donation.PersonSimulator.Console
     code "C:\Users\fredericaltorres\AppData\Local\Temp\donation-personsimulator-console--Deployment.{Params}.yaml"
 
     kubectl get deployment
@@ -113,8 +117,9 @@ The concept of Statefullsets is need to have each container instance machine nam
 
 5. Let's clean up
 ```powershell
-   .\DeploymentUtilityAll.ps1 -a deleteDeployment -app all
-   .\DeploymentUtilityAll.ps1 -a initData
+
+   .\DeploymentUtilityMaster.ps1 -a deleteDeployment -app all
+   .\DeploymentUtilityMaster.ps1 -a initData
 
     kubectl get deployment
     kubectl get service

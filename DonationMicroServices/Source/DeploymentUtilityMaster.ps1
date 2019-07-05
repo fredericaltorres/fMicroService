@@ -41,7 +41,7 @@ function executeCommandInFolder($folder, $theAction) {
     cd ..
 }
 cls
-$scriptTitle = "Donation Automation Deployment Utility"
+$scriptTitle = "Donation Automation Deployment Utility Master"
 if($app -eq "all") {
     $appFolders = @("Donation.RestApi.Entrance", "Donation.QueueProcessor.Console", "Donation.PersonSimulator.Console")
 }
@@ -49,7 +49,7 @@ else {
     $appFolders = @($app)
 }
 
-Write-Host "$scriptTitle -- ALL" -ForegroundColor Yellow
+Write-Host "$scriptTitle" -ForegroundColor Yellow
 Write-Host "Action: $action, App: $app" -ForegroundColor DarkYellow
 
 switch($action) {
@@ -81,4 +81,5 @@ switch($action) {
     }    
 }
 
-Write-Host "`r`n$scriptTitle -- ALL" -ForegroundColor Yellow
+Write-Host "`r`n$scriptTitle" -ForegroundColor Yellow
+

@@ -496,7 +496,7 @@ React-Table
 
      onKeyboardAltKey = (event, down) => {
          if (this.state.keyAltDown !== down) {
-             console.log(`onKeyboardAltKey down:${down}`);
+             // console.log(`onKeyboardAltKey down:${down}`);
              event.preventDefault();
              this.updateState('keyAltDown', down);
          }
