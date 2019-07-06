@@ -9,6 +9,9 @@ kubectl get statefulsets queueprocessor-1-0-50-sfs -o json
 
 Try url output error expected on failure
 
+Remove action parameter from
+await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}",
+
 ## Donation-QueueProcessor-Console
 - queueprocessor-1-0-43-sfs-1 is logging donation info
 - queueprocessor-1-0-43-sfs-1 is not logging donation info

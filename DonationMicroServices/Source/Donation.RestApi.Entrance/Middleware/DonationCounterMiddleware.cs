@@ -74,7 +74,7 @@ namespace Donation.RestApi.Entrance.Middleware
             await saNotificationPublisher.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationEnqueued, $"<!> final:{final}",
                 __perfTracker.Duration, __perfTracker.ItemPerSecond, itemCount
             );
-            await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint, final:{final}"));
+            await saNotificationPublisher.NotifyInfoAsync(__perfTracker.GetTrackedInformation($"Donations received by endpoint"+(final ? $", final:{final}" : "")));
             await saNotificationPublisher.CloseAsync();
         }
 
