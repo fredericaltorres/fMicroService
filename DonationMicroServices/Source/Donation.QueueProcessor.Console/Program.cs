@@ -18,11 +18,6 @@ namespace Donation.PersonSimulator.Console
 {
     class Program
     {
-        /// <summary>
-        /// Parameter -generationIndex is passed as an envrironment variable when running
-        /// as a container
-        /// </summary>
-        /// <param name="args"></param>
         static void Main(string[] args)
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
@@ -41,24 +36,40 @@ namespace Donation.PersonSimulator.Console
             try
             {
                 // Settings come frm the appsettings.json file
-                var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                var donationTableManager = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));    
-                var donationAggregateTableManager = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                var donationAggregationService = new DonationsAggregationService();
-                const int queuBatchSize = 10;
-                const int sleepDurationWhenNoItemInQueue = 4;
+                var donationQueue                         = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationTableManager                  = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));    
+                var donationAggregateTableManager         = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationAggregationService            = new DonationsAggregationService();
+                var queuBatchSize                         = 10;
+                var sleepDurationWhenNoItemInQueue        = 4;
+                var lastTimeDonationWereProcessed         = DateTime.Now;
+                var sendFinalNotification                 = true;   // If true we need to send the final notification to web dashboard
+                var monitorIdleProcess                    = false;  // Should we start monitoring for idle mode after having processed donation
+                var maxIdleMinutesToSendFinalNotification = 3;
 
                 while (true)
                 {
                     var donations = await donationQueue.DequeueAsync(queuBatchSize);
                     if (donations.Count == 0)
                     {
+                        // No donation in the queue, let's wait and sleep
                         Thread.Sleep(sleepDurationWhenNoItemInQueue * 1000);
+
+                        // Check if we need to send the final notification to the web dashboard
+                        if(monitorIdleProcess && sendFinalNotification && ((DateTime.Now - lastTimeDonationWereProcessed).Minutes > maxIdleMinutesToSendFinalNotification))
+                        {
+                            // Send the final notification after 3 minutes being idle
+                            await NotifyBatchProcessedAsync(saNotification, donationQueue, donationAggregateTableManager, donationAggregationService);
+                            sendFinalNotification = false; // we sent the final notification, we do not need to do it again
+                        }
                     }
                     else
                     {
+                        monitorIdleProcess             = true; // We processed at least our first donation, so now we can start waiting for the idle mode
+                        lastTimeDonationWereProcessed  = DateTime.Now; // Mark the last time we pop and processed notification
                         var donationsValidationService = new DonationsValidationService(donations);
-                        var validationErrors = donationsValidationService.ValidateData();
+                        var validationErrors           = donationsValidationService.ValidateData();
+
                         if (validationErrors.Count == 0)
                         {
                             donationAggregationService.Add(donations);
@@ -78,12 +89,12 @@ namespace Donation.PersonSimulator.Console
                                     var insertErrors = await donationTableManager.InsertAsync(donationTableRecord);
                                     if (insertErrors.NoError)
                                     {
-                                        await donationQueue.DeleteAsync(donation);
+                                        await donationQueue.DeleteAsync(donation); // Delete the donation from the queue after processing
                                     }
                                     else
                                     {
                                         await saNotification.NotifyErrorAsync(insertErrors);
-                                        donationQueue.Release(donation);
+                                        donationQueue.Release(donation);  // Release and will retry the messager after x time the message will go to dead letter queue
                                     }
                                 }
                                 else
@@ -101,11 +112,7 @@ namespace Donation.PersonSimulator.Console
 
                         if (donationQueue.ItemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                         {
-                            await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationProcessed, "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
-                            await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));
-                            await saNotification.NotifySetDashboardInfoInfoAsync("CountryAggregate", donationAggregationService.CountryAggregateData.ToJSON(), donationAggregationService.AggregatedRecordCount);
-                            await saNotification.NotifyInfoAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
-                            donationAggregationService.Clear();
+                            await NotifyBatchProcessedAsync(saNotification, donationQueue, donationAggregateTableManager, donationAggregationService);
                         }
                     }
                 }
@@ -114,6 +121,15 @@ namespace Donation.PersonSimulator.Console
             {
                 await saNotification.NotifyErrorAsync($"Process crashed on machine {RuntimeHelper.GetMachineName()}, ex:{ex.Message}", ex);
             }
+        }
+
+        private static async Task NotifyBatchProcessedAsync(SystemActivityNotificationManager saNotification, DonationQueue donationQueue, DonationAggregateTableManager donationAggregateTableManager, DonationsAggregationService donationAggregationService)
+        {
+            await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));
+            await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationProcessed, "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
+            await saNotification.NotifySetDashboardInfoInfoAsync("CountryAggregate", donationAggregationService.CountryAggregateData.ToJSON(), donationAggregationService.AggregatedRecordCount);
+            await saNotification.NotifyInfoAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
+            donationAggregationService.Clear();
         }
     }
 }
