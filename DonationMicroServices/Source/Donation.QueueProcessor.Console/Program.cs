@@ -59,7 +59,7 @@ namespace Donation.PersonSimulator.Console
                         if(monitorIdleProcess && sendFinalNotification && ((DateTime.Now - lastTimeDonationWereProcessed).Minutes > maxIdleMinutesToSendFinalNotification))
                         {
                             // Send the final notification after 3 minutes being idle
-                            await NotifyBatchProcessedAsync(saNotification, donationQueue, donationAggregateTableManager, donationAggregationService);
+                            await NotifyBatchProcessedAsync(saNotification, donationQueue, donationAggregateTableManager, donationAggregationService, true);
                             sendFinalNotification = false; // we sent the final notification, we do not need to do it again
                         }
                     }
@@ -112,7 +112,7 @@ namespace Donation.PersonSimulator.Console
 
                         if (donationQueue.ItemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                         {
-                            await NotifyBatchProcessedAsync(saNotification, donationQueue, donationAggregateTableManager, donationAggregationService);
+                            await NotifyBatchProcessedAsync(saNotification, donationQueue, donationAggregateTableManager, donationAggregationService, false);
                         }
                     }
                 }
@@ -123,12 +123,12 @@ namespace Donation.PersonSimulator.Console
             }
         }
 
-        private static async Task NotifyBatchProcessedAsync(SystemActivityNotificationManager saNotification, DonationQueue donationQueue, DonationAggregateTableManager donationAggregateTableManager, DonationsAggregationService donationAggregationService)
+        private static async Task NotifyBatchProcessedAsync(SystemActivityNotificationManager saNotification, DonationQueue donationQueue, DonationAggregateTableManager donationAggregateTableManager, DonationsAggregationService donationAggregationService, bool final)
         {
             await donationAggregateTableManager.InsertAsync(new DonationAggregateAzureTableRecord(donationAggregationService.CountryAggregateData, donationAggregationService.AggregatedRecordCount));
-            await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationProcessed, "processed from queue", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
+            await saNotification.NotifyPerformanceInfoAsync(SystemActivityPerformanceType.DonationProcessed, $"processed from queue (final:{final})", donationQueue.Duration, donationQueue.ItemPerSecond, donationQueue.ItemCount);
             await saNotification.NotifySetDashboardInfoInfoAsync("CountryAggregate", donationAggregationService.CountryAggregateData.ToJSON(), donationAggregationService.AggregatedRecordCount);
-            await saNotification.NotifyInfoAsync(donationQueue.GetTrackedInformation("Donations processed from queue"));
+            await saNotification.NotifyInfoAsync(donationQueue.GetTrackedInformation($"Donations processed from queue (final:{final})"));
             donationAggregationService.Clear();
         }
     }

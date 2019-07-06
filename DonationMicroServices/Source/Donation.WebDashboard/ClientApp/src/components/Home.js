@@ -16,6 +16,9 @@ React-Table
      https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/archives/v6-examples/react-table-cell-renderers
  */
 
+const chartWidth = 501;
+const chartHeight = 175;
+
  export class Home extends Component {
 
     static displayName          = Home.name;
@@ -35,7 +38,6 @@ React-Table
         },
         autoRefreshOn: false,
         donationCountryBreakdownMinimunAmountForDisplay: 1000,
-        keyCounter: 0,
         keyAltDown: false,
     };
 
@@ -163,7 +165,7 @@ React-Table
 
         const data = this.getDonationInfoActivitySummaryTable();
         if (data.length === 0)
-            return null
+            return null;
 
         return (
             <ReactTable
@@ -195,7 +197,7 @@ React-Table
 
         const data = this.getDonationErrorsActivitySummaryTable();
         if (data.length === 0)
-            return null
+            return null;
 
         return (
             <ReactTable
@@ -246,7 +248,7 @@ React-Table
 
         const data = this.getDonationProcessedpointActivitySummaryTable();
         if (data.length === 0)
-            return null
+            return null;
 
         return (
             <ReactTable
@@ -266,7 +268,7 @@ React-Table
 
         const data = this.getDonationSentToEndpointActivitySummaryTable();
         if (data.length === 0)
-            return null
+            return null;
 
         return (
             <ReactTable
@@ -286,7 +288,7 @@ React-Table
 
         const data = this.getDonationEnqueuedActivitySummaryTable();
         if (data.length === 0)
-            return null
+            return null;
 
         return (
             <ReactTable
@@ -312,26 +314,6 @@ React-Table
         { Header: "Json Data", accessor: "jsonData" }
     ];
     
-    //renderDashboardResourceActivitySummaryTable = () => {
-
-    //    const data = this.getDashboardResourceActivitySummaryTable();
-    //    if (data.length === 0)
-    //        return null
-
-    //    return (
-    //        <ReactTable
-    //            data={data}
-    //            columns={[{
-    //                Header: "Dashboard Country Aggregate",
-    //                columns: this.getColumnsForJsonDataTable()
-    //            }]}
-    //            defaultPageSize={this.summaryTableDefaultPageSize}
-    //            className="-striped -highlight"
-    //            showPagination={false}
-    //        />
-    //    );
-    //}
-
     getDonationMachineCount = (dictionary) => {
 
         const machineNames = Object.keys(dictionary);
@@ -345,6 +327,7 @@ React-Table
             const machineName = machineNames[machineIndex];
             return machineName;
         }
+
         return null;
     };
     
@@ -354,12 +337,13 @@ React-Table
         const countries = Object.keys(donationCountryBreakdown);
         const data = [];
         countries.forEach((country) => {
+
             const amount = Math.round(donationCountryBreakdown[country]);
-            if (amount > this.state.donationCountryBreakdownMinimunAmountForDisplay) {
+            if (amount > this.state.donationCountryBreakdownMinimunAmountForDisplay)
                 data.push({ country, amount });
-            }            
         });
         data.sort((a, b) => (a.amount < b.amount) ? 1 : -1);
+
         return data;
     }
 
@@ -367,18 +351,23 @@ React-Table
         
         const machineNames = Object.keys(dictionary);
         if (machineNames.length) {
+
             const machineName = machineNames[machineIndex];
             if (machineName) {
-                const history = dictionary[machineName].history;
+
+                const history = dictionary[machineName].history; // List<DonationActivityItem>
                 const data = history.map((e) => {
+
                     return { timeStamp: e.chartLabel, value: e.total };
                 });
+
                 return data;
             }
             else {
                 // Machine #2 may not be ready
             }
         }
+
         return [];
     };
 
@@ -398,8 +387,7 @@ React-Table
     };
 
     getDonationProcessedMachineName = (machineIndex) => {
-        const chartWidth = 501;
-        const chartHeight = 175;
+
         return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationProcessedChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="value" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -410,8 +398,7 @@ React-Table
     };
 
     getDonationEnqueuedMachineName = (machineIndex) => {
-        const chartWidth = 501;
-        const chartHeight = 175;
+
         return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationEnqueuedChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="value" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -422,8 +409,7 @@ React-Table
     };
 
     getDonationSentToEndPointMachineName = (machineIndex) => {
-        const chartWidth = 501;
-        const chartHeight = 175;
+
         return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationSentToEndPointChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="value" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -436,6 +422,7 @@ React-Table
     getDonationCountryBreakdownChart = () => {
         const chartWidth = 1000;
         const chartHeight = 175;
+
         return <LineChart width={chartWidth} height={chartHeight} data={this.getCountryBreakDownChartData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="amount" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -445,7 +432,8 @@ React-Table
         </LineChart>;
     };
     
-    getDonationPerformanceInfoChartsTR = (dictionary, title, generateChartCallBack) => {
+     getDonationPerformanceInfoChartsTR = (dictionary, title, generateChartCallBack) => {
+
         let max = this.getDonationMachineCount(dictionary);
         let html = [];
         for (let i = 0; i < max; i++) {
@@ -457,22 +445,24 @@ React-Table
                     </div>
                 </div>
             </td>);
-        }
+         }
+
         return html;
     }
 
-    getDonationPerformanceInfoCharts = () => {
+     getDonationPerformanceInfoCharts = () => {
+
         return <table>
             <tbody>
-            <tr>
+                <tr>
                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent', this.getDonationSentToEndPointMachineName)}
-            </tr>
-            <tr>
+                </tr>
+                <tr>
                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued', this.getDonationEnqueuedMachineName)}
-            </tr>
-            <tr>
+                </tr>
+                <tr>
                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ', this.getDonationProcessedMachineName)}
-            </tr>
+                </tr>
             </tbody>
         </table >
     }
@@ -483,18 +473,21 @@ React-Table
      }
 
      onKeyboardAutoRefresh = (event) => {         
+
          event.preventDefault();
          if (this.state.keyAltDown)
              this.reverseAutoRefresh();
      }
 
      onKeyboardRefresh = (event) => {
+
          event.preventDefault();
          if (this.state.keyAltDown)
              this.reloadData();
      }
 
      onKeyboardAltKey = (event, down) => {
+
          if (this.state.keyAltDown !== down) {
              // console.log(`onKeyboardAltKey down:${down}`);
              event.preventDefault();
@@ -505,66 +498,63 @@ React-Table
      // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values
      
      getKeyHandlers = () => {
+
          return <span>
+
              <KeyHandler keyEventName={KEYUP} code="KeyA" onKeyHandle={this.onKeyboardAutoRefresh} />
              <KeyHandler keyEventName={KEYUP} code="KeyR" onKeyHandle={this.onKeyboardRefresh} />
 
-             <KeyHandler keyEventName={KEYDOWN} code="AltLeft" onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }} />
-             <KeyHandler keyEventName={KEYUP} code="AltLeft" onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }} />
-             <KeyHandler keyEventName={KEYDOWN} code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }} />
-             <KeyHandler keyEventName={KEYUP} code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }} />
+             <KeyHandler keyEventName={KEYDOWN} code="AltLeft"  onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }}    />
+             <KeyHandler keyEventName={KEYUP}   code="AltLeft"  onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }}   />
+             <KeyHandler keyEventName={KEYDOWN} code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }}    />
+             <KeyHandler keyEventName={KEYUP}   code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }}   />
          </span>;
     }
     
     render() {
-        // console.log(`getCountryBreakDownChartData: ${JSON.stringify(this.getCountryBreakDownChartData())}`);
 
         return (
             <React.Fragment>
 
                 {this.getKeyHandlers()}
 
-            <div>
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} (Alt+A)</button>
-                &nbsp;
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh (Alt+R)</button>
-                &nbsp;
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Errors </button>
-                &nbsp;
-                <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAll} > Clear All </button>
-                &nbsp;
-                {new Date().toString()}
-                    Counter: {this.state.keyCounter} - 
-                    keyAltDown: {this.state.keyAltDown}
+                <div>
+                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} (Alt+A)</button>
+                    &nbsp;
+                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh (Alt+R)</button>
+                    &nbsp;
+                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAllErrors} > Clear Errors </button>
+                    &nbsp;
+                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAll} > Clear All </button>
+                    &nbsp;
+                    {new Date().toString()}                    
 
-                {this.getDonationPerformanceInfoCharts()}
+                    {this.getDonationPerformanceInfoCharts()}
 
-                <div className="card">
-                    <div className="card-header">Countries Break Down &nbsp;&nbsp;&nbsp;
-                        <small>
-                            ( Minimun Amount:&nbsp;
-                            <input id="donationCountryBreakdownMinimunAmountForDisplay" type="text" value={this.state.donationCountryBreakdownMinimunAmountForDisplay}
-                                onChange={this.onDonationCountryBreakdownMinimunAmountForDisplayChange}
-                            /> )
-                        </small>
+                    <div className="card">
+                        <div className="card-header">Countries Break Down &nbsp;&nbsp;&nbsp;
+                            <small>
+                                ( Minimun Amount:&nbsp;
+                                <input id="donationCountryBreakdownMinimunAmountForDisplay" type="text" value={this.state.donationCountryBreakdownMinimunAmountForDisplay}
+                                    onChange={this.onDonationCountryBreakdownMinimunAmountForDisplayChange}
+                                /> )
+                            </small>
+                        </div>
+                        <div className="card-body">
+                            {this.getDonationCountryBreakdownChart()}
+                        </div>
                     </div>
-                    <div className="card-body">
-                        {this.getDonationCountryBreakdownChart()}
-                    </div>
-                </div>
 
-                
-
-                {this.renderDonationSentToEndpointActivitySummaryTable()}
-                <br /><br />
-                {this.renderDonationEnqueuedActivitySummaryTable()}                
-                <br /><br />
-                {this.renderDonationProcessedActivitySummaryTable()}
-                <br /><br />
-                {this.renderDonationInfoActivitySummaryTable()}
-                <br /><br />
-                {this.renderDonationErrorsActivitySummaryTable()}
-                <br /><br />
+                    {this.renderDonationSentToEndpointActivitySummaryTable()}
+                    <br /><br />
+                    {this.renderDonationEnqueuedActivitySummaryTable()}                
+                    <br /><br />
+                    {this.renderDonationProcessedActivitySummaryTable()}
+                    <br /><br />
+                    {this.renderDonationInfoActivitySummaryTable()}
+                    <br /><br />
+                    {this.renderDonationErrorsActivitySummaryTable()}
+                    <br /><br />
                 </div>
             </React.Fragment>
         );
