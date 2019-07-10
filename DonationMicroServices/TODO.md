@@ -35,36 +35,66 @@ https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-ti
 
 ## Video
 
-0. Initialization cleam the temp folder
+0. Clean Up
+
+- Clean up Azure Fred Container Registry
+- Initialization cleam the temp folder
+- Docker images
+```powershell
+C:\tools\pdocker.ps1 -a delete-image -filter fredcontainerregistry.azurecr.io/donation.*
+C:\tools\pdocker.ps1 -a delete-dangling-image
+
+Remove-item "$($env:TEMP)\*.yaml"
+Remove-item "$($env:TEMP)\*.json"
+```
 
 1. Let's create a Kubernetes cluster Create.Kubernetes.ps1, which will be
 named fkubernetes6
+```powershell
+    cd "C:\DVT\microservices\fMicroService\DonationMicroServices\Source"
+    .\Create.Kubernetes.ps1 -a create
+
+    # When cluster is created 
+    kubectl.exe get nodes
+```
 * Let's look at the script and cluster configuration
 
+While the cluster is creating, we can build the container images
+
 2. The build process
+
+```powershell
+    cd "C:\dvt\microservices\fMicroService\DonationMicroServices\Source"
+    .\DeploymentUtilityMaster.ps1 -a buildAndPush -app all
+```
+
 - Let's build the different projects
 - Created the Docker container image
 - Publish the container images into a Azure Container Registry named FredContainerRegistry
 
 I have 3 C# projects
 - Simulator, is .NET core console that can read a JSON file containing 50 000 JSON
-donation and send them to an endpoint using an HTTP post. The console app execute 10
-HTTP post in paralele 
+donations and send them to an endpoint using an HTTP post. The console app execute 10
+HTTP posts in paralele.
 
 - RestApi.Entrance, is .NET core REST API that receive JSON donations
 ```json
 {"Guid":"eacf779c-e42d-47f3-8265-92d3c114feed","FirstName":"Rooney","LastName":"Shall","Email":"rshall0@fema.gov","Gender":"Male","Phone":"271-648-3024","IpAddress":"147.110.186.181","Country":"China","Amount":"$44.38","CC_Number":"6767595943679547","CC_ExpMonth":12,"CC_ExpYear":2016,"CC_SecCode":472},
 ```
 with the following url 'http://HOST/api/Donation'.
-The endpoint first validate the data and store the updated JSON in a Azure queue.
+The endpoint first validate the data and store the updated JSON into a Azure queue.
 
 - The Queue.Processor is a .NET core console that read donations from the Azure queue,
 validate the data, compute in memory amount aggregation per country/amount and then store the data into an Azure Table named 'DonationTable'.
 
-`Notifications`, every 500 donations processed, the app notify via Azure Service Bus (Publish/Subscribe), 
-    * the total number of donation processed, 
-    * the number processed per second.
-    * the app also notify the details of the country/amount aggregation for the last 500 donations. 
+`Notifications`, All applications
+- Simulator
+- RestApi.Entrance
+- The Queue.Processor
+after a batch of 500 donations processed, notify via Azure Service Bus (Publish/Subscribe),
+* The total number of donation sent, received or processed 
+* The number of donation sent, received or processed per second
+* The app also notify the details of the country/amount aggregation for the last 500 donations.
 
 All this notification feed data for the real time web dashboard.
 The details of the country/amount aggregation is stored in an Azure table named 'DonationAggregate'

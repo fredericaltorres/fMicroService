@@ -77,6 +77,9 @@ if($azureContainerRegistryPassword -eq $null -or $azureContainerRegistryPassword
     throw "Parameter `$azureContainerRegistryPassword is required"
 }
 
+$appName                = GetAppNameFromProject
+$dockerFilName          = ".\Source\$appName\Dockerfile"
+
 function GetContainerInstanceUrlFromJsonMetadata($jsonString) {
 <#
     .Synopsis
@@ -119,10 +122,22 @@ switch($action) {
     build { 
         
         Write-Host-Color "Building .NET project"
-        dotnet publish -c Release
+        ############dotnet publish -c Release
 
         Write-Host-Color "`r`nBuild container containerImage:$containerImage"
-        docker build -t $containerImage .
+        #docker build -t $containerImage .
+
+        #docker build -t "donation.webdashboard" .
+        # docker build -f "C:\DVT\microservices\fMicroService\DonationMicroServices\Source\Donation.WebDashboard\Dockerfile" 
+        #  -t donationwebdashboard:dev --target base  --label "com.microsoft.created-by=visual-studio" "C:\DVT\microservices\fMicroService\DonationMicroServices\Source" 
+
+        pushd
+        cd ..\..
+        docker build -t $containerImage -f "$dockerFilName" .
+        popd
+
+        
+
         $exp = "docker images --filter=""reference=$containerImage`:latest"""
         Invoke-Expression $exp        
     }
