@@ -519,7 +519,7 @@ const chartHeight = 175;
                 {this.getKeyHandlers()}
 
                 <div>
-                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh@@@: {this.getAutoRefreshStatus()} (Alt+A)</button>
+                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh~~~: {this.getAutoRefreshStatus()} (Alt+A)</button>
                     &nbsp;
                     <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh (Alt+R)</button>
                     &nbsp;

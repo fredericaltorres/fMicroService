@@ -6,7 +6,7 @@ param(
     [string]$action = "info",
 
     [Parameter(Mandatory=$false)]
-    [string]$kubernetesClusterName = "fkubernetes8"
+    [string]$kubernetesClusterName = "fkubernetes2"
 )
 
 

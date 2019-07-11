@@ -45,7 +45,7 @@ namespace Donation.PersonSimulator.Console
                 var lastTimeDonationWereProcessed         = DateTime.Now;
                 var sendFinalNotification                 = true;   // If true we need to send the final notification to web dashboard
                 var monitorIdleProcess                    = false;  // Should we start monitoring for idle mode after having processed donation
-                var maxIdleMinutesToSendFinalNotification = 3;
+                var maxIdleMinutesToSendFinalNotification = 1;
 
                 while (true)
                 {

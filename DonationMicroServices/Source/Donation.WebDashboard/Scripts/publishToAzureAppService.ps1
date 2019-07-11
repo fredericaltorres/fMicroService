@@ -10,10 +10,9 @@ param(
 
 	[Parameter(Mandatory=$true)]
 	[string]$Password,
-
+	
 	[Parameter(Mandatory=$false)]
-	[string]$PublishProfiles = "Properties\PublishProfiles\DonationWebDashboard20190710022653 - Web Deploy.pubxml"
-
+	[string]$PublishProfiles = "Properties\PublishProfiles\DonationWebDashboard - Web Deploy.pubxml"
 )
 cls
 
@@ -24,8 +23,10 @@ switch($action) {
 	publish { 
         
         Write-Host "Deploy Donation.WebDashboard to Azure using publishing profile" -ForegroundColor Yellow
-		dotnet publish .\Donation.WebDashboard.csproj -c Release /p:UserName="$UserName" /p:Password="$Password" /p:PublishProfile="$PublishProfiles"
-		#dotnet publish .\Donation.WebDashboard.csproj --configuration release --output ".\toto"
+		dotnet publish .\Donation.WebDashboard.csproj -c Release `
+			/p:UserName="$UserName" `
+			/p:Password="$Password" `
+			/p:PublishProfile="$PublishProfiles"
     }
 }
 
