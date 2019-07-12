@@ -20,18 +20,23 @@ namespace fAzureHelper
         private readonly JwtHeader _jwtHeader;
         private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public JwtHandler(IOptions<JwtOptions> options)
+        public JwtHandler(IOptions<JwtOptions> options) : this(options.Value)
         {
-            _options                   = options.Value;
-            _issuerSigningKey          = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
-            _signingCredentials        = new SigningCredentials(_issuerSigningKey, SecurityAlgorithms.HmacSha256);
-            _jwtHeader                 = new JwtHeader(_signingCredentials);
+            
+        }
+
+        public JwtHandler(JwtOptions options)
+        {
+            _options = options;
+            _issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
+            _signingCredentials = new SigningCredentials(_issuerSigningKey, SecurityAlgorithms.HmacSha256);
+            _jwtHeader = new JwtHeader(_signingCredentials);
             _tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false, 
-                ValidIssuer      = _options.Issuer,
+                ValidateAudience = false,
+                ValidIssuer = _options.Issuer,
                 IssuerSigningKey = _issuerSigningKey
-            }; 
+            };
         }
 
         public JsonWebToken Create(Guid userId)

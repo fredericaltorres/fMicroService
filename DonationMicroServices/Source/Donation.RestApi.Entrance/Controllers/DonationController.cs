@@ -6,6 +6,8 @@ using Donation.Model;
 using Donation.Queue.Lib;
 using Donation.Service;
 using fDotNetCoreContainerHelper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +35,7 @@ namespace Donation.RestApi.Entrance.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(DonationDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme )]
         public async Task<IActionResult> PostDonationDTO(DonationDTO donationDTO)
         {
             // Console.WriteLine($"New donation posted {donationDTO.GetSummary()}");

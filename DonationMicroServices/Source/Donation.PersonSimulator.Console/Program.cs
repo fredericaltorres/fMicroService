@@ -56,7 +56,7 @@ namespace Donation.PersonSimulator.Console
         static string GetDonationUrl(string hostOrIp, string port)
         {
             var protocol = "http";
-            if (port == "443")
+            if (port == "443" || port == "44399")
                 protocol = "https";
 
             return $"{protocol}://{hostOrIp}:{port}/api/Donation";
@@ -87,29 +87,12 @@ namespace Donation.PersonSimulator.Console
             return false;
         }
 
-        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, int recursiveCallCount = 0)
+        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, string jsonWebToken,  int recursiveCallCount = 0)
         {
             try
             {                
-                var jwtOptions = new JwtOptions()
-                {
-                    SecretKey = RuntimeHelper.GetAppSettings("jwt:secretKey"),
-                    ExpiryMinutes = RuntimeHelper.GetAppSettings("jwt:expiryMinutes", 1),
-                    Issuer = RuntimeHelper.GetAppSettings("jwt:issuer"),
-                };
-
-                var options = new JwtOptions();
-                var configuration = RuntimeHelper.BuildAppSettingsJsonConfiguration();
-                var section = configuration.GetSection("jwt");
-                
-
-                Microsoft.Extensions.Options.IOptions<JwtOptions> options2 = null;
-                var jwtHandler = new JwtHandler(options2);
-                var userService = new UserService(new Encrypter(), jwtHandler);
-                var jsonWebToken = userService.LoginAsync(RuntimeHelper.GetMachineName(), "abcd1234!");
-
                 donation.__EntranceMachineID = null;
-                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)), donation.ToJSON());
+                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)), donation.ToJSON(), bearerToken: jsonWebToken);
                 if (succeeded)
                     return location;
             }
@@ -120,10 +103,24 @@ namespace Donation.PersonSimulator.Console
                 {
                     recursiveCallCount += 1;
                     System.Console.WriteLine($"Retry PostDonation recursiveCallCount:{recursiveCallCount}");
-                    return await PostDonation(donation, donationEndPointIP, donationEndPointPort, recursiveCallCount);
+                    return await PostDonation(donation, donationEndPointIP, donationEndPointPort, jsonWebToken, recursiveCallCount);
                 }
             }
             return null;
+        }
+
+        private static string GetJWToken()
+        {
+            var jwtOptions = new JwtOptions()
+            {
+                SecretKey = RuntimeHelper.GetAppSettings("jwt:secretKey"),
+                ExpiryMinutes = RuntimeHelper.GetAppSettings("jwt:expiryMinutes", 1),
+                Issuer = RuntimeHelper.GetAppSettings("jwt:issuer"),
+            };
+            var userService = new UserService(new Encrypter(), new JwtHandler(jwtOptions));
+            var user = userService.Login(RuntimeHelper.GetMachineName(), "abcd1234!");
+            var jsonWebToken = userService.GetWebToken(user).Token;
+            return jsonWebToken;
         }
 
         static async Task Publish(int generationIndex, string donationEndPointIP, string donationEndPointPort)
@@ -149,8 +146,9 @@ namespace Donation.PersonSimulator.Console
             {
                 System.Console.Write(".");
                 var donation10 = donations.Take(groupCount);
+                var jwtToken = GetJWToken(); // Get one token for the 10 donation about to be sent
                 
-                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort)));
+                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken)));
                 if(locations.Any(location => location == null))
                 {
                     await saNotification.NotifyAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}", SystemActivityType.Error);

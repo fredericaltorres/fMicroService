@@ -14,7 +14,10 @@ param(
     [Parameter(Mandatory=$false)]
     [int]$port = 44399,
     [Parameter(Mandatory=$false)]
-    [bool]$secure = $true
+    [bool]$secure = $true,
+
+	[Parameter(Mandatory=$false)]
+    [string]$bearerToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MmRmYmZmZC01NjI2LTQzOWMtYjk4ZC1hNjU0NGYzNjQ0MGMiLCJpc3MiOiJEb25hdGlvbi5QZXJzb25TaW11bGF0b3IuQ29uc29sZSIsImlhdCI6MTU2MjkwMjU3MiwiZXhwIjoxNTYyOTAyODcyLCJ1bmlxdWVfbmFtZSI6IjcyZGZiZmZkLTU2MjYtNDM5Yy1iOThkLWE2NTQ0ZjM2NDQwYyJ9.w3eFTs6_rH37Oc3RVHlIbTFwfHI7mKGGLwHURlwPkBA"	
 )
 
 # Command when deploy using a Kubernetes cluster and deployment to pod2 + load balancer
@@ -45,7 +48,12 @@ function postNewDonation() {
     $data = '{ `Guid`:`[GUID]`,`FirstName`:`Sonny`,`LastName`:`Haking`,`Email`:`shaking0@theguardian.com`,`Gender`:`Male`,`Phone`:`310-632-6062`,`IpAddress`:`138.27.230.192`,`Country`:`Indonesia`,`Amount`:`$91.37`,`CC_Number`:`4026367644878790`,`CC_ExpMonth`:12,`CC_ExpYear`:2022,`CC_SecCode`:233}'
     $data = $data.replace("``","""""").replace("""","``""").Replace("[GUID]", $guid)
     $url  = buildUrl $hostOrIp $port $secure
-    $command = "curl.exe -H `"$contentType`" -X POST --data `"$data`" $url "
+
+	$command = "curl.exe "
+	if($bearerToken.length -gt 0) {
+		$command += " -H `"Authorization: Bearer $bearerToken`" "
+	}
+    $command += " -H `"$contentType`" -X POST --data `"$data`" $url "
     Write-Host $command
     Write-Host ""
     Invoke-Expression $command | Out-Null

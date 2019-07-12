@@ -1,8 +1,6 @@
 using System;
 using System.Threading.Tasks;
 
-
-
 namespace fAzureHelper
 {
     public class UserService : IUserService
@@ -31,8 +29,8 @@ namespace fAzureHelper
             //user.SetPassword(password, _encrypter);
             //await _repository.AddAsync(user);
         }
-
-        public JsonWebToken LoginAsync(string email, string password)
+   
+        public User Login(string email, string password)
         {
             var user = new User(email, email);
             user.SetPassword(password, _encrypter);
@@ -43,6 +41,11 @@ namespace fAzureHelper
             if (!user.ValidatePassword(password, _encrypter))
                 throw new Exception("invalid_credential - Invalid credentials.");
 
+            return user;
+        }
+
+        public JsonWebToken GetWebToken(User user)
+        {
             return _jwtHandler.Create(user.Id);
         }
     }

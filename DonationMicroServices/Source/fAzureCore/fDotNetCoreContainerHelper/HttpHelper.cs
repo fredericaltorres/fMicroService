@@ -7,10 +7,13 @@ namespace fDotNetCoreContainerHelper
 {
     public class HttpHelper
     {
-        public async Task<(bool succeeded, string location, HttpResponseMessage httpResponseMessage)> PostJson(Uri uri, string json)
+        public async Task<(bool succeeded, string location, HttpResponseMessage httpResponseMessage)> PostJson(Uri uri, string json, string bearerToken = null)
         {
             using (var client = new HttpClient())
             {
+                if(bearerToken != null)
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+
                 HttpResponseMessage hrp = await client.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"));                
                 if(hrp.IsSuccessStatusCode)
                     return (hrp.IsSuccessStatusCode, hrp.Headers.Location.ToString(), hrp);
