@@ -12,6 +12,7 @@ using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Donation.PersonSimulator.Console
 {
@@ -89,7 +90,24 @@ namespace Donation.PersonSimulator.Console
         static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, int recursiveCallCount = 0)
         {
             try
-            {
+            {                
+                var jwtOptions = new JwtOptions()
+                {
+                    SecretKey = RuntimeHelper.GetAppSettings("jwt:secretKey"),
+                    ExpiryMinutes = RuntimeHelper.GetAppSettings("jwt:expiryMinutes", 1),
+                    Issuer = RuntimeHelper.GetAppSettings("jwt:issuer"),
+                };
+
+                var options = new JwtOptions();
+                var configuration = RuntimeHelper.BuildAppSettingsJsonConfiguration();
+                var section = configuration.GetSection("jwt");
+                
+
+                Microsoft.Extensions.Options.IOptions<JwtOptions> options2 = null;
+                var jwtHandler = new JwtHandler(options2);
+                var userService = new UserService(new Encrypter(), jwtHandler);
+                var jsonWebToken = userService.LoginAsync(RuntimeHelper.GetMachineName(), "abcd1234!");
+
                 donation.__EntranceMachineID = null;
                 var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)), donation.ToJSON());
                 if (succeeded)

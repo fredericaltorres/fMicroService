@@ -30,6 +30,7 @@ namespace Donation.RestApi.Entrance
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddJwt(Configuration);
 
             // AddTransient, AddScoped and AddSingleton Services Differences?
             // https://stackoverflow.com/questions/38138100/addtransient-addscoped-and-addsingleton-services-differences

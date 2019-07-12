@@ -225,6 +225,15 @@ namespace fDotNetCoreContainerHelper
             return BuildAppSettingsJsonConfiguration()[name];
         }
 
+        public static int GetAppSettings(string name, int defaultValue = 0)
+        {
+            var v = GetAppSettings(name);
+            int iv = 0;
+            if(int.TryParse(v, out iv))
+                return iv;
+            return defaultValue;
+        }
+
         public static void InfiniteLoop(int max = 10000)
         {
             var loopIndex = 0;
