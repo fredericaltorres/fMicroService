@@ -40,6 +40,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     state = {
         systemActivitySummary: {
             donationCountryBreakdown                       : {},
+            donationQueueCountSummaryDictionary            : {}, 
             donationSentToEndPointActivitySummaryDictionary: {}, 
             donationEnqueuedActivitySummaryDictionary      : {},
             dashboardResourceActivitySummaryDictionary     : {},            
@@ -396,7 +397,12 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
         }
 
         return [];
-    };
+     };
+
+     getDonationQueueCountChartData = (machineIndex) => {
+
+         return this.getDonationChartData(this.state.systemActivitySummary.donationQueueCountSummaryDictionary, machineIndex);
+     };
 
     getDonationSentToEndPointChartData = (machineIndex) => {
 
@@ -433,7 +439,18 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
             <YAxis />
             <Tooltip />
         </LineChart>;
-    };
+     };
+
+     getDonationQueueCountMachineName = (machineIndex) => {
+         // +++
+         return <LineChart width={chartWidth} height={chartHeight} data={this.getDonationQueueCountChartData(machineIndex)} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+             <Line type="monotone" dataKey="value" stroke="#8884d8" />
+             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+             <XAxis dataKey="timeStamp" />
+             <YAxis />
+             <Tooltip />
+         </LineChart>;
+     };
 
     getDonationSentToEndPointMachineName = (machineIndex) => {
 
@@ -464,23 +481,31 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
         const max  = this.getDonationMachineCount(dictionary);
         const html = [];
         for (let i = 0; i < max; i++) {
-            html.push(<td key={`${title}-${i}`}>
-                <div className="card">
-                    <div className="card-header">{title}, machine {i} {this.getDonationMachineName(dictionary, i)}</div>
-                    <div className="card-body">
-                        {generateChartCallBack(i)}                        
+            html.push(
+                <td key={`${title}-${i}`}>
+                    <div className="card">
+                        <div className="card-header">{title}, machine {i} {this.getDonationMachineName(dictionary, i)}</div>
+                        <div className="card-body">
+                            {generateChartCallBack(i)}
+                        </div>
                     </div>
-                </div>
-            </td>);
+                </td>
+            );
          }
 
         return html;
     }
 
-     getDonationPerformanceInfoCharts = () => {
+    getDonationPerformanceInfoCharts = () => {
 
          return <table>
              <tbody>
+
+                 <tr>
+                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationQueueCountSummaryDictionary, 'Queue Count', this.getDonationQueueCountMachineName)}
+                 </tr>
+                 {/* +++ */}
+
                  <tr>
                      {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent', this.getDonationSentToEndPointMachineName)}
                  </tr>

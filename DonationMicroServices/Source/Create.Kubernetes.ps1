@@ -40,7 +40,7 @@ function createKubernetesCluster (
     ) {
 
     write-host "Creating Azure Resource Group $kubernetesClusterName"
-    az group create -n $kubernetesClusterName -l $kubernetesClusterRegion
+    # az group create -n $kubernetesClusterName -l $kubernetesClusterRegion
 
     write-host "Creating Kubernetes Cluster $kubernetesClusterName"
     az aks create --name $kubernetesClusterName --resource-group $kubernetesClusterName `

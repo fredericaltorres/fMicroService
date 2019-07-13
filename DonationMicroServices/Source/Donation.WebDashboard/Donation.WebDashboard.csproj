@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\fAzureCore\fAzureHelper\fAzureHelper.csproj" />
     <ProjectReference Include="..\..\Source\fAzureCore\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
+    <ProjectReference Include="..\Donation.Queue.Lib\Donation.Queue.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

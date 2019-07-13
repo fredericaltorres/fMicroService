@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Donation.Queue.Lib;
 using fAzureHelper;
+using fDotNetCoreContainerHelper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -25,6 +27,7 @@ namespace Donation.WebDashboard.Controllers
         [HttpGet("[action]")]
         public SystemActivitySummary GetSystemActivityClearAll()
         {
+            __systemActivitySummary.DonationQueueCountSummaryDictionary.Clear();
             __systemActivitySummary.DonationErrorsSummaryDictionary.Clear();
             __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.Clear();
             __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.Clear();
@@ -77,6 +80,8 @@ namespace Donation.WebDashboard.Controllers
 
         private static SystemActivitySummary GetSystemActivitySummaryPreparedToBeSentToWebDashboard()
         {
+            AddDonationQueueCount();
+            __systemActivitySummary.DonationQueueCountSummaryDictionary.PrepareDataForDisplay();
             __systemActivitySummary.DashboardResourceActivitySummaryDictionary.PrepareDataForDisplay();
             __systemActivitySummary.DonationSentToEndPointActivitySummaryDictionary.PrepareDataForDisplay();
             __systemActivitySummary.DonationEnqueuedActivitySummaryDictionary.PrepareDataForDisplay();
@@ -99,6 +104,27 @@ namespace Donation.WebDashboard.Controllers
             __systemActivitySummary.DonationCountryBreakdown = countryBreakDownHistory;
 
             return __systemActivitySummary;
+        }
+
+        private static DonationQueue GetDonationQueue()
+        {
+            return new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+        }
+
+        public static void AddDonationQueueCount()
+        {
+            DonationQueue donationQueue = GetDonationQueue();
+            var queueCount = donationQueue.ApproximateMessageCountAsync().GetAwaiter().GetResult();
+
+            __systemActivitySummary.DonationQueueCountSummaryDictionary.Add(
+                new DonationActivitySummary()
+                {
+                    Caption = "Queue Count",
+                    MachineName = "DonationQueue",
+                    Total = queueCount,
+                    UTCDateTime = DateTime.Now,
+                }
+            );
         }
 
         public static void AddDonationSentToEndpoint(SystemActivity sa)
@@ -189,6 +215,8 @@ namespace Donation.WebDashboard.Controllers
         public class SystemActivitySummary
         {
             public DonationCountryBreakdown DonationCountryBreakdown;
+            public DonationActivitySummaryDictionary DonationQueueCountSummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
+
             public DonationActivitySummaryDictionary DonationSentToEndPointActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
             public DonationActivitySummaryDictionary DonationEnqueuedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
             public DonationActivitySummaryDictionary DonationProcessedActivitySummaryDictionary { get; set; } = new DonationActivitySummaryDictionary(true);
