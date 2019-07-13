@@ -482,12 +482,15 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                 <tr>
                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent', this.getDonationSentToEndPointMachineName)}
                 </tr>
+                <tr><td colSpan="6">&nbsp;</td></tr>
                 <tr>
                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued', this.getDonationEnqueuedMachineName)}
                 </tr>
+                <tr><td colSpan="6">&nbsp;</td></tr>
                 <tr>
                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ', this.getDonationProcessedMachineName)}
                 </tr>
+                <tr><td colSpan="6">&nbsp;</td></tr>
             </tbody>
         </table >
     }
@@ -566,7 +569,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                     &nbsp;
                     <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAll} > Clear All </button>
                     &nbsp;
-                    {new Date().toString()}        
+                    <small> {new Date().toString()} </small>
 
                     <br /><br />
 
@@ -609,15 +612,15 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                     {this.getDonationPerformanceInfoCharts()}
 
                     {this.renderDonationSentToEndpointActivitySummaryTable()}
-                    <br /><br />
+                    <br />
                     {this.renderDonationEnqueuedActivitySummaryTable()}                
-                    <br /><br />
+                    <br />
                     {this.renderDonationProcessedActivitySummaryTable()}
-                    <br /><br />
+                    <br />
                     {this.renderDonationInfoActivitySummaryTable()}
-                    <br /><br />
+                    <br />
                     {this.renderDonationErrorsActivitySummaryTable()}
-                    <br /><br />
+                    
                 </div>
             </React.Fragment>
         );
