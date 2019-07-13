@@ -36,16 +36,16 @@ namespace Donation.PersonSimulator.Console
             try
             {
                 // Settings come frm the appsettings.json file
-                var donationQueue                         = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                var donationTableManager                  = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));    
-                var donationAggregateTableManager         = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                var donationAggregationService            = new DonationsAggregationService();
-                var queuBatchSize                         = 10;
-                var sleepDurationWhenNoItemInQueue        = 4;
-                var lastTimeDonationWereProcessed         = DateTime.Now;
-                var sendFinalNotification                 = true;   // If true we need to send the final notification to web dashboard
-                var monitorIdleProcess                    = false;  // Should we start monitoring for idle mode after having processed donation
-                var maxIdleMinutesToSendFinalNotification = 1;
+                var donationQueue                          = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationTableManager                   = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));    
+                var donationAggregateTableManager          = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
+                var donationAggregationService             = new DonationsAggregationService();
+                var queuBatchSize                          = 10;
+                var sleepDurationInSecondWhenNoItemInQueue = 4;
+                var lastTimeDonationWereProcessed          = DateTime.Now;
+                var sendFinalNotification                  = true;   // If true we need to send the final notification to web dashboard
+                var monitorIdleProcess                     = false;  // Should we start monitoring for idle mode after having processed donation
+                var maxIdleMinutesToSendFinalNotification  = 1;
 
                 while (true)
                 {
@@ -53,7 +53,7 @@ namespace Donation.PersonSimulator.Console
                     if (donations.Count == 0)
                     {
                         // No donation in the queue, let's wait and sleep
-                        Thread.Sleep(sleepDurationWhenNoItemInQueue * 1000);
+                        Thread.Sleep(sleepDurationInSecondWhenNoItemInQueue * 1000);
 
                         // Check if we need to send the final notification to the web dashboard
                         if(monitorIdleProcess && sendFinalNotification && ((DateTime.Now - lastTimeDonationWereProcessed).Minutes > maxIdleMinutesToSendFinalNotification))
