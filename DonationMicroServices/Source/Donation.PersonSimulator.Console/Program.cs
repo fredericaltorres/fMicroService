@@ -146,8 +146,7 @@ namespace Donation.PersonSimulator.Console
             {
                 System.Console.Write(".");
                 var donation10 = donations.Take(groupCount);
-                var jwtToken = GetJWToken(); // Get one token for the 10 donation about to be sent
-                
+                var jwtToken = GetJWToken(); // Get one token for the next 10 donations about to be sent
                 var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken)));
                 if(locations.Any(location => location == null))
                 {

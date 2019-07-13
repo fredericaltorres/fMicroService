@@ -11,21 +11,21 @@ namespace fDotNetCoreContainerHelper
         {
             using (var client = new HttpClient())
             {
-                if(bearerToken != null)
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+                SetJwtToken(bearerToken, client);
 
-                HttpResponseMessage hrp = await client.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"));                
-                if(hrp.IsSuccessStatusCode)
+                HttpResponseMessage hrp = await client.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json"));
+                if (hrp.IsSuccessStatusCode)
                     return (hrp.IsSuccessStatusCode, hrp.Headers.Location.ToString(), hrp);
                 else
                     return (hrp.IsSuccessStatusCode, null, hrp);
             }
         }
 
-        public async Task<(bool succeeded, HttpResponseMessage httpResponseMessage)> Get(Uri uri)
+        public async Task<(bool succeeded, HttpResponseMessage httpResponseMessage)> Get(Uri uri, string bearerToken = null)
         {
             using (var client = new HttpClient())
             {
+                SetJwtToken(bearerToken, client);
                 HttpResponseMessage hrp = await client.GetAsync(uri);
                 if (hrp.IsSuccessStatusCode)
                     return (hrp.IsSuccessStatusCode, hrp);
@@ -34,5 +34,10 @@ namespace fDotNetCoreContainerHelper
             }
         }
 
+        private static void SetJwtToken(string bearerToken, HttpClient client)
+        {
+            if (bearerToken != null)
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+        }
     }
 }

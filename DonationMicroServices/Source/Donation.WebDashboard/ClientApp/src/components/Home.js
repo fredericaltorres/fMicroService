@@ -19,6 +19,17 @@ React-Table
 const chartWidth = 501;
 const chartHeight = 175;
 
+const dollarFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+});
+
+const numberFormatter = new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: 3,
+    minimumFractionDigits: 2
+});
+
  export class Home extends Component {
 
     static displayName          = Home.name;
@@ -330,7 +341,21 @@ const chartHeight = 175;
 
         return null;
     };
-    
+
+    getCountryTotalAmountDonated = () => {
+
+         const donationCountryBreakdown = this.state.systemActivitySummary.donationCountryBreakdown;
+         const countries = Object.keys(donationCountryBreakdown);
+         let total = 0;
+         countries.forEach((country) => {
+
+             const amount = Math.round(donationCountryBreakdown[country]);
+             total += amount;
+         });
+
+         return total;
+    }
+
     getCountryBreakDownChartData = () => {
 
         const donationCountryBreakdown = this.state.systemActivitySummary.donationCountryBreakdown;
@@ -509,6 +534,20 @@ const chartHeight = 175;
              <KeyHandler keyEventName={KEYDOWN} code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, true); }}    />
              <KeyHandler keyEventName={KEYUP}   code="AltRight" onKeyHandle={(event) => { this.onKeyboardAltKey(event, false); }}   />
          </span>;
+     }
+
+    getDonationEnqueuedMaxCount = () => {
+
+        var t = this.getDonationEnqueuedActivitySummaryTable();
+        var lastRecord = t[t.length - 1];
+        return lastRecord.total;
+    }
+
+    getDonationProcessedMaxCount = () => {
+
+        var t = this.getDonationProcessedpointActivitySummaryTable();
+        var lastRecord = t[t.length - 1];
+        return lastRecord.total;
     }
     
     render() {
@@ -527,13 +566,33 @@ const chartHeight = 175;
                     &nbsp;
                     <button type="button" className="btn btn-primary  btn-sm " onClick={this.clearAll} > Clear All </button>
                     &nbsp;
-                    {new Date().toString()}                    
+                    {new Date().toString()}        
 
-                    {this.getDonationPerformanceInfoCharts()}
+                    <br /><br />
 
                     <div className="card">
-                        <div className="card-header">Countries Break Down &nbsp;&nbsp;&nbsp;
-                            <small>
+                        <div className="card-header">Summary</div>
+                        <div className="card-body">
+                            <center>
+                                <h4>
+                                    Donation Received: {numberFormatter.format(this.getDonationEnqueuedMaxCount())}
+                                </h4>
+                                <h4>
+                                    Donation Processed: {numberFormatter.format(this.getDonationProcessedMaxCount())}
+                                </h4>
+                                <h4>
+                                    Total Amount: {dollarFormatter.format(this.getCountryTotalAmountDonated())}
+                                </h4>
+                            </center>
+                        </div>
+                    </div>
+
+                    <br />
+             
+                    <div className="card">
+                        <div className="card-header">Countries Break Down 
+                            &nbsp;&nbsp;&nbsp;                            
+                            <small>                                
                                 ( Minimun Amount:&nbsp;
                                 <input id="donationCountryBreakdownMinimunAmountForDisplay" type="text" value={this.state.donationCountryBreakdownMinimunAmountForDisplay}
                                     onChange={this.onDonationCountryBreakdownMinimunAmountForDisplayChange}
@@ -544,6 +603,10 @@ const chartHeight = 175;
                             {this.getDonationCountryBreakdownChart()}
                         </div>
                     </div>
+
+                    <br />
+
+                    {this.getDonationPerformanceInfoCharts()}
 
                     {this.renderDonationSentToEndpointActivitySummaryTable()}
                     <br /><br />
