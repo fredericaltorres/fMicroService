@@ -48,8 +48,8 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
             donationErrorsSummaryDictionary                : {},                        
         },
         autoRefreshOn: false,
-        donationCountryBreakdownMinimunAmountForDisplay: 1000,
-        keyAltDown: false,
+        keyAltDown   : false,
+        donationCountryBreakdownMinimunAmountForDisplay: 1000,        
     };
 
     clearAllErrors = () => {
@@ -345,8 +345,9 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     getCountryTotalAmountDonated = () => {
 
          const donationCountryBreakdown = this.state.systemActivitySummary.donationCountryBreakdown;
-         const countries = Object.keys(donationCountryBreakdown);
-         let total = 0;
+         const countries                = Object.keys(donationCountryBreakdown);
+         let total                      = 0;
+
          countries.forEach((country) => {
 
              const amount = Math.round(donationCountryBreakdown[country]);
@@ -359,8 +360,9 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     getCountryBreakDownChartData = () => {
 
         const donationCountryBreakdown = this.state.systemActivitySummary.donationCountryBreakdown;
-        const countries = Object.keys(donationCountryBreakdown);
-        const data = [];
+        const countries                = Object.keys(donationCountryBreakdown);
+        const data                     = [];
+
         countries.forEach((country) => {
 
             const amount = Math.round(donationCountryBreakdown[country]);
@@ -381,7 +383,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
             if (machineName) {
 
                 const history = dictionary[machineName].history; // List<DonationActivityItem>
-                const data = history.map((e) => {
+                const data    = history.map((e) => {
 
                     return { timeStamp: e.chartLabel, value: e.total };
                 });
@@ -459,8 +461,8 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     
      getDonationPerformanceInfoChartsTR = (dictionary, title, generateChartCallBack) => {
 
-        let max = this.getDonationMachineCount(dictionary);
-        let html = [];
+        const max  = this.getDonationMachineCount(dictionary);
+        const html = [];
         for (let i = 0; i < max; i++) {
             html.push(<td key={`${title}-${i}`}>
                 <div className="card">
@@ -477,35 +479,35 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
 
      getDonationPerformanceInfoCharts = () => {
 
-        return <table>
-            <tbody>
-                <tr>
-                    {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent', this.getDonationSentToEndPointMachineName)}
-                </tr>
-                <tr><td colSpan="6">&nbsp;</td></tr>
-                <tr>
-                    {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued', this.getDonationEnqueuedMachineName)}
-                </tr>
-                <tr><td colSpan="6">&nbsp;</td></tr>
-                <tr>
-                    {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ', this.getDonationProcessedMachineName)}
-                </tr>
-                <tr><td colSpan="6">&nbsp;</td></tr>
-            </tbody>
-        </table >
+         return <table>
+             <tbody>
+                 <tr>
+                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationSentToEndPointActivitySummaryDictionary, 'Donation Sent', this.getDonationSentToEndPointMachineName)}
+                 </tr>
+                 <tr><td colSpan="6">&nbsp;</td></tr>
+                 <tr>
+                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationEnqueuedActivitySummaryDictionary, 'Donation Enqueued', this.getDonationEnqueuedMachineName)}
+                 </tr>
+                 <tr><td colSpan="6">&nbsp;</td></tr>
+                 <tr>
+                     {this.getDonationPerformanceInfoChartsTR(this.state.systemActivitySummary.donationProcessedActivitySummaryDictionary, 'Donation Processed ', this.getDonationProcessedMachineName)}
+                 </tr>
+                 <tr><td colSpan="6">&nbsp;</td></tr>
+             </tbody>
+         </table>;
     }
 
     onDonationCountryBreakdownMinimunAmountForDisplayChange = (e) => {
 
         this.updateState('donationCountryBreakdownMinimunAmountForDisplay', e.target.value);
-     }
+    }
 
-     onKeyboardAutoRefresh = (event) => {         
+    onKeyboardAutoRefresh = (event) => {         
 
-         event.preventDefault();
-         if (this.state.keyAltDown)
-             this.reverseAutoRefresh();
-     }
+        event.preventDefault();
+        if (this.state.keyAltDown)
+            this.reverseAutoRefresh();
+    }
 
      onKeyboardRefresh = (event) => {
 
@@ -517,14 +519,12 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
      onKeyboardAltKey = (event, down) => {
 
          if (this.state.keyAltDown !== down) {
-             // console.log(`onKeyboardAltKey down:${down}`);
              event.preventDefault();
              this.updateState('keyAltDown', down);
          }
      }
 
-     // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values
-     
+     // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values     
      getKeyHandlers = () => {
 
          return <span>
@@ -541,15 +541,17 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
 
     getDonationEnqueuedMaxCount = () => {
 
-        var t = this.getDonationEnqueuedActivitySummaryTable();
+        var t          = this.getDonationEnqueuedActivitySummaryTable();
         var lastRecord = t[t.length - 1];
+
         return lastRecord.total;
     }
 
     getDonationProcessedMaxCount = () => {
 
-        var t = this.getDonationProcessedpointActivitySummaryTable();
+        var t          = this.getDonationProcessedpointActivitySummaryTable();
         var lastRecord = t[t.length - 1];
+
         return lastRecord.total;
     }
     
@@ -561,7 +563,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                 {this.getKeyHandlers()}
 
                 <div>
-                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh~~~: {this.getAutoRefreshStatus()} (Alt+A)</button>
+                    <button type="button" className="btn btn-primary  btn-sm " onClick={this.reverseAutoRefresh} > AutoRefresh: {this.getAutoRefreshStatus()} (Alt+A)</button>
                     &nbsp;
                     <button type="button" className="btn btn-primary  btn-sm " onClick={this.reloadData} > Refresh (Alt+R)</button>
                     &nbsp;
