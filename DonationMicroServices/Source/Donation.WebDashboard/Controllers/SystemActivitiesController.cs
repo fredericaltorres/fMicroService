@@ -119,7 +119,7 @@ namespace Donation.WebDashboard.Controllers
             __systemActivitySummary.DonationQueueCountSummaryDictionary.Add(
                 new DonationActivitySummary()
                 {
-                    Caption = "Queue Count",
+                    Caption = "",
                     MachineName = "DonationQueue",
                     Total = queueCount,
                     UTCDateTime = DateTime.Now,
