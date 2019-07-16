@@ -15,10 +15,11 @@ if($null -eq (Get-Module Util)) {
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
 }
 
+# https://docs.microsoft.com/en-us/azure/cloud-services/cloud-services-sizes-specs
 #$vmSize = "Standard_D2s_v2" # 2 cpu, 7 Gb Ram
 #$vmSize = "Standard_D4s_v3" # 4 cpu, 17 Gb Ram
-$vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
-#$vmSize = "Standard_D2_v2" # 1 cpu, 3.5 Gb Ram
+#$vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
+$vmSize = "Standard_D2_v2" # 2 cpu, 7 Gb Ram
 $vmCount = 2
 $kubernetesClusterRegion = "eastus2"
 

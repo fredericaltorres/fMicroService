@@ -15,6 +15,7 @@ namespace Donation.WebDashboard.Controllers
     [Route("api/[controller]")]
     public class SystemActivitiesController : Controller
     {
+        
         public static SystemActivitySummary __systemActivitySummary = new SystemActivitySummary();
         
         [HttpGet("[action]")]
@@ -115,16 +116,27 @@ namespace Donation.WebDashboard.Controllers
         {
             DonationQueue donationQueue = GetDonationQueue();
             var queueCount = donationQueue.ApproximateMessageCountAsync().GetAwaiter().GetResult();
+            const string donationQueueKey = "DonationQueue";
+            var first5TotalSum = 0l;
+            if(__systemActivitySummary.DonationQueueCountSummaryDictionary.ContainsKey(donationQueueKey))
+                first5TotalSum = __systemActivitySummary.DonationQueueCountSummaryDictionary[donationQueueKey].History.Take(5).Sum(e => e.Total);
 
-            __systemActivitySummary.DonationQueueCountSummaryDictionary.Add(
-                new DonationActivitySummary()
-                {
-                    Caption = "",
-                    MachineName = "DonationQueue",
-                    Total = queueCount,
-                    UTCDateTime = DateTime.Now,
-                }
-            );
+            if(first5TotalSum == 0 && queueCount == 0)
+            {
+                // Do not store another 0
+            }
+            else
+            {
+                __systemActivitySummary.DonationQueueCountSummaryDictionary.Add(
+                    new DonationActivitySummary()
+                    {
+                        Caption = "",
+                        MachineName = donationQueueKey,
+                        Total = queueCount,
+                        UTCDateTime = DateTime.Now,
+                    }
+                );
+            }
         }
 
         public static void AddDonationSentToEndpoint(SystemActivity sa)

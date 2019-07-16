@@ -134,20 +134,19 @@ namespace Donation.PersonSimulator.Console
             else
                 throw new InvalidDataException($"Cannot find file {Path.GetFileName(donationJsonFile)}");
 
-            var donations = DonationDTOs.FromJsonFile(donationJsonFile);
+            var donations          = DonationDTOs.FromJsonFile(donationJsonFile);
             var donationTotalCount = donations.Count;
-            
-            await saNotification.NotifyAsync($"{RuntimeHelper.GetAppName()} start sending {donationTotalCount} Donations from file {donationJsonFile}");
+            var groupCount         = 10;
+            var perfTracker        = new PerformanceTracker();
 
-            var groupCount = 10;
-            var perfTracker = new PerformanceTracker();
+            await saNotification.NotifyAsync($"{RuntimeHelper.GetAppName()} start sending {donationTotalCount} Donations from file {donationJsonFile}");
 
             while (donations.Count > 0)
             {
                 System.Console.Write(".");
                 var donation10 = donations.Take(groupCount);
-                var jwtToken = GetJWToken(); // Get one token for the next 10 donations about to be sent
-                var locations = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken)));
+                var jwtToken   = GetJWToken(); // Get one token for the next 10 donations about to be sent
+                var locations  = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken)));
                 if(locations.Any(location => location == null))
                 {
                     await saNotification.NotifyAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}", SystemActivityType.Error);
