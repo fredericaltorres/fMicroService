@@ -4,6 +4,8 @@ In this repo I am experimenting building microservices with
 - Docker
 - Kubernetes on Azure
 
+My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
+
 ## On line donation back end prototype
 I am going to build a back end able to received and processed donations.
 The donation should be created by hundreds of users entering donation amounts
@@ -15,7 +17,7 @@ that can be instantiated up to 10 times in Docker containers instance in an Azur
 Each instance will read a specific local donation[X].json file containing 50 000
 donations and execute an HTTP post to a specific end point for each donations.
 10 HTTP post are executed in parallel. 
-Every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subcribers) some performance information.
+Every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
 ### Rest Api
 A .NET Core REST API will implement the HTTP post to received the donations.
@@ -24,15 +26,15 @@ behind a load balancer provisioned using am Azure Kubernetes cluster.
 When a donation is received, it is 
 - Validated
 - Push to a queue
-- Every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subcribers) some performance information.
+- Every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
 ### Queue Processor
-A .NET Core console application that can be instantiated mulitple times as Docker containers instances in an Azure Kubernetes cluster will
+A .NET Core console application that can be instantiated multiple times as Docker containers instances in an Azure Kubernetes cluster will
 - Pop messages from the queue
 - Validate the data
 - Store the data in an Azure Table
 - Compute an aggregate of the amount received per country 
-- Every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subcribers) the aggregated information and other performance information.
+- Every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) the aggregated information and other performance information.
 
 ### Web Dashboard
 A ASP.NET Core Web Application implementing
