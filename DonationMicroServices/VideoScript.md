@@ -77,7 +77,7 @@ fAzureHelper sub folders SystemActicity and ServiceBus.
 
 ```powershell
     cd C:\DVT\microservices\fMicroService\DonationMicroServices\Source\Donation.WebDashboard
-     .\Scripts\publishToAzureAppService.ps1 -a publish -Password XXXXXXXX
+     .\Scripts\publishToAzureAppService.ps1 -a publish
 ```
 
 - RestApi.Entrance, The endpoint must be deployed first because we need to know
@@ -111,7 +111,7 @@ The concept of Statefullsets is need to have each container instance machine nam
     kubectl get pods
     # Show web dashboard
 ```
-
+CRcr    
 - The Person.Simulator, let's deploy the Person Simulator, I am goind to deploy
 X instances of container image and using Kubernetes Statefullsets concepts.
 The concept of Statefullsets is need to have each container instance machine name or pod name to end with index like 'xxxx-0', 'xxx-1'. The index is used the load and send a specific JSON file. Each file contains 50 000 donation and I have up to 10 files.
