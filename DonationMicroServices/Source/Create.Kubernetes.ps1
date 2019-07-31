@@ -9,7 +9,6 @@ param(
     [string]$kubernetesClusterName = "fkubernetes4"
 )
 
-
 if($null -eq (Get-Module Util)) {
     Write-Host "PSScriptRoot: $PSScriptRoot"
     Import-Module "$(if($PSScriptRoot -eq '') {'.'} else {$PSScriptRoot})\Util.psm1" -Force
@@ -22,7 +21,6 @@ if($null -eq (Get-Module Util)) {
 $vmSize = "Standard_D2_v2" # 2 cpu, 7 Gb Ram
 $vmCount = 3
 $kubernetesClusterRegion = "eastus2"
-
 
 function selectKubernetesCluster ([string]$kubernetesClusterName) {
 
@@ -63,7 +61,7 @@ switch($action) {
     }
     delete {
         az aks delete -n $kubernetesClusterName -g $kubernetesClusterName
-        az group delete -n $kubernetesClusterName
+        # az group delete -n $kubernetesClusterName
     }
     select {
         selectKubernetesCluster $kubernetesClusterName

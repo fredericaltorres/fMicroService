@@ -142,7 +142,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
         r.push({ // Add summation row
             machineName  : 'Total',
             caption      : sCaption,
-            total        : sTotal,
+            total        : sTotal,  
             itemPerSecond: sItemPerSecond,
         });
         return r;
