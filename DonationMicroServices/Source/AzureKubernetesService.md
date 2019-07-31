@@ -43,7 +43,6 @@ az aks get-credentials --resource-group $kubernetesClusterName --name $kubernete
 kubectl config use-context $kubernetesClusterName # Switch to cluster
 
 
-
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
 az aks create help # return all parameters
