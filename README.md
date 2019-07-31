@@ -6,7 +6,7 @@ In this repo I am experimenting building microservices with
 
 My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
 
-## On line donation back end prototype
+## On line donation back end case study
 I am going to build a back end able to received and processed donations.
 The donation should be created by hundreds of users entering donation amounts
 and credit card information on a web site and press send.
@@ -17,26 +17,28 @@ that can be instantiated up to 10 times in Docker containers instance in an Azur
 Each instance will read a specific local donation[X].json file containing 50 000
 donations and execute an HTTP post to a specific end point for each donations.
 10 HTTP post are executed in parallel. 
-Every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
+For every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
-### Rest Api
+* [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
+
+### The Rest Api
 A .NET Core REST API will implement the HTTP post to received the donations.
 Multiple instances of the API process will be executed in a Docker containers
 behind a load balancer provisioned using am Azure Kubernetes cluster.
 When a donation is received, it is 
 - Validated
-- Push to a queue
-- Every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
+- Push to an Azure Queue
+- For every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
-### Queue Processor
+### The Queue Processor
 A .NET Core console application that can be instantiated multiple times as Docker containers instances in an Azure Kubernetes cluster will
-- Pop messages from the queue
+- Pop messages from the Azure Queue
 - Validate the data
 - Store the data in an Azure Table
-- Compute an aggregate of the amount received per country 
-- Every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) the aggregated information and other performance information.
+- Compute an aggregate of the amount received per country, store the data into another Azure Table.
+- For every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) the aggregated information and other performance information.
 
-### Web Dashboard
+### The Web Dashboard
 A ASP.NET Core Web Application implementing
 - An internal endpoint named SystemActivitiesController will
     * Received the information sent by the the different processes to the Azure Service Bus channel
