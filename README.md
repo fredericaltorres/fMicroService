@@ -44,13 +44,12 @@ A .NET Core console application that can be instantiated multiple times as Docke
 
 ### The Web Dashboard
 A ASP.NET Core Web Application implementing
+TODO: Add images
 - An internal endpoint named SystemActivitiesController will
     * Received the information sent by the the different processes to the Azure Service Bus channel
     * Store and aggregate the data in static dictionaries
     * Communicate the information the Dashboard browser side 
-
-TODO: Add images
-
+    
     * [SystemActivitiesController source code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/Controllers/SystemActivitiesController.cs)
 
 - A Web Dashboard written as a Single Page Application (SPA) in React that display the performance informations sent by the different processes and the donation amount per country in charts and tables in `pseudo real time`.
