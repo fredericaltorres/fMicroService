@@ -51,7 +51,7 @@ A ASP.NET Core Web Application implementing
 
 TODO: Add images
 
-    * [SystemActivitiesController source code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/Controllers/SystemActivitiesController.cs)
+* [SystemActivitiesController source code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/Controllers/SystemActivitiesController.cs)
 
 - A Web Dashboard written as a Single Page Application (SPA) in React that display the performance informations sent by the different processes and the donation amount per country in charts and tables in `pseudo real time`.
 
@@ -103,8 +103,8 @@ The Kubernetes cluster is running 3 Linux Azure virtual machines of type
 #### Performance
 For a total of 60% of CPU for the al cluster and very little memory, the web dashboard reported the following
 (See video 08 and 09)
-    * The 3 instances of the Donation.PersonSimulator.Console are sending around 370 donations per second
-    * The 3 instances of the Donation.RestApi.Entrance + Load Balancer are receiving and enqueuing around 370 donations per second
-    * The 3 instances of the Donation.QueueProcessor.Console are processing around 280 donations per second
+* The 3 instances of the Donation.PersonSimulator.Console are sending around 370 donations per second
+* The 3 instances of the Donation.RestApi.Entrance + Load Balancer are receiving and enqueuing around 370 donations per second
+* The 3 instances of the Donation.QueueProcessor.Console are processing around 280 donations per second
 
 TODO: Add images of the web dashboard and queue
