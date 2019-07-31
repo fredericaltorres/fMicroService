@@ -30,6 +30,8 @@ When a donation is received, it is
 - Push to an Azure Queue
 - For every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
+* [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.RestApi.Entrance)
+
 ### The Queue Processor
 A .NET Core console application that can be instantiated multiple times as Docker containers instances in an Azure Kubernetes cluster will
 - Pop messages from the Azure Queue
@@ -37,6 +39,8 @@ A .NET Core console application that can be instantiated multiple times as Docke
 - Store the data in an Azure Table
 - Compute an aggregate of the amount received per country, store the data into another Azure Table.
 - For every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) the aggregated information and other performance information.
+
+* [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
 
 ### The Web Dashboard
 A ASP.NET Core Web Application implementing
@@ -51,10 +55,21 @@ A ASP.NET Core Web Application implementing
 
     * [Web Dashboard React Code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/ClientApp/src/components/Home.js)
 
+* [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.WebDashboard)
 
-## Donation MicroServices
-This folder contains the source code of a back end and client simulator to
-1. Send 500 000 donation transactions
-1. Process the transactions
 
-in progress
+## Build and Deployment
+The build and deployment processes consisting of
+- Compiling the .NET Core projects
+- Creating the docker images locally
+- Pushing the docker images to an Azure Container Registry
+- Deploying the different container image to an Azure Kubernetes cluster
+are automated using PowerShell script and the Kubernetes command line tool KubeCtl.exe,
+running on an Azure VM.
+
+* [See powershell script in folder](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source)
+
+### Kubernetes YAML files
+A simple template engine written in PowerShell will execute the YAML template file located in folder
+
+* [Kubernetes.Templates](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Kubernetes.Templates)
