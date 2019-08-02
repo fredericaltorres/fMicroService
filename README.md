@@ -123,11 +123,10 @@ For a total of 60% of CPU for the all cluster and very little memory, the web da
 
 ![Azure.Kubernetes.Performance.Dashboard](./Azure.Kubernetes.Performance.Dashboard.jpg)
 
-| Kubernetes Cluster Configuration                	| PersonSimulator                	| Rest Api                       	| Queue Processor                	|
+| Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
 |-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
 | 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|
 | 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 406 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 294 donations/S  	|
 | 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 405 donations/S  	| 5 containers. 405 donations/S  	| 5 containers. 317 donations/S  	|
 | 4 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 474 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 328 donations/S  	|
 | 3 VM of type Standard_D4s_v3 (4 CPU, 17 Gb Ram) 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	|
-|-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
