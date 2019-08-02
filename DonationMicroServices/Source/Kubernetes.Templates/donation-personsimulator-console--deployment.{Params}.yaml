@@ -18,7 +18,7 @@ metadata:
   name: personsimulator-${APP_VERSION_UNDERSCORE}-sfs
 spec:
   serviceName: "personsimulator-${APP_VERSION_UNDERSCORE}-svc"
-  replicas: 6
+  replicas: 4
   selector:
     matchLabels:
       app: personsimulator-${APP_VERSION_UNDERSCORE}-sfs

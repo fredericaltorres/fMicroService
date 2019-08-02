@@ -9,7 +9,7 @@ param(
 	[string]$UserName = 'jsonbuser2',
 
 	[Parameter(Mandatory=$false)]
-	[string]$Password = "machi123!machi123!",
+	[string]$Password = "",
 	
 	[Parameter(Mandatory=$false)]
 	[string]$PublishProfiles = "Properties\PublishProfiles\DonationWebDashboard - Web Deploy.pubxml"

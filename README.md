@@ -6,10 +6,13 @@ In this repo I am experimenting building microservices with
 
 My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
 
+- Azure resource used: table, queue, service bus, web site, load balancer.
+
 ## On line donation back end case study
 
-I am going to build a back end able to received and processed donations.
-The donation should be created by hundreds of users entering donation amounts
+- I am going to build a back end able to received and processed donations with monitoring
+web dashboard.
+- The donations should be created by hundreds of users entering donation amounts
 and credit card information on a web site and press send.
 
 TODO: Create diagram
@@ -121,9 +124,14 @@ For a total of 60% of CPU for the all cluster and very little memory, the web da
 
 ![Azure.Kubernetes.Performance.Dashboard](./Azure.Kubernetes.Performance.Dashboard.jpg)
 
-| Kubernetes Cluster Configuration                	| PersonSimulator                	| Rest Api                       	| Queue Processor                	|                	|
-|-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|----------------	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|                	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. XXX donations/S  	| 6 containers. XXX donations/S  	| 6 containers. XXX donations/S  	|                	|
-| 3 VM of type Standard_D4s_v3 (4 CPU, 17 Gb Ram) 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| Standard_D2_v2 	|
+| Kubernetes Cluster Configuration                	| PersonSimulator                	| Rest Api                       	| Queue Processor                	|
+|-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
+
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 406 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 294 donations/S  	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 405 donations/S  	| 5 containers. 405 donations/S  	| 5 containers. 317 donations/S  	|
+
+| 4 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 474 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 328 donations/S  	|
+
+| 3 VM of type Standard_D4s_v3 (4 CPU, 17 Gb Ram) 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	|
 

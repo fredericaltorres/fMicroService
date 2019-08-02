@@ -35,7 +35,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     static displayName          = Home.name;
     timerId                     = null;
     refreshTimeOut              = 1000 * 5;    
-    summaryTableDefaultPageSize = 6;
+    summaryTableDefaultPageSize = 7;
 
     state = {
         systemActivitySummary: {
@@ -186,7 +186,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                     Header: "Donation Info",
                     columns: this.getColumnsForMessagesTable()
                 }]}
-                defaultPageSize={this.summaryTableDefaultPageSize+2}
+                defaultPageSize={this.summaryTableDefaultPageSize*3+1}
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {
@@ -218,7 +218,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                         Header: "Donation Errors",
                         columns: this.getColumnsForMessagesTable()
                 }]}                
-                defaultPageSize={this.summaryTableDefaultPageSize}
+                defaultPageSize={this.summaryTableDefaultPageSize*3+1}
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {
