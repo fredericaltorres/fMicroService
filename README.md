@@ -19,6 +19,9 @@ web dashboard.
 ### The Person Simulator
 I will not build the front end, but rather create a .NET Core console application
 that can be instantiated up to 10 times in Docker containers in an Azure Kubernetes cluster.
+
+![DonationDiagram02](./diagram.drawio/DonationDiagram02.jpg)
+
 Each instance will read a specific local 
 [donation[X].json](https://raw.githubusercontent.com/fredericaltorres/fMicroService/master/DonationMicroServices/Source/Donation.PersonSimulator.Console/GeneratedData/donation.SmallSample.json)
 file containing 50 000 donations and execute an HTTP POST to a specific end point for each donation.
