@@ -8,7 +8,7 @@ My goal is to build a case study that I can use to evaluate the scalability poss
 
 - Azure resources used: table, queue, service bus, web site, load balancer.
 
-## Case Study: An fictional online donation back end case study
+## Case Study: An fictional online donation back end
 
 - I am going to build a back end able to received and processed online donations with a monitoring
 web dashboard.
