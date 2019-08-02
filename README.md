@@ -14,7 +14,7 @@ My goal is to build a case study that I can use to evaluate the scalability poss
 web dashboard.
 - The donations should be created by hundreds of users entering donation amounts and credit card information on a web site and press send.
 
-TODO: Create diagram
+![DonationDiagram01](./diagram.drawio/DonationDiagram01.jpg)
 
 ### The Person Simulator
 I will not build the front end, but rather create a .NET Core console application
