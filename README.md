@@ -7,19 +7,24 @@ In this repo I am experimenting building microservices with
 My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
 
 ## On line donation back end case study
+
 I am going to build a back end able to received and processed donations.
 The donation should be created by hundreds of users entering donation amounts
 and credit card information on a web site and press send.
 
+TODO: Create diagram
+
 ### The Person Simulator
 I will not build the front end, but rather create a .NET Core console application
-that can be instantiated up to 10 times in Docker containers instance in an Azure Kubernetes cluster.
+that can be instantiated up to 10 times in Docker containers in an Azure Kubernetes cluster.
 Each instance will read a specific local donation[X].json file containing 50 000
 donations and execute an HTTP post to a specific end point for each donations.
 10 HTTP post are executed in parallel. 
 For every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
+
+![VisualStudio.PersonSimulator](./VisualStudio.PersonSimulator.jpg)
 
 ### The Rest Api
 A .NET Core REST API will implement the HTTP post to received the donations.
@@ -44,13 +49,14 @@ A .NET Core console application that can be instantiated multiple times as Docke
 
 ### The Web Dashboard
 A ASP.NET Core Web Application implementing
-TODO: Add images
 - An internal endpoint named SystemActivitiesController will
-    * Received the information sent by the the different processes to the Azure Service Bus channel
+    * Receive the information sent by the the different processes to the Azure Service Bus channel
     * Store and aggregate the data in static dictionaries
     * Communicate the information the Dashboard browser side 
 
     * [SystemActivitiesController source code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/Controllers/SystemActivitiesController.cs)
+
+![WebDashboard.00](./WebDashboard.00.jpg)
 
 - A Web Dashboard written as a Single Page Application (SPA) in React that display the performance informations sent by the different processes and the donation amount per country in charts and tables in `pseudo real time`.
 
@@ -59,6 +65,8 @@ TODO: Add images
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.WebDashboard)
 
 - The Web Dashboard is deployed in Azure in an AppService
+
+![WebDashboard.01](./WebDashboard.01.jpg)
 
 ## Build and Deployment
 The build and deployment processes consisting of
@@ -69,6 +77,8 @@ The build and deployment processes consisting of
 
 are automated using PowerShell script and the Kubernetes command line tool KubeCtl.exe,
 running on an Azure VM.
+
+![powershell.deploy.restapi](./powershell.deploy.restapi.jpg)
 
 * [See powershell scripts in folder](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source)
 
@@ -87,7 +97,8 @@ I recorded and narrated, a full demo of my case study.
 - [06 Let's deploy the endpoint](https://www.youtube.com/watch?v=cPKklS3JYww)
 - [07 Let's deploy the queue processor](https://www.youtube.com/watch?v=i6e9qWumf34)
 - [08 Let's run the simulation (part I)](https://www.youtube.com/watch?v=-yumIshxrm0)
-- [09 Let's run the simulation (part II)](https://www.youtube.com/watch?v=6YNrc5Dic94)
+- [08 Let's run the simulation (part II)](https://www.youtube.com/watch?v=zWrzRKeSKOk)
+- [09 Let's run the simulation (part III)](https://www.youtube.com/watch?v=6YNrc5Dic94)
 
 ## Performance Study
 
@@ -107,4 +118,6 @@ For a total of 60% of CPU for the all cluster and very little memory, the web da
 * The 3 instances of the Donation.RestApi.Entrance + Load Balancer are receiving and enqueuing around 370 donations per second
 * The 3 instances of the Donation.QueueProcessor.Console are processing around 280 donations per second
 
-TODO: Add images of the web dashboard and queue
+
+![Azure.Kubernetes.Performance.Dashboard](./Azure.Kubernetes.Performance.Dashboard.jpg)
+
