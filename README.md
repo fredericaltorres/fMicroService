@@ -17,9 +17,10 @@ TODO: Create diagram
 ### The Person Simulator
 I will not build the front end, but rather create a .NET Core console application
 that can be instantiated up to 10 times in Docker containers in an Azure Kubernetes cluster.
-Each instance will read a specific local donation[X].json file containing 50 000
-donations and execute an HTTP post to a specific end point for each donations.
-10 HTTP post are executed in parallel. 
+Each instance will read a specific local 
+[donation[X].json](https://raw.githubusercontent.com/fredericaltorres/fMicroService/master/DonationMicroServices/Source/Donation.PersonSimulator.Console/GeneratedData/donation.SmallSample.json)
+file containing 50 000 donations and execute an HTTP POST to a specific end point for each donation.
+10 HTTP POSTs are executed in parallel. 
 For every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
@@ -27,12 +28,12 @@ For every 500 donations sent, the application send to an Azure Service Bus chann
 ![VisualStudio.PersonSimulator](./VisualStudio.PersonSimulator.jpg)
 
 ### The Rest Api
-A .NET Core REST API will implement the HTTP post to received the donations.
+A .NET Core REST API will implement the HTTP POST to received the donations.
 Multiple instances of the API process will be executed in a Docker containers
-behind a load balancer provisioned using am Azure Kubernetes cluster.
+behind a load balancer provisioned using Azure Kubernetes cluster. <<< TODO: Update
 When a donation is received, it is 
 - Validated
-- Push to an Azure Queue
+- Pushed to an Azure Queue
 - For every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.RestApi.Entrance)
