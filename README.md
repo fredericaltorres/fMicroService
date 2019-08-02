@@ -118,6 +118,11 @@ For a total of 60% of CPU for the all cluster and very little memory, the web da
 * The 3 instances of the Donation.RestApi.Entrance + Load Balancer are receiving and enqueuing around 370 donations per second
 * The 3 instances of the Donation.QueueProcessor.Console are processing around 280 donations per second
 
-
 ![Azure.Kubernetes.Performance.Dashboard](./Azure.Kubernetes.Performance.Dashboard.jpg)
+
+| Kubernetes Cluster Configuration                	| PersonSimulator                	| Rest Api                       	| Queue Processor                	|                	|
+|-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|----------------	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|                	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. XXX donations/S  	| 6 containers. XXX donations/S  	| 6 containers. XXX donations/S  	|                	|
+| 3 VM of type Standard_D4s_v3 (4 CPU, 17 Gb Ram) 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| Standard_D2_v2 	|
 
