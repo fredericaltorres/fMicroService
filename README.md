@@ -6,14 +6,13 @@ In this repo I am experimenting building microservices with
 
 My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
 
-- Azure resource used: table, queue, service bus, web site, load balancer.
+- Azure resources used: table, queue, service bus, web site, load balancer.
 
-## On line donation back end case study
+## Case Study: An fictional online donation back end case study
 
-- I am going to build a back end able to received and processed donations with monitoring
+- I am going to build a back end able to received and processed online donations with a monitoring
 web dashboard.
-- The donations should be created by hundreds of users entering donation amounts
-and credit card information on a web site and press send.
+- The donations should be created by hundreds of users entering donation amounts and credit card information on a web site and press send.
 
 TODO: Create diagram
 
