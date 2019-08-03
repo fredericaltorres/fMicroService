@@ -82,7 +82,7 @@ namespace Donation.PersonSimulator.Console
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine($"PostDonation failed, ex:{ex.Message}");
+                System.Console.WriteLine($"SendFlushNotificationToEndpoint failed, ex:{ex.Message}");
             }
 
             return false;
@@ -99,12 +99,14 @@ namespace Donation.PersonSimulator.Console
             }
             catch(System.Exception ex)
             {
-                System.Console.WriteLine($"PostDonation failed, ex:{ex.Message}");
+                System.Console.WriteLine($"PostDonation failed, ex:{ex}");
                 if (recursiveCallCount < 2)
                 {
                     recursiveCallCount += 1;
-                    System.Console.WriteLine($"Retry PostDonation recursiveCallCount:{recursiveCallCount}");
-                    return await PostDonation(donation, donationEndPointIP, donationEndPointPort, jsonWebToken, recursiveCallCount);
+                    System.Console.WriteLine($"{Environment.NewLine}Retry PostDonation recursiveCallCount:{recursiveCallCount}");
+                    var r = await PostDonation(donation, donationEndPointIP, donationEndPointPort, jsonWebToken, recursiveCallCount);
+                    System.Console.WriteLine($"{Environment.NewLine}Retry PostDonation recursiveCallCount:{recursiveCallCount} result:{r}");
+                    return r;
                 }
             }
 

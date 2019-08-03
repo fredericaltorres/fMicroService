@@ -8,8 +8,6 @@ Write-Host "Remove current system and data"
 .\DeploymentUtilityMaster.ps1 -a initData
 "Done"
 
-
-
 pause 
 
 Write-Host "Deploying..."
