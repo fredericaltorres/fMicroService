@@ -1,5 +1,4 @@
-﻿///using Microsoft.Azure.Storage.Queue;
-using Microsoft.WindowsAzure.Storage.Queue;
+﻿using Microsoft.WindowsAzure.Storage.Queue;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace fAzureHelper
 {
-
     /// <summary>
     /// https://docs.microsoft.com/en-us/azure/storage/queues/storage-dotnet-how-to-use-queues
     /// </summary>
@@ -20,8 +18,6 @@ namespace fAzureHelper
         CloudQueue _queue;
         private List<CloudQueueMessage> _inProcessMessages = new List<CloudQueueMessage>();
 
-        //Error CS0029  Cannot implicitly convert type 'Microsoft.WindowsAzure.Storage.Queue.CloudQueueClient' 
-        // to 'Microsoft.Azure.Storage.Queue.CloudQueueClient'  fAzureHelper 
         Microsoft.WindowsAzure.Storage.Queue.CloudQueueClient _queueClient = null;
 
         public QueueManager(string storageAccountName, string storageAccessKey, string queueName) : base(storageAccountName, storageAccessKey)
@@ -63,6 +59,7 @@ namespace fAzureHelper
         public async Task<int> ApproximateMessageCountAsync()
         {
             await this._queue.FetchAttributesAsync();
+
             return this._queue.ApproximateMessageCount.HasValue ? this._queue.ApproximateMessageCount.Value : -1;
         }
 
@@ -75,12 +72,8 @@ namespace fAzureHelper
             IEnumerable<CloudQueueMessage> messages = await this._queue.GetMessagesAsync(
                 count, 
                 waitTimeForAllMessageToArraiveInQueue, 
-                new QueueRequestOptions {
-                         
-                }, 
-                new Microsoft.WindowsAzure.Storage.OperationContext {
-                     
-                }
+                new QueueRequestOptions {},
+                new Microsoft.WindowsAzure.Storage.OperationContext {}
             );
 
             var l = new List<QueueMessage>();

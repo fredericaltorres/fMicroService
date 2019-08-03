@@ -14,14 +14,17 @@ namespace Donation.Service
             else
                 this[country.ToLowerInvariant()] = amount;
         }
+
         public decimal GetTotal()
         {
             return this.Values.Sum(v => v);
         }
+
         public string ToJSON()
         {
             return JsonObject.Serialize(this);
         }
+
         public static DonationsAggregate FromJSON(string json)
         {
             return JsonObject.Deserialize<DonationsAggregate>(json);

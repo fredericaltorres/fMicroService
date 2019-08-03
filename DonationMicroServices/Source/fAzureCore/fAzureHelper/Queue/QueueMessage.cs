@@ -1,6 +1,4 @@
-﻿///using Microsoft.Azure.Storage.Queue;
-
-namespace fAzureHelper
+﻿namespace fAzureHelper
 {
     public sealed class QueueMessage
     {        

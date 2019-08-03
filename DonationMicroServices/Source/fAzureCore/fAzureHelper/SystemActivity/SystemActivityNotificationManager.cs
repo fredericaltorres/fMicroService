@@ -10,10 +10,8 @@ namespace fAzureHelper
     {
         public const string SystemActivityTopic = "systemactivity";
         public const int NotifyEvery = 500;
-
         public delegate void OnMessageReceivedEventHandler(SystemActivity systemActivity);
         public event OnMessageReceivedEventHandler OnMessageReceived;
-
         public bool PauseOnMessageReceived = false;
 
         private AzurePubSubManager _pubSub;
@@ -36,7 +34,6 @@ namespace fAzureHelper
                 if (OnMessageReceived != null && !PauseOnMessageReceived)
                     OnMessageReceived(sa);
 
-                // System.Console.WriteLine($"[{sa.Type}] Host:{sa.MachineName}, {sa.UtcDateTime}, {sa.Message}");
                 return true;
             }
         }

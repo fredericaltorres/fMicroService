@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,20 +17,15 @@ namespace AzureServiceBusSubHelper
         private string _subscriptionName;
         private ITopicClient _topicClient;
         private ISubscriptionClient _subscriptionClient;
-        
         private OnMessageReceived _onMessageReceived;
 
         public long MessagePublishedCounter = 0;
         public DateTime MessagePublishedTimeStamp;
-
         public long MessageReceivedCounter = 0;
         public DateTime MessageReceivedTimeStamp;
-
         public delegate bool OnMessageReceived(string messageBody, string messageId, long sequenceNumber);
 
-        public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null
-            // , bool mustCreateSubscription = true, bool purgeSubscription = false
-            )
+        public AzurePubSubManager(AzurePubSubManagerType type, string connectionString, string topic, string subscriptionName = null)
         {
             _type = type;
             _connectionString = connectionString;
@@ -47,29 +41,10 @@ namespace AzureServiceBusSubHelper
                 
                 this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
 
-                //if (purgeSubscription)
-                //{
-                //    this.DeleteSubscription().GetAwaiter().GetResult();
-                //    this.CreateSubscriptionIfNeededAsync(_subscriptionName).GetAwaiter().GetResult();
-                //}
-
                 _subscriptionClient = new SubscriptionClient(_connectionString, _topic, _subscriptionName);
             }
         }
 
-        public void Purge()
-        {
-            //var receiveMode = _subscriptionClient.ReceiveMode;
-            //while (true)
-            //{
-            //    var messages = _subscriptionClient.
-            //    if (messages.Count() == 0)
-            //    {
-            //        break;
-            //    }
-            //}
-
-        }
 
         private async Task CreateSubscriptionIfNeededAsync(string subscriptionName)
         {
@@ -96,11 +71,6 @@ namespace AzureServiceBusSubHelper
         {
             if (_type == AzurePubSubManagerType.Subcribe) {
                 await this.StopSubscribingAsync();
-                //if (_mustCreateDeleteSubscription)
-                //{
-                //    var managementClient = new ManagementClient(_connectionString);
-                //    await managementClient.DeleteSubscriptionAsync(_topic, _subscriptionName);
-                //}
                 await _subscriptionClient.CloseAsync();
             }
             if (_type == AzurePubSubManagerType.Subcribe)
@@ -173,8 +143,6 @@ namespace AzureServiceBusSubHelper
                 MessageReceivedTimeStamp = DateTime.UtcNow;
 
             MessageReceivedCounter++;
-
-            // Console.WriteLine($"Received message: MessageId:{messageId}, SequenceNumber:{sequenceNumber} Body:{messageBody}");
 
             var r = _onMessageReceived(messageBody, message.MessageId, sequenceNumber);
             if(r)

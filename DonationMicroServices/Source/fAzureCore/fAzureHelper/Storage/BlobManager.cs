@@ -10,7 +10,6 @@ namespace fAzureHelper
     public class BlobManager : AzureStorageBaseClass
     {
         public string ContainerName;
-
         private CloudBlobContainer _cloudBlobContainer = null;
         private CloudBlobClient _cloudBlobClient = null;
 
@@ -33,6 +32,7 @@ namespace fAzureHelper
                 containerPermissions.PublicAccess = BlobContainerPublicAccessType.Blob; // Public
                 await container.SetPermissionsAsync(containerPermissions);
             }
+
             return container;
         }
 
@@ -79,6 +79,7 @@ namespace fAzureHelper
         public async Task<bool> FileExistAsync(string cloudFileName)
         {
             CloudBlockBlob blockBlob = _cloudBlobContainer.GetBlockBlobReference(cloudFileName);
+
             return await blockBlob.ExistsAsync();
         }
 

@@ -39,7 +39,6 @@ namespace fAzureHelper
         {
             this.TableName = tabkeName.ToLowerInvariant();
             _tableClient = _storageAccount.CreateCloudTableClient();
-
             _table = _tableClient.GetTableReference(this.TableName);
             _table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
         }
@@ -71,8 +70,7 @@ namespace fAzureHelper
 
             public string GenerateFilterCondition()
             {
-                var r = TableQuery.GenerateFilterCondition(this.Name, this.Comparator, this.Value);
-                return r;
+                return TableQuery.GenerateFilterCondition(this.Name, this.Comparator, this.Value);                
             }
 
             public string CombineFilters<T>(TableQuery<T> query) where T : ITableEntity, new()
@@ -88,14 +86,12 @@ namespace fAzureHelper
         public async Task<IList<T>> GetRecords<T>(string partition, string rowKey = null, WhereClauseExpression extra = null) where T : ITableEntity, new()
         {
             var items = new List<T>();
-            // TableContinuationToken token = null;
-            // CancellationToken ct = default(CancellationToken);
 
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partition));
             if(rowKey != null)
             {
                 query = new TableQuery<T>().Where(
-                    (new WhereClauseExpression() { Name = "RowKey", Value = rowKey }).CombineFilters(query)                 
+                    (new WhereClauseExpression() { Name = "RowKey", Value = rowKey }).CombineFilters(query)
                 );
             }
             if(extra != null)

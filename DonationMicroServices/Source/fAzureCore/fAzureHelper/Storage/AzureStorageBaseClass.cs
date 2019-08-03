@@ -8,7 +8,6 @@ namespace fAzureHelper
         protected const string ConnectionStringFormat = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
         protected string _storageAccountName;
         protected string _storageAccessKey;
-
         protected CloudStorageAccount _storageAccount = null;
 
         protected string GetConnectString()
@@ -22,7 +21,6 @@ namespace fAzureHelper
 
             if (!CloudStorageAccount.TryParse(GetConnectString(), out _storageAccount))
                 throw new ApplicationException("Cannot parse connection string");
-
         }
     }
 }

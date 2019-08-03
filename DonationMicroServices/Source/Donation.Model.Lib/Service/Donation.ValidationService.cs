@@ -80,6 +80,7 @@ namespace Donation.Service
                 }
                 else throw new InvalidOperationException(errorMessage);
             }
+
             return total;
         }
     }

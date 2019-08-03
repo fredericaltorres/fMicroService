@@ -8,7 +8,6 @@ namespace Donation.Model.Lib.UnitTests
     [TestClass]
     public class Donations_AggregationService_UnitTests
     {
-
         [TestMethod]
         public void GetTotal_ShoulReturnZeroWhenAggregateDataMethodIsNotCalled()
         {
@@ -16,7 +15,6 @@ namespace Donation.Model.Lib.UnitTests
             var donationsAggregationService = new DonationsAggregationService(donations);
             Assert.AreEqual(0m, donationsAggregationService.CountryAggregateData.GetTotal());
         }
- 
 
         [TestMethod]
         public void Aggregate()
@@ -28,7 +26,6 @@ namespace Donation.Model.Lib.UnitTests
             donationsAggregationService.AggregateData();
             AssertAggregateDataForJson0DataFile(expectedAggregatedData, donationsAggregationService);
         }
-
 
         [TestMethod]
         public void Aggregate_MultipleTime()
@@ -71,6 +68,5 @@ namespace Donation.Model.Lib.UnitTests
 
             AssertAggregateDataForJson0DataFile(expectedAggregatedData, donationsAggregationService);
         }
-
     }
 }

@@ -35,7 +35,6 @@ namespace Donation.PersonSimulator.Console
             await saNotification.NotifyInfoAsync($"starting");            
             try
             {
-                // Settings come frm the appsettings.json file
                 var donationQueue                          = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
                 var donationTableManager                   = new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));    
                 var donationAggregateTableManager          = new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));

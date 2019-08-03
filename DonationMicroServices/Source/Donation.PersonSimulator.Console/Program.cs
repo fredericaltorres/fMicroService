@@ -27,15 +27,14 @@ namespace Donation.PersonSimulator.Console
         {
             System.Console.WriteLine(RuntimeHelper.GetContextInformation());
 
-            //var containerInstanceIndex = RuntimeHelper.GetCommandLineParameterInt("-containerInstanceIndex", args);
-            // The console app is provisioned as Kubernetes statefulsets, therefore is pod machine name end
-            // with -0, -1, -2 index, that we extract
             var containerInstanceIndex = RuntimeHelper.GetKubernetesStatefullSetMachineNamePodIndex();
             var donationEndPointIP = RuntimeHelper.GetCommandLineParameterString("-donationEndPointIP", args);
             var donationEndPointPort = RuntimeHelper.GetCommandLineParameterString("-donationEndPointPort", args);
 
             System.Console.WriteLine($"containerInstanceIndex:{containerInstanceIndex}, donationEndPointIP:{donationEndPointIP}, donationEndPointPort:{donationEndPointPort}");
+
             Publish(containerInstanceIndex, donationEndPointIP, donationEndPointPort).GetAwaiter().GetResult();
+
             System.Console.WriteLine("Job done waiting for ever");
             while (true)
             {
@@ -61,6 +60,7 @@ namespace Donation.PersonSimulator.Console
 
             return $"{protocol}://{hostOrIp}:{port}/api/Donation";
         }
+
         static string GetFlushNotificationUrl(string hostOrIp, string port)
         {
             var protocol = "http";
@@ -84,6 +84,7 @@ namespace Donation.PersonSimulator.Console
             {
                 System.Console.WriteLine($"PostDonation failed, ex:{ex.Message}");
             }
+
             return false;
         }
 
@@ -106,6 +107,7 @@ namespace Donation.PersonSimulator.Console
                     return await PostDonation(donation, donationEndPointIP, donationEndPointPort, jsonWebToken, recursiveCallCount);
                 }
             }
+
             return null;
         }
 
@@ -120,6 +122,7 @@ namespace Donation.PersonSimulator.Console
             var userService = new UserService(new Encrypter(), new JwtHandler(jwtOptions));
             var user = userService.Login(RuntimeHelper.GetMachineName(), "abcd1234!");
             var jsonWebToken = userService.GetWebToken(user).Token;
+
             return jsonWebToken;
         }
 

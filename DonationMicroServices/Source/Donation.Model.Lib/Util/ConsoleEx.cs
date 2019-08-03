@@ -64,6 +64,5 @@ namespace Donation.Model.Lib.Util
 
             Console.ForegroundColor = bu;
         }
-
     }
 }

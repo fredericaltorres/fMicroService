@@ -3,13 +3,17 @@ using System.Threading.Tasks;
 
 namespace fAzureHelper
 {
+    /// <summary>
+    /// Storing the user in a repository has been removed
+    /// </summary>
     public class UserService : IUserService
     {
         //private readonly IUserRepository _repository;
         private readonly IEncrypter _encrypter;
         private readonly IJwtHandler _jwtHandler;
 
-        public UserService(// IUserRepository repository,
+        public UserService(
+            // IUserRepository repository,
             IEncrypter encrypter,
             IJwtHandler jwtHandler)
         {

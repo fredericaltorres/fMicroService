@@ -9,7 +9,6 @@ using System.Collections;
 
 namespace fDotNetCoreContainerHelper
 {
-
     public class RuntimeHelper
     {
         public static readonly HttpHelper HttpHelper = new HttpHelper();
@@ -19,6 +18,7 @@ namespace fDotNetCoreContainerHelper
             var s = new StringBuilder();
             foreach (var l in list)
                 s.Append(l).Append(" ");
+
             return s.ToString().TrimEnd();
         }
 
@@ -28,6 +28,7 @@ namespace fDotNetCoreContainerHelper
             int i;
             if (int.TryParse(v, out i))
                 return i;
+
             throw new InvalidProgramException($"Cannot find parameter:{name} in command line or environment");
         }
 
@@ -37,6 +38,7 @@ namespace fDotNetCoreContainerHelper
             bool i;
             if (bool.TryParse(v, out i))
                 return i;
+
             throw new InvalidProgramException($"Cannot find parameter:{name} in command line or environment");
         }
 
@@ -63,6 +65,7 @@ namespace fDotNetCoreContainerHelper
                 if(args[i] == name && i+1 < args.Length)
                     return args[i+1];
             }
+
             return null;
         }
 
@@ -89,6 +92,7 @@ namespace fDotNetCoreContainerHelper
             {
                 d.Add(e.Key.ToString(), e.Value);
             }
+
             return d;
         }
 
@@ -98,14 +102,14 @@ namespace fDotNetCoreContainerHelper
             
             if(json)
             {
-                var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(d, Newtonsoft.Json.Formatting.Indented);
-                return jsonContent;
+                return  Newtonsoft.Json.JsonConvert.SerializeObject(d, Newtonsoft.Json.Formatting.Indented);                
             }
             else
             {
                 var s = new StringBuilder();
                 foreach(var e in d)
                     s.Append($"{e.Key}: {e.Value}").AppendLine();
+
                 return s.ToString();
             }
         }
@@ -138,6 +142,7 @@ namespace fDotNetCoreContainerHelper
                 int value = 0;
                 if (int.TryParse(stringValue, out value))
                     return value;
+
                 throw new ApplicationException($"Cannot extract Kuberneste statefulsets pod machine name index from:{machineName}");
             }
             else return defaultValue;
@@ -162,6 +167,7 @@ namespace fDotNetCoreContainerHelper
                 if (!string.IsNullOrEmpty(parts[0]))
                     return parts[0].Trim();
             }
+
             return s;
         }
 
@@ -177,6 +183,7 @@ namespace fDotNetCoreContainerHelper
         {
             if (_AppPath != null)
                 return _AppPath;
+
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
@@ -203,20 +210,19 @@ namespace fDotNetCoreContainerHelper
 
         const string APP_SETTING_JSON_FILE_NAME = "appsettings.json";
 
-        private static IConfigurationRoot _configurationRoot = null;
-        
+        private static IConfigurationRoot _configurationRoot = null;        
 
         public static IConfigurationRoot BuildAppSettingsJsonConfiguration()
         {
             if (_configurationRoot == null)
             {
                 var p = RuntimeHelper.GetAppPath();
-                // Console.WriteLine($"Reading configuration {RuntimeHelper.GetAppSettingsJsonFile()}");
                 var builder = new ConfigurationBuilder()
                                 .SetBasePath(RuntimeHelper.GetAppPath())
                                 .AddJsonFile(APP_SETTING_JSON_FILE_NAME, optional: true, reloadOnChange: true);
                 _configurationRoot = builder.Build();
             }
+
             return _configurationRoot;
         }
 
@@ -231,6 +237,7 @@ namespace fDotNetCoreContainerHelper
             int iv = 0;
             if(int.TryParse(v, out iv))
                 return iv;
+
             return defaultValue;
         }
 

@@ -10,7 +10,6 @@ namespace Donation.Table.Lib
     public class DonationAggregateAzureTableRecord : TableRecordManager
     {
         public Guid Guid { get; set; }
-
         public int DonationsProcessedCount { get; set; }
         public string DonationsAggregateJSON { get; set; }
         public string __EntranceMachineID { get; set; }
@@ -18,7 +17,6 @@ namespace Donation.Table.Lib
 
         public DonationAggregateAzureTableRecord(DonationsAggregate donationsAggregate, int donationsProcessedCount)
         {
-
             this.Set(donationsAggregate, donationsProcessedCount);
         }
 

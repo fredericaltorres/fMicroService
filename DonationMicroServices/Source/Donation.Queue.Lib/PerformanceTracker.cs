@@ -67,9 +67,5 @@ namespace Donation.Queue.Lib
             var messagePerSecond = this.ItemPerSecond;
             return $"{ItemCount} {action} - {duration:0.0} seconds, {messagePerSecond:0.0} message/S";
         }
-        //public long GetPerformanceTrackerCounter()
-        //{
-        //    return ItemCount;
-        //}
     }
 }

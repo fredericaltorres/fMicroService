@@ -37,16 +37,13 @@ namespace Donation.RestApi.Entrance
             // services.AddScoped new for each request
             // services.AddSingleton same for all object and request
             // services.AddTransient new every call
-            services.AddScoped<IDonationQueueEndqueue, DonationQueue>();
+            // services.AddScoped<IDonationQueueEndqueue, DonationQueue>();
             services.AddTransient<IDonationQueueEndqueue, DonationQueue>((ctx) =>
             {
-                // Console.WriteLine($"Instantiate a new donationQueue");
-                var donationQueue = new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
-                return donationQueue;
+                return new DonationQueue(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
             });
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var ASPNETCORE_URLS = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
@@ -76,11 +73,8 @@ namespace Donation.RestApi.Entrance
             // Middleware must be called before UseMvc()
             RuntimeHelper.SetAppPath(env.ContentRootPath);
             app.UseMiddleware(typeof(DonationCounterMiddleware));
-
             app.UseHttpsRedirection();
             app.UseMvc();
-
-
         }
     }
 }

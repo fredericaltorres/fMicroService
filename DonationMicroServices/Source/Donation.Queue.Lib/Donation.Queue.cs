@@ -42,7 +42,7 @@ namespace Donation.Queue.Lib
             else
             {
                 base.TrackNewItem(count);
-                return new DonationDTOs( messages.Select(
+                return new DonationDTOs(messages.Select(
                     m => {
                         var d = DonationDTO.FromJSON(m.AsString);
                         d.__QueueMessageID = m.Id;
@@ -71,6 +71,7 @@ namespace Donation.Queue.Lib
         public void Release(DonationDTO donation)
         {
         }
+
         public void Release(IEnumerable<DonationDTO> donations)
         {
         }

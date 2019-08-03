@@ -72,7 +72,6 @@ namespace Donation.PersonSimulator.Console
                 GetDonationTableManager();
                 System.Console.Title = $"Donation.Monitor.Console Q)uit C)ls P)ause";
                 var goOn = true;
-                // var pausedMode = false;
                 while (goOn)
                 {
                     Wait(waitSeconds);
@@ -122,6 +121,7 @@ namespace Donation.PersonSimulator.Console
         {
             return new DonationTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
         }
+
         private static DonationAggregateTableManager GetDonationAggregateTableManager()
         {
             return new DonationAggregateTableManager(RuntimeHelper.GetAppSettings("storage:AccountName"), RuntimeHelper.GetAppSettings("storage:AccountKey"));
