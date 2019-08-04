@@ -1,23 +1,25 @@
 # fMicroService
-In this repo I am experimenting building microservices with 
+In this github repository, I am experimenting building microservices with 
 - .NET Core
 - Docker
 - Kubernetes on Azure
 
 My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
 
-- Azure resources used: table, queue, service bus, web site, load balancer.
+- Other Azure resources used: table, queue, service bus, web site, load balancer.
 
 ## Case Study: An fictional online donation back end
 
 - I am going to build a back end able to received and processed online donations with a monitoring
 web dashboard.
-- The donations should be created by hundreds of users entering donation amounts and credit card information on a web site and press send.
+- The donations should be created by hundreds of thousands users entering donation amounts and credit card information on a web site and press send.
+
+Here is the overview execution architecture:
 
 ![DonationDiagram01](./diagram.drawio/DonationDiagram01.jpg)
 
 ### The Person Simulator
-I will not build the front end, but rather create a .NET Core console application
+I will not build the front end, but to simulate the donations I will create a .NET Core console application
 that can be instantiated up to 10 times in Docker containers in an Azure Kubernetes cluster.
 
 ![DonationDiagram02](./diagram.drawio/DonationDiagram02.jpg)
@@ -25,8 +27,9 @@ that can be instantiated up to 10 times in Docker containers in an Azure Kuberne
 Each instance will read a specific local 
 [donation[X].json](https://raw.githubusercontent.com/fredericaltorres/fMicroService/master/DonationMicroServices/Source/Donation.PersonSimulator.Console/GeneratedData/donation.SmallSample.json)
 file containing 50 000 donations and execute an HTTP POST to a specific end point for each donation.
-10 HTTP POSTs are executed in parallel. 
-For every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
+The console has the ability to execute 10 HTTP POSTs in parallel.
+For every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) 
+a message containing performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
 
@@ -35,11 +38,11 @@ For every 500 donations sent, the application send to an Azure Service Bus chann
 ### The Rest Api
 A .NET Core REST API will implement the HTTP POST to received the donations.
 Multiple instances of the API process will be executed in a Docker containers
-behind a load balancer provisioned using Azure Kubernetes cluster. <<< TODO: Update
+behind a load balancer provisioned using Azure Kubernetes cluster.
 When a donation is received, it is 
 - Validated
 - Pushed to an Azure Queue
-- For every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) some performance information.
+- For every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) a message containing performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.RestApi.Entrance)
 
@@ -49,40 +52,39 @@ A .NET Core console application that can be instantiated multiple times as Docke
 - Validate the data
 - Store the data in an Azure Table
 - Compute an aggregate of the amount received per country, store the data into another Azure Table.
-- For every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) the aggregated information and other performance information.
+- For every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) a message containing the aggregated country/amount information and other performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
 
 ### The Web Dashboard
-A ASP.NET Core Web Application implementing
+An ASP.NET Core Web Application implementing
 - An internal endpoint named SystemActivitiesController will
-    * Receive the information sent by the the different processes to the Azure Service Bus channel
-    * Store and aggregate the data in static dictionaries
-    * Communicate the information the Dashboard browser side 
+    * Receive the information sent by the the different processes via the Azure Service Bus channel
+    * Store and aggregate the data in static dictionaries in memory
+    * Communicate the information the Dashboard browser side via HTTP Get on the controller
 
     * [SystemActivitiesController source code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/Controllers/SystemActivitiesController.cs)
 
 ![WebDashboard.00](./WebDashboard.00.jpg)
 
-- A Web Dashboard written as a Single Page Application (SPA) in React that display the performance informations sent by the different processes and the donation amount per country in charts and tables in `pseudo real time`.
+- A Web Dashboard Single Page Application (SPA) written with React that display the performance informations sent by the different processes and the donation amount per country in charts and tables in `pseudo real time`.
 
     * [Web Dashboard React Component Code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/ClientApp/src/components/Home.js)
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.WebDashboard)
 
-- The Web Dashboard is deployed in Azure in an AppService
-
 ![WebDashboard.01](./WebDashboard.01.jpg)
 
-## Build and Deployment
-The build and deployment processes consisting of
-- Compiling the .NET Core projects
-- Creating the docker images locally
-- Pushing the docker images to an Azure Container Registry
-- Deploying the different container images to an Azure Kubernetes cluster
+- The Web Dashboard is deployed in Azure in an AppService
 
-are automated using PowerShell script and the Kubernetes command line tool KubeCtl.exe,
-running on an Azure VM.
+## Build and Deployment
+The build and deployment processes consists of
+1. Compiling the .NET Core projects
+1. Creating the docker images locally
+1. Pushing the docker images to an Azure Container Registry
+1. Deploying the different container images to multiple container instances in an Azure Kubernetes cluster
+
+All these steps are automated using PowerShell scripts and the Kubernetes command line tool [KubeCtl.exe](https://kubernetes.io/docs/reference/kubectl/overview/), running on an Azure VM.
 
 ![powershell.deploy.restapi](./powershell.deploy.restapi.jpg)
 
