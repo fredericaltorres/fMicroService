@@ -1,4 +1,5 @@
 # fMicroService
+## Overview
 In this github repository, I am experimenting building microservices with 
 - .NET Core
 - Docker
@@ -7,6 +8,10 @@ In this github repository, I am experimenting building microservices with
 My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
 
 - Other Azure resources used: table, queue, service bus, web site, load balancer.
+
+## Index
+- [Case Study: An fictional online donation back end](#Case-Study-An-fictional-online-donation-back-end)
+- [Build and Deployment](#Build-and-Deployment)
 
 ## Case Study: An fictional online donation back end
 
@@ -101,7 +106,7 @@ All these steps are automated using PowerShell scripts and the Kubernetes comman
 
 - The file [Create.Kubernetes.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Create.Kubernetes.ps1) is used to create or delete the Azure Kubernete cluster.
 
-- The file [DeploymentUtilityMaster.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/DeploymentUtilityMaster.ps1) allow to build and deploy any of .NET core projects.
+- The file [DeploymentUtilityMaster.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/DeploymentUtilityMaster.ps1) allow to build and deploy any or all the .NET core projects.
     * Each of the .NET Core project implement a local file named [DeploymentUtility.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.PersonSimulator.Console/DeploymentUtility.ps1) which get called by the DeploymentUtilityMaster.ps1 
 
 - The file [Deployment.Kubernetes.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Deployment.Kubernetes.ps1) is used to deploy any of the .NET Core project as a container based on the last build and last container images created and pushed into Azure.
