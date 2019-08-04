@@ -11,7 +11,14 @@ My goal is to build a case study that I can use to evaluate the scalability poss
 
 ## Index
 - [Case Study: An fictional online donation back end](#Case-Study-An-fictional-online-donation-back-end)
+    * [The Person Simulator](#The-Person-Simulator)
+    * [The Rest Api](#The-Rest-Api)
+    * [The Queue Processor](#The-Queue-Processor)
+    * [The Web Dashboard](#The-Web-Dashboard)
 - [Build and Deployment](#Build-and-Deployment)
+    * [Kubernetes YAML files](#Kubernetes-YAML-files)
+- [Videos](#Videos)
+- [Performance Study](#Performance-Study)
 
 ## Case Study: An fictional online donation back end
 
