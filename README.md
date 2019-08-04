@@ -19,14 +19,23 @@ Here is the overview execution architecture:
 ![DonationDiagram01](./diagram.drawio/DonationDiagram01.jpg)
 
 ### The Person Simulator
-I will not build the front end, but to simulate the donations I will create a .NET Core console application
-that can be instantiated up to 10 times in Docker containers in an Azure Kubernetes cluster.
+I will not build the front end, but to simulate the donations sent I will create a .NET Core console application that can be instantiated up to 10 times in Docker containers in an Azure Kubernetes cluster.
 
 ![DonationDiagram02](./diagram.drawio/DonationDiagram02.jpg)
 
-Each instance will read a specific local 
+Each instance will read a specific local JSON file 
 [donation[X].json](https://raw.githubusercontent.com/fredericaltorres/fMicroService/master/DonationMicroServices/Source/Donation.PersonSimulator.Console/GeneratedData/donation.SmallSample.json)
-file containing 50 000 donations and execute an HTTP POST to a specific end point for each donation.
+containing 50 000 donations instances like this one
+```JSON
+{
+ "Guid":"cd7af44d-db7b-4d4c-9157-052ce5f50836",
+ "FirstName":"Sonny","LastName":"Haking","Gender":"Male",
+ "Email":"shaking0@theguardian.com", "Phone":"310-632-6062","IpAddress":"138.27.230.192",
+ "Country":"Indonesia","Amount":"$91.37",
+ "CC_Number":"4026367644878790","CC_ExpMonth":12,"CC_ExpYear":2022,"CC_SecCode":233
+}
+```
+and execute an HTTP POST to a specific end point for each donation.
 The console has the ability to execute 10 HTTP POSTs in parallel.
 For every 500 donations sent, the application send to an Azure Service Bus channel (Publisher/Subscribers) 
 a message containing performance information.
@@ -37,9 +46,9 @@ a message containing performance information.
 
 ### The Rest Api
 A .NET Core REST API will implement the HTTP POST to received the donations.
-Multiple instances of the API process will be executed in a Docker containers
+Multiple instances of the API process will be deployed and executed as a Docker container
 behind a load balancer provisioned using Azure Kubernetes cluster.
-When a donation is received, it is 
+When a donation is received, it is
 - Validated
 - Pushed to an Azure Queue
 - For every 500 donations received, the endpoint send to an Azure Service Bus channel (Publisher/Subscribers) a message containing performance information.
@@ -51,7 +60,7 @@ A .NET Core console application that can be instantiated multiple times as Docke
 - Pop messages from the Azure Queue
 - Validate the data
 - Store the data in an Azure Table
-- Compute an aggregate of the amount received per country, store the data into another Azure Table.
+- Aggregate the amounts received per country for the last 500 donations and store the result into another Azure Table.
 - For every 500 donations processed, the application send to an Azure Service Bus channel (Publisher/Subscribers) a message containing the aggregated country/amount information and other performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
@@ -61,13 +70,13 @@ An ASP.NET Core Web Application implementing
 - An internal endpoint named SystemActivitiesController will
     * Receive the information sent by the the different processes via the Azure Service Bus channel
     * Store and aggregate the data in static dictionaries in memory
-    * Communicate the information the Dashboard browser side via HTTP Get on the controller
+    * Communicate the information to the Dashboard browser side via HTTP Get
 
     * [SystemActivitiesController source code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/Controllers/SystemActivitiesController.cs)
 
 ![WebDashboard.00](./WebDashboard.00.jpg)
 
-- A Web Dashboard Single Page Application (SPA) written with React that display the performance informations sent by the different processes and the donation amount per country in charts and tables in `pseudo real time`.
+- A Web Dashboard Single Page Application (SPA) written with React that display the performance information sent by the different processes and the donation amounts per country in charts and tables in `pseudo real time`.
 
     * [Web Dashboard React Component Code](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.WebDashboard/ClientApp/src/components/Home.js)
 
@@ -88,10 +97,24 @@ All these steps are automated using PowerShell scripts and the Kubernetes comman
 
 ![powershell.deploy.restapi](./powershell.deploy.restapi.jpg)
 
-* [See powershell scripts in folder](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source)
+* See powershell scripts in folder [source](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source)
+
+- The file [Create.Kubernetes.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Create.Kubernetes.ps1) is used to create or delete the Azure Kubernete cluster.
+
+- The file [DeploymentUtilityMaster.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/DeploymentUtilityMaster.ps1) allow to build and deploy any of .NET core projects.
+    * Each of the .NET Core project implement a local file named [DeploymentUtility.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Donation.PersonSimulator.Console/DeploymentUtility.ps1) which get called by the DeploymentUtilityMaster.ps1 
+
+- The file [Deployment.Kubernetes.ps1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Deployment.Kubernetes.ps1) is used to deploy any of the .NET Core project as a container based on the last build and last container images created and pushed into Azure.
+
+- The file [KubernetesManager.psm1] is a re-usable library to execute Kubernetes YAML file and wait for the deployment.
+
+- The file [Util.psm1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Util.psm1) contains general helper functions.
+
 
 ### Kubernetes YAML files
 A simple template engine written in PowerShell will execute the YAML template file located in folder
+
+- See function processFile in file [Util.psm1](https://github.com/fredericaltorres/fMicroService/blob/master/DonationMicroServices/Source/Util.psm1) contains general helper functions.
 
 * [Kubernetes.Templates](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Kubernetes.Templates)
 
