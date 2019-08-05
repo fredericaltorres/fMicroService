@@ -145,7 +145,7 @@ I recorded and narrated, a full demo of my case study.
 
 ## Performance Study
 
-### Configuration For Scenario 1
+### Experimenting with 3 VM in the Kubernetes Cluster
 The Kubernetes cluster is running 3 Linux Azure virtual machines of type
 - Standard_D2_v2 - 2 cpu - 7 Gb Ram
 
@@ -154,20 +154,24 @@ The Kubernetes cluster is running 3 Linux Azure virtual machines of type
     * The app Donation.RestApi.Entrance is instantiated 3 times as a Docker container instance behind 1 Azure load balancer provisioned using Kubernetes Service.
     * The app Donation.QueueProcessor.Console is instantiated 3 times as a Docker container instance
 
-#### Performance
+| Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
+|-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 406 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 294 donations/S  	|
+| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 405 donations/S  	| 5 containers. 
+
 For a total of 60% of CPU for the all cluster and very little memory, the web dashboard reported the following
 (See video 08 and 09)
 * The 3 instances of the Donation.PersonSimulator.Console are sending around 370 donations per second
 * The 3 instances of the Donation.RestApi.Entrance + Load Balancer are receiving and enqueuing around 370 donations per second
 * The 3 instances of the Donation.QueueProcessor.Console are processing around 280 donations per second
 
+### Experimenting with 4, 5 and 6 VM in the Kubernetes Cluster
+
 ![Azure.Kubernetes.Performance.Dashboard](./Azure.Kubernetes.Performance.Dashboard.jpg)
 
 | Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
 |-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 406 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 294 donations/S  	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 405 donations/S  	| 5 containers. 405 donations/S  	| 5 containers. 317 donations/S  	|
 | 4 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 474 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 328 donations/S  	|
 | 5 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 523 donations/S  	| 5 containers. 523 donations/S  	| 5 containers. 427 donations/S  	|
 | 5 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. 535 donations/S  	| 6 containers. 535 donations/S  	| 6 containers. 473 donations/S  	|
