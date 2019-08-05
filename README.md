@@ -19,6 +19,8 @@ My goal is to build a case study that I can use to evaluate the scalability poss
     * [Kubernetes YAML files](#Kubernetes-YAML-files)
 - [Videos](#Videos)
 - [Performance Study](#Performance-Study)
+    * [Experimenting with 3 VMs in the Kubernetes Cluster](#Experimenting-with-3-VMs-in-the-Kubernetes-Cluster)
+    * [Experimenting with 4, 5 and 6 VMs in the Kubernetes Cluster](#Experimenting-with-4-5-and-6-VMs-in-the-Kubernetes-Cluster)
 
 ## Case Study: An fictional online donation back end
 
@@ -145,36 +147,37 @@ I recorded and narrated, a full demo of my case study.
 
 ## Performance Study
 
-### Experimenting with 3 VM in the Kubernetes Cluster
-The Kubernetes cluster is running 3 Linux Azure virtual machines of type
+### Experimenting with 3 VMs in the Kubernetes Cluster
+My Kubernetes cluster is running 3 Linux Azure virtual machines of type
 - Standard_D2_v2 - 2 cpu - 7 Gb Ram
 
-- .NET Core App / Container
-    * The app Donation.PersonSimulator.Console is instantiated 3 times as a Docker container instance
-    * The app Donation.RestApi.Entrance is instantiated 3 times as a Docker container instance behind 1 Azure load balancer provisioned using Kubernetes Service.
-    * The app Donation.QueueProcessor.Console is instantiated 3 times as a Docker container instance
+My .NET Core App / Container Instances are configured this way:
+* Donation.PersonSimulator.Console ***3*** container instances
+* Donation.RestApi.Entrance is ***3*** container instances 
+    - Behind 1 Azure load balancer provisioned using Kubernetes Service.
+* Donation.QueueProcessor.Console is ***3*** container instances
+
+For a total of 60% of CPU for the all cluster and very little memory, the web dashboard reported 
+performance information in row 0 in table below. (See videos [08](https://www.youtube.com/watch?v=zWrzRKeSKOk) and [09](https://www.youtube.com/watch?v=6YNrc5Dic94))
 
 | Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
 |-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S  	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 406 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 294 donations/S  	|
-| 3 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 405 donations/S  	| 5 containers. 
-
-For a total of 60% of CPU for the all cluster and very little memory, the web dashboard reported the following
-(See video 08 and 09)
-* The 3 instances of the Donation.PersonSimulator.Console are sending around 370 donations per second
-* The 3 instances of the Donation.RestApi.Entrance + Load Balancer are receiving and enqueuing around 370 donations per second
-* The 3 instances of the Donation.QueueProcessor.Console are processing around 280 donations per second
-
-### Experimenting with 4, 5 and 6 VM in the Kubernetes Cluster
+| 3 VM of type Standard_D2_v2 | 3 containers. 370 donations/S  	| 3 containers. 370 donations/S  	| 3 containers. 280 donations/S |
+| 3 VM of type Standard_D2_v2 | 4 containers. 406 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 294 donations/S |
+| 3 VM of type Standard_D2_v2 | 5 containers. 405 donations/S  	| 5 containers. 405 donations/S | 5 containers. 317 donations/S
 
 ![Azure.Kubernetes.Performance.Dashboard](./Azure.Kubernetes.Performance.Dashboard.jpg)
+
+### Experimenting with 4, 5 and 6 VMs in the Kubernetes Cluster
+In this table I tried 4, 5 and 6 Linux Azure virtual machines of type
+- Standard_D2_v2 - 2 cpu - 7 Gb Ram
+And also different container instances.
 
 | Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
 |-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
 | 4 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 4 containers. 474 donations/S  	| 4 containers. 406 donations/S  	| 4 containers. 328 donations/S  	|
 | 5 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 523 donations/S  	| 5 containers. 523 donations/S  	| 5 containers. 427 donations/S  	|
 | 5 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. 535 donations/S  	| 6 containers. 535 donations/S  	| 6 containers. 473 donations/S  	|
-| 6 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. 563 donations/S  	| 6 containers. 563 donations/S  	| 6 containers. 499 donations/S  	|
 | 6 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 506 donations/S  	| 5 containers. 506 donations/S  	| 5 containers. 417 donations/S  	|
-| 3 VM of type Standard_D4s_v3 (4 CPU, 17 Gb Ram) 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	| 10 containers. XXX donations/S 	|
+| 6 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. 563 donations/S  	| 6 containers. 563 donations/S  	| 6 containers. 499 donations/S  	|
+
