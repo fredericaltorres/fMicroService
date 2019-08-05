@@ -56,12 +56,18 @@ a message containing performance information.
 
 * [Source Code](https://github.com/fredericaltorres/fMicroService/tree/master/DonationMicroServices/Source/Donation.QueueProcessor.Console)
 
+* **Deployment**: The .NET Core console is deployed as a Kubernetes kind:Service and kind:StatefulSet,
+this allow each container instance machine name to be set to 'personsimulator-[VERSION]-sfs-[INDEX]',
+The machine name ends with a container index instance, for example 'personsimulator-1.0.50-sfs-0'.
+The index is used to load the local JSON file.
+See file [donation-personsimulator-console--deployment.{Params}.yaml](https://github.com/fredericaltorres/fMicroService/edit/master/DonationMicroServices/Source/Kubernetes.Templates/donation-personsimulator-console--deployment.%7BParams%7D.yaml)
+
 ![VisualStudio.PersonSimulator](./VisualStudio.PersonSimulator.jpg)
 
 ### The Rest Api
 A .NET Core REST API will implement the HTTP POST to received the donations.
 Multiple instances of the API process will be deployed and executed as a Docker container
-behind a load balancer provisioned using Azure Kubernetes cluster.
+behind a load balancer provisioned using Azure Kubernetes Service.
 When a donation is received, it is
 - Validated
 - Pushed to an Azure Queue
@@ -171,7 +177,7 @@ performance information in row 0 in table below. (See videos [08](https://www.yo
 ### Experimenting with 4, 5 and 6 VMs in the Kubernetes Cluster
 In this table I tried 4, 5 and 6 Linux Azure virtual machines of type
 - Standard_D2_v2 - 2 cpu - 7 Gb Ram
-And also different container instances.
+And also different number of container instances.
 
 | Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
 |-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|

@@ -145,17 +145,21 @@ namespace Donation.PersonSimulator.Console
             var perfTracker        = new PerformanceTracker();
 
             await saNotification.NotifyAsync($"{RuntimeHelper.GetAppName()} start sending {donationTotalCount} Donations from file {donationJsonFile}");
+            await saNotification.NotifyErrorAsync($"Test Error, machine/pod:{RuntimeHelper.GetMachineName()}");
 
             while (donations.Count > 0)
             {
                 System.Console.Write(".");
-                var donation10 = donations.Take(groupCount);
+                var donation10 = donations.Take(groupCount).ToList();
                 var jwtToken   = GetJWToken(); // Get one token for the next 10 donations about to be sent
+
+                System.Console.Write($"[{DateTime.Now}]posting {donation10.Count} donations");
                 var locations  = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken)));
                 if(locations.Any(location => location == null))
                 {
-                    await saNotification.NotifyAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}", SystemActivityType.Error);
+                    await saNotification.NotifyErrorAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}");
                 }
+                System.Console.Write($"[{DateTime.Now}]posting {donation10.Count} donations done");
 
                 donations.RemoveRange(0, groupCount);
                 perfTracker.TrackNewItem(groupCount);

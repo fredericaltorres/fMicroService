@@ -110,7 +110,7 @@ namespace fAzureHelper
         {
             await _pubSub.PublishAsync(sa.ToJSON());
             if (sendToConsole)
-                System.Console.WriteLine($"[san:{sa.Type}, {sa.MachineName}]{sa.Message}");
+                System.Console.WriteLine($"[san:{sa.Type}, {sa.MachineName}, {sa.UtcDateTime}]{sa.Message}");
         }
     }
 }
