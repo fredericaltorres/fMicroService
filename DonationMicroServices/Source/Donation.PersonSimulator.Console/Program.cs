@@ -88,12 +88,12 @@ namespace Donation.PersonSimulator.Console
             return false;
         }
 
-        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, string jsonWebToken,  int recursiveCallCount = 0)
+        static async Task<string> PostDonation(DonationDTO donation, string donationEndPointIP, string donationEndPointPort, string jsonWebToken,  int recursiveCallCount = 0, System.Net.Http.HttpClient sharedHttpClient = null)
         {
             try
             {                
                 donation.__EntranceMachineID = null;
-                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)), donation.ToJSON(), bearerToken: jsonWebToken);
+                var (succeeded, location, _) = await RuntimeHelper.HttpHelper.PostJson(new Uri(GetDonationUrl(donationEndPointIP, donationEndPointPort)), donation.ToJSON(), bearerToken: jsonWebToken, sharedHttpClient);
                 if (succeeded)
                     return location;
             }
@@ -104,7 +104,7 @@ namespace Donation.PersonSimulator.Console
                 {
                     recursiveCallCount += 1;
                     System.Console.WriteLine($"{Environment.NewLine}Retry PostDonation recursiveCallCount:{recursiveCallCount}");
-                    var r = await PostDonation(donation, donationEndPointIP, donationEndPointPort, jsonWebToken, recursiveCallCount);
+                    var r = await PostDonation(donation, donationEndPointIP, donationEndPointPort, jsonWebToken, recursiveCallCount, sharedHttpClient);
                     System.Console.WriteLine($"{Environment.NewLine}Retry PostDonation recursiveCallCount:{recursiveCallCount} result:{r}");
                     return r;
                 }
@@ -143,6 +143,7 @@ namespace Donation.PersonSimulator.Console
             var donationTotalCount = donations.Count;
             var groupCount         = 10;
             var perfTracker        = new PerformanceTracker();
+            var sharedHttpClient   = new System.Net.Http.HttpClient();
 
             await saNotification.NotifyAsync($"{RuntimeHelper.GetAppName()} start sending {donationTotalCount} Donations from file {donationJsonFile}");
             await saNotification.NotifyErrorAsync($"Test Error, machine/pod:{RuntimeHelper.GetMachineName()}");
@@ -153,13 +154,11 @@ namespace Donation.PersonSimulator.Console
                 var donation10 = donations.Take(groupCount).ToList();
                 var jwtToken   = GetJWToken(); // Get one token for the next 10 donations about to be sent
 
-                System.Console.Write($"[{DateTime.Now}]posting {donation10.Count} donations");
-                var locations  = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken)));
+                var locations  = await Task.WhenAll(donation10.Select(d => PostDonation(d, donationEndPointIP, donationEndPointPort, jwtToken, sharedHttpClient: sharedHttpClient)));
                 if(locations.Any(location => location == null))
                 {
                     await saNotification.NotifyErrorAsync($"Error posting donation, machine/pod:{RuntimeHelper.GetMachineName()}");
                 }
-                System.Console.Write($"[{DateTime.Now}]posting {donation10.Count} donations done");
 
                 donations.RemoveRange(0, groupCount);
                 perfTracker.TrackNewItem(groupCount);
@@ -172,16 +171,14 @@ namespace Donation.PersonSimulator.Console
                     await saNotification.NotifyInfoAsync(perfTracker.GetTrackedInformation("Donation sent to send endpoint"));
                 }
             }
-
             // Wait for all simulator processes to be finished
-            Thread.Sleep(60 * 1 * 1000);
+            //Thread.Sleep(60 * 1 * 1000);
 
             // Hopefully this 10 calls hit both processes behind the firewall
             for (var i=0; i < 10; i++)
             {                
                 await SendFlushNotificationToEndpoint(saNotification, donationEndPointIP, donationEndPointPort);
             }
-
             await saNotification.NotifyAsync(DS.List(
                 $"{donationTotalCount} donations sent",
                 $"End sending donation from file {donationJsonFile}"

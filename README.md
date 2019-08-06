@@ -187,3 +187,11 @@ And also different number of container instances.
 | 6 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 5 containers. 506 donations/S  	| 5 containers. 506 donations/S  	| 5 containers. 417 donations/S  	|
 | 6 VM of type Standard_D2_v2 (2 CPU, 7 Gb Ram)   	| 6 containers. 563 donations/S  	| 6 containers. 563 donations/S  	| 6 containers. 499 donations/S  	|
 
+### Experimenting with 3 more powerfull VM
+In this configuration my Kubernetes cluster run 3  Standard_D4_v3 (4 CPU, 17 Gb Ram) 
+Linux Azure VMs.
+
+| Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
+|-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
+| 3 VM of type Standard_D4_v3 (4 CPU, 17 Gb Ram)   	| 6 containers. 671 donations/S  	| 6 containers. 671 donations/S  	| 6 containers. 452 donations/S  	|
+
