@@ -194,4 +194,7 @@ Linux Azure VMs.
 | Kubernetes Cluster Configuration                	| Person Simulator                	| Rest Api                       	| Queue Processor                	|
 |-------------------------------------------------	|--------------------------------	|--------------------------------	|--------------------------------	|
 | 3 VM of type Standard_D4_v3 (4 CPU, 17 Gb Ram)   	| 6 containers. 671 donations/S  	| 6 containers. 671 donations/S  	| 6 containers. 452 donations/S  	|
+| 3 VM of type Standard_D4_v3 (4 CPU, 17 Gb Ram)   	| 6 containers. 620 donations/S  	| 6 containers. 671 donations/S  	| 6 containers. 474 donations/S  	|
+
+Continue test 3 vm 8 container in each process
 
