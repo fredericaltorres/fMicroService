@@ -5,7 +5,8 @@ In this github repository, I am experimenting building microservices with
 - Docker
 - Kubernetes on Azure
 
-My goal is to build a case study that I can use to evaluate the scalability possibilities of the technologies mentioned above.
+My goal is to build a case study that I can use to evaluate the scalability possibilities 
+of the technologies mentioned above and also build a real time web dashboard
 
 - Other Azure resources used: table, queue, service bus, web site, load balancer.
 
