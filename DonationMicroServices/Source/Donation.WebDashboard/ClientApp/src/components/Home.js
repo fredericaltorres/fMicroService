@@ -35,7 +35,7 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     static displayName          = Home.name;
     timerId                     = null;
     refreshTimeOut              = 1000 * 5;    
-    summaryTableDefaultPageSize = 7;
+    summaryTableDefaultPageSize = 11
 
     state = {
         systemActivitySummary: {
