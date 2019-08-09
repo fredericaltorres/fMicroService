@@ -38,11 +38,8 @@ namespace Donation.RestApi.Entrance.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme )]
         public async Task<IActionResult> PostDonationDTO(DonationDTO donationDTO)
         {
-            // Console.WriteLine($"New donation posted {donationDTO.GetSummary()}");
-
             donationDTO.__EntranceMachineID = RuntimeHelper.GetMachineName();
             var donationsService = new DonationsValidationService(donationDTO);
-            
             var errors = donationsService.ValidateData();
             if(errors.NoError)
             {                

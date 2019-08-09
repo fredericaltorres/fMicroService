@@ -171,9 +171,7 @@ namespace Donation.PersonSimulator.Console
                     await saNotification.NotifyInfoAsync(perfTracker.GetTrackedInformation("Donation sent to send endpoint"));
                 }
             }
-            // Wait for all simulator processes to be finished
-            //Thread.Sleep(60 * 1 * 1000);
-
+            
             // Hopefully this 10 calls hit both processes behind the firewall
             for (var i=0; i < 10; i++)
             {                

@@ -10,15 +10,15 @@ using Microsoft.WindowsAzure.Storage.Table;
 namespace fAzureHelper
 {
     /// <summary>
-    /// https://docs.microsoft.com/en-us/azure/storage/queues/storage-dotnet-how-to-use-queues
+    /// Get started with Azure Queue storage using .NET
+    ///     https://docs.microsoft.com/en-us/azure/storage/queues/storage-dotnet-how-to-use-queues
     /// </summary>
     public class QueueManager : AzureStorageBaseClass
     {
         public string _queueName;
-        CloudQueue _queue;
+        private CloudQueue _queue;
         private List<CloudQueueMessage> _inProcessMessages = new List<CloudQueueMessage>();
-
-        Microsoft.WindowsAzure.Storage.Queue.CloudQueueClient _queueClient = null;
+        private CloudQueueClient _queueClient;
 
         public QueueManager(string storageAccountName, string storageAccessKey, string queueName) : base(storageAccountName, storageAccessKey)
         {
@@ -68,12 +68,13 @@ namespace fAzureHelper
             var timeOutIsMilliSeconds = 500;
             if(count > 32)
                 timeOutIsMilliSeconds = 100;
+
             var waitTimeForAllMessageToArraiveInQueue = new TimeSpan(0, 0, 0, 0, timeOutIsMilliSeconds);
             IEnumerable<CloudQueueMessage> messages = await this._queue.GetMessagesAsync(
                 count, 
                 waitTimeForAllMessageToArraiveInQueue, 
-                new QueueRequestOptions {},
-                new Microsoft.WindowsAzure.Storage.OperationContext {}
+                new QueueRequestOptions(),
+                new Microsoft.WindowsAzure.Storage.OperationContext()
             );
 
             var l = new List<QueueMessage>();

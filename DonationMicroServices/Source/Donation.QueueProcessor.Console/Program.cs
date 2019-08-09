@@ -65,7 +65,7 @@ namespace Donation.PersonSimulator.Console
                     else
                     {
                         monitorIdleProcess             = true; // We processed at least our first donation, so now we can start waiting for the idle mode
-                        lastTimeDonationWereProcessed  = DateTime.Now; // Mark the last time we pop and processed notification
+                        lastTimeDonationWereProcessed  = DateTime.Now; // Mark the last time we popped and processed notification
                         var donationsValidationService = new DonationsValidationService(donations);
                         var validationErrors           = donationsValidationService.ValidateData();
 

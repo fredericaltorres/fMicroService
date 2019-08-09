@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: donation-restapi-entrance-deployment-${APP_VERSION}
 spec:
-  replicas: 6
+  replicas: 8
   template:
     metadata:
       labels:

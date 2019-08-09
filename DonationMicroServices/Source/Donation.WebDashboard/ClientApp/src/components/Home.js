@@ -40,13 +40,13 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
     state = {
         systemActivitySummary: {
             donationCountryBreakdown                       : {},
-            donationQueueCountSummaryDictionary            : {}, 
-            donationSentToEndPointActivitySummaryDictionary: {}, 
+            donationQueueCountSummaryDictionary            : {},
+            donationSentToEndPointActivitySummaryDictionary: {},
             donationEnqueuedActivitySummaryDictionary      : {},
-            dashboardResourceActivitySummaryDictionary     : {},            
+            dashboardResourceActivitySummaryDictionary     : {},
             donationProcessedActivitySummaryDictionary     : {},
             donationInfoSummaryDictionary                  : {},
-            donationErrorsSummaryDictionary                : {},                        
+            donationErrorsSummaryDictionary                : {},
         },
         autoRefreshOn: false,
         keyAltDown   : false,
@@ -192,14 +192,18 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                 SubComponent={row => {
                     
                     var messages = row.original.messages;
-                    var messagesHtml = messages.map((message, index) => {
-                        return <li key={index}>{message}</li>;
-                    });                    
-                    return (
-                        <ul style={{ padding: "20px" }}>
-                            {messagesHtml}
-                        </ul>
-                    );
+                    if (messages) {
+                        var messagesHtml = messages.map((message, index) => {
+                            return <li key={index}>{message}</li>;
+                        });
+                        return (
+                            <ul style={{ padding: "20px" }}>
+                                {messagesHtml}
+                            </ul>
+                        );
+                    }
+
+                    return "Nothing to display";
                 }}
             />
         );
@@ -222,15 +226,19 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
                 className="-striped -highlight"
                 showPagination={false}
                 SubComponent={row => {
-                    var messages = row.original.message;
-                    var messagesHtml = messages.map((message, index) => {
-                        return <li key={index}>{message}</li>;
-                    });
-                    return (
-                        <ul style={{ padding: "20px" }}>
-                            {messagesHtml}
-                        </ul>
-                    );
+                     // debugger;
+                    var messages = row.original.messages;
+                    if (messages) {
+                        var messagesHtml = messages.map((message, index) => {
+                            return <li key={index}>{message}</li>;
+                        });
+                        return (
+                            <ul style={{ padding: "20px" }}>
+                                {messagesHtml}
+                            </ul>
+                        );
+                    }
+                    return "Nothing to display";
                 }}
             />
         );

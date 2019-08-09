@@ -44,6 +44,7 @@ namespace Donation.RestApi.Entrance.Middleware
             if (context.Request.Method.ToLowerInvariant() == "post" && context.Request.Path.ToString().ToLowerInvariant() == "/api/donation")
             {
                 // NOT A GOOD IDEA FOR PERFORMANCE
+                // TODO: Move the semaphore only for the call to NotifyAll
                 await _notificationSemaphore.WaitAsync();
                 try
                 {
@@ -51,11 +52,14 @@ namespace Donation.RestApi.Entrance.Middleware
 
                     // There is a triggering issue with this code when we reach the end of the dataset
                     // Process 1 processed 50 000, and Process 2 processed 45 000
-                    // Now the 500 remaining are going be processed by both process, never reaching
+                    // Now the 500 remaining are going be processed by both processes, never reaching
                     // out the number 500 for the modulo to trigger.
-                    // Not to mention that call to /api/info/getflushnotification can only hit
-                    // one of the 2 processes due to the load balancer.
-                    // For now I never get the right final count of donation processed
+                    // Not to mention that call to /api/info/getflushnotification may not hit
+                    // all processes due to the load balancer.
+                    // Since each PersonSimulator process call /api/info/getflushnotification
+                    // 10 times, it does reach all processes.
+                    // TODO: To re test, make sure that the total number of donations processed
+                    // match the total in the web dashboard
                     if (itemCount % SystemActivityNotificationManager.NotifyEvery == 0)
                         await NotifyAll(itemCount, false);
                 }

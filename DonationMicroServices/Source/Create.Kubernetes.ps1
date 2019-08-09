@@ -20,7 +20,7 @@ if($null -eq (Get-Module Util)) {
 #$vmSize = "Standard_D1_v2" # 1 cpu, 3.5 Gb Ram
 $vmSize = "Standard_D2_v2" # 2 cpu, 7 Gb Ram
 $vmSize = "Standard_D4_v3" # 4 cpu, 17 Gb Ram
-$vmCount = 2
+$vmCount = 3
 $kubernetesClusterRegion = "eastus2"
 function selectKubernetesCluster ([string]$kubernetesClusterName) {
 
