@@ -19,6 +19,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building project:${env.PROJECT_NAME}"
+                // PowerShell(". '.\\disk-usage.ps1'") 
+                PowerShell(".\\build.ps1")
             }
         }
         stage('Package') {
