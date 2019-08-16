@@ -7,11 +7,21 @@ pipeline {
         PROJECT_NAME = "fMicroService Project"
     }    
     stages {
-        stage('Test') {
+        stage('Init') {
             steps {
-                echo "Executing stage Test, project:${env.PROJECT_NAME}"
-                cd "DonationMicroServices/Source"
+                echo "Initialization project:${env.PROJECT_NAME}"
+                // cd "DonationMicroServices/Source"
             }
         }
+        stage('Build') {
+            steps {
+                echo "Building project:${env.PROJECT_NAME}"
+            }
+        }
+        stage('Package') {
+            steps {
+                echo "Packaging project:${env.PROJECT_NAME}"
+            }
+        }        
     }
 }
