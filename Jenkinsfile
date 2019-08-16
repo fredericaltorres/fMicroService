@@ -5,7 +5,10 @@ pipeline {
     agent any
     environment {        
         PROJECT_NAME = "fMicroService Project"
-    }    
+    }
+    parameters {
+        booleanParam (name: 'FORCE_PACKAGE', defaultValue: false, description: 'Package build')
+    }
     stages {
         stage('Init') {
             steps {
@@ -19,6 +22,13 @@ pipeline {
             }
         }
         stage('Package') {
+            when {
+                anyOf {
+                    //branch 'master'
+                    branch 'develop'
+                    e//xpression { return params.FORCE_PUBLISH }
+                }
+            }            
             steps {
                 echo "Packaging project:${env.PROJECT_NAME}"
             }
