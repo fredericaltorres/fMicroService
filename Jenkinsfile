@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Init') {
             steps {
-                echo "Initialization project:${env.PROJECT_NAME}"
+                echo "Initialization project:${env.PROJECT_NAME}, WORKSPACE:${env.WORKSPACE}"
                 // cd "DonationMicroServices/Source"
             }
         }
