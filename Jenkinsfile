@@ -20,9 +20,7 @@ pipeline {
             steps {
                 echo "Building project:${env.PROJECT_NAME}"
                 powershell(".\\build.ps1")
-                dir("${env.WORKSPACE}\\DonationMicroServices\\Source") {
-                    sh "pwd"
-                }
+                dir("${env.WORKSPACE}\\DonationMicroServices\\Source")
             }
         }
         stage('Package') {
