@@ -26,7 +26,7 @@ pipeline {
                 anyOf {
                     //branch 'master'
                     branch 'develop'
-                    e//xpression { return params.FORCE_PUBLISH }
+                    //expression { return params.FORCE_PUBLISH }
                 }
             }            
             steps {
