@@ -3,7 +3,7 @@
 */
 pipeline {
     agent any
-    environment {        
+    environment {
         PROJECT_NAME = "fMicroService Project"
     }
     parameters {
@@ -13,14 +13,12 @@ pipeline {
         stage('Init') {
             steps {
                 echo "Initialization project:${env.PROJECT_NAME}, WORKSPACE:${env.WORKSPACE}"
-                // cd "DonationMicroServices/Source"
             }
         }
         stage('Build') {
             steps {
                 echo "Building project:${env.PROJECT_NAME}"
                 powershell(".\\build.ps1")
-                // dir("${env.WORKSPACE}\\DonationMicroServices\\Source")
             }
         }
         stage('Package') {
@@ -34,6 +32,6 @@ pipeline {
             steps {
                 echo "Packaging project:${env.PROJECT_NAME}, FORCE_PACKAGE:${params.FORCE_PACKAGE}"
             }
-        }        
+        }
     }
 }
