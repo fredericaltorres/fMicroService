@@ -24,13 +24,13 @@ pipeline {
         stage('Package') {
             when {
                 anyOf {
-                    //branch 'master'
+                    //  branch 'master'
                     branch 'develop'
-                    //expression { return params.FORCE_PUBLISH }
+                    expression { return params.FORCE_PACKAGE }
                 }
-            }            
+            }
             steps {
-                echo "Packaging project:${env.PROJECT_NAME}"
+                echo "Packaging project:${env.PROJECT_NAME}, FORCE_PACKAGE:${params.FORCE_PACKAGE}"
             }
         }        
     }
