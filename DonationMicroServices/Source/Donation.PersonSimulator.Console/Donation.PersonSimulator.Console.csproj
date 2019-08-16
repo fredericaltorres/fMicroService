@@ -86,8 +86,4 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="set APPSETTINGS=C:\DVT\microservices\fMicroService\DonationMicroServices\Source\Donation.PersonSimulator.Console\appsettings.json&#xD;&#xA;if exist &quot;$(ProjectDir)\appsettings.json&quot; echo &quot;file appsettings.json found, suspect local build&quot;&#xD;&#xA;if not exist &quot;$(ProjectDir)\appsettings.json&quot; echo &quot;file appsettings.json not find, suspect Jenkins build mode&quot;&#xD;&#xA;if not exist &quot;$(ProjectDir)\appsettings.json&quot; copy &quot;%25APPSETTINGS%25&quot; &quot;$(ProjectDir)\appsettings.json&quot;&#xD;&#xA;" />
-  </Target>
-
 </Project>
