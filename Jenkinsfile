@@ -7,7 +7,10 @@ pipeline {
         PROJECT_NAME = "fMicroService Project"
     }
     parameters {
-        booleanParam (name: 'DeployAndRunToAzure', defaultValue: false, description: 'Deploy and run to Azure')
+        booleanParam (name: 'BuildPush_QueueProcessor', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
+        booleanParam (name: 'BuildPush_RestApi', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
+        booleanParam (name: 'BuildPush_PersonSimulator', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
+// 'all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console'
     }
     stages {
         stage('Init') {
@@ -15,10 +18,22 @@ pipeline {
                 echo "Initialization project:${env.PROJECT_NAME}, WORKSPACE:${env.WORKSPACE}"
             }
         }
-        stage('Build') {
+        stage('BuildPush_QueueProcessor') {
+            when { anyOf { expression { return params.BuildPush_QueueProcessor } } }
             steps {
-                echo "Building project:${env.PROJECT_NAME}"
-                powershell(".\\build.ps1")
+                powershell(".\\build.ps1 -a build -app Donation.QueueProcessor.Console")
+            }
+        }
+        stage('BuildPush_RestApi') {
+            when { anyOf { expression { return params.BuildPush_RestApi } } }
+            steps {
+                powershell(".\\build.ps1 -a build -app Donation.RestApi.Entrance")
+            }
+        }
+        stage('BuildPush_PersonSimulator') {
+            when { anyOf { expression { return params.BuildPush_PersonSimulator } } }
+            steps {
+                powershell(".\\build.ps1 -a build -app Donation.PersonSimulator.Console")
             }
         }
         stage('Package') {

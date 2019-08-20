@@ -1,5 +1,17 @@
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$true)]
+    [Alias('a')]
+    [ValidateSet('build', 'push','buildAndPush','buildPushAndDeploy','deploy','deleteDeployment','getLogs', 'initData', 'info')]
+    [string]$action = "initData",
+
+    [Parameter(Mandatory=$false)]
+    [ValidateSet('all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console')]
+    [string]$app = "all"
+)
+
 Write-Output "************************"
-Write-Output "Building from powershell"
+Write-Output "Building from powershell - action:$action, app :$app "
 Write-Output "************************"
 
 Set-Location ".\DonationMicroServices\Source"
@@ -25,4 +37,5 @@ $sourceFile = "C:\DVT\microservices\fMicroService\DonationMicroServices\Source\D
 $file = ".\Donation.QueueProcessor.Console\appsettings.json"
 restoreFile $file $sourceFile
 
-.\DeploymentUtilityMaster.ps1 -a build -app Donation.PersonSimulator.Console
+.\DeploymentUtilityMaster.ps1 -a $action -app $app
+
