@@ -7,7 +7,7 @@ pipeline {
         PROJECT_NAME = "fMicroService Project"
     }
     parameters {
-        booleanParam (name: 'FORCE_PACKAGE', defaultValue: false, description: 'Package build')
+        booleanParam (name: 'DeployAndRunToAzure', defaultValue: false, description: 'Deploy and run to Azure')
     }
     stages {
         stage('Init') {
@@ -24,13 +24,13 @@ pipeline {
         stage('Package') {
             when {
                 anyOf {
-                    branch 'master'
-                    branch 'develop'
-                    expression { return params.FORCE_PACKAGE }
+                    //branch 'master'
+                    //branch 'develop'
+                    expression { return params.DeployAndRunToAzure }
                 }
             }
             steps {
-                echo "Packaging project:${env.PROJECT_NAME}, FORCE_PACKAGE:${params.FORCE_PACKAGE}"
+                echo "DeployAndRunToAzure project:${env.PROJECT_NAME}, DeployAndRunToAzure:${params.DeployAndRunToAzure}"
             }
         }
     }
