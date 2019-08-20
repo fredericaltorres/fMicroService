@@ -10,6 +10,11 @@ pipeline {
         booleanParam (name: 'BuildPush_QueueProcessor', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
         booleanParam (name: 'BuildPush_RestApi', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
         booleanParam (name: 'BuildPush_PersonSimulator', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
+        booleanParam (name: 'DeployAndRunInCurrentAzureKubernetesCluster', defaultValue: false, description: 'Deploy And Run In Current Azure Kubernetes Cluster')
+
+        booleanParam (name: 'CleanCurrentAzureKubernetesCluster', defaultValue: false, description: 'Clean Current Azure Kubernetes Cluster')
+
+        
 // 'all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console'
     }
     stages {
@@ -21,32 +26,46 @@ pipeline {
         stage('BuildPush_QueueProcessor') {
             when { anyOf { expression { return params.BuildPush_QueueProcessor } } }
             steps {
-                powershell(".\\build.ps1 -a build -app Donation.QueueProcessor.Console")
+                powershell(".\\build.ps1 -a buildAndPush -app Donation.QueueProcessor.Console")
             }
         }
         stage('BuildPush_RestApi') {
             when { anyOf { expression { return params.BuildPush_RestApi } } }
             steps {
-                powershell(".\\build.ps1 -a build -app Donation.RestApi.Entrance")
+                powershell(".\\build.ps1 -a buildAndPush -app Donation.RestApi.Entrance")
             }
         }
-        stage('BuildPush_PersonSimulator') {
-            when { anyOf { expression { return params.BuildPush_PersonSimulator } } }
+        stage('DeployAndRunInCurrentAzureKubernetesCluster') {
+            when { anyOf { expression { return params.DeployAndRunInCurrentAzureKubernetesCluster } } }
             steps {
-                powershell(".\\build.ps1 -a build -app Donation.PersonSimulator.Console")
+                // 'all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console'
+                powershell(".\\build.ps1 -a deploy -app Donation.QueueProcessor.Console")
+                powershell(".\\build.ps1 -a deploy -app Donation.RestApi.Entrance")
+                powershell(".\\build.ps1 -a deploy -app Donation.PersonSimulator.Console")
             }
         }
-        stage('Package') {
-            when {
-                anyOf {
-                    //branch 'master'
-                    //branch 'develop'
-                    expression { return params.DeployAndRunToAzure }
-                }
-            }
+        stage('CleanCurrentAzureKubernetesCluster') {
+            when { anyOf { expression { return params.CleanCurrentAzureKubernetesCluster } } }
             steps {
-                echo "DeployAndRunToAzure project:${env.PROJECT_NAME}, DeployAndRunToAzure:${params.DeployAndRunToAzure}"
+                // 'all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console'
+                powershell(".\\build.ps1 -a deleteDeployment -app Donation.QueueProcessor.Console")
+                powershell(".\\build.ps1 -a deleteDeployment -app Donation.RestApi.Entrance")
+                powershell(".\\build.ps1 -a deleteDeployment -app Donation.PersonSimulator.Console")
+                powershell(".\\build.ps1 -a initData -app all")
             }
         }
+
+        // stage('Package') {
+        //     when {
+        //         anyOf {
+        //             //branch 'master'
+        //             //branch 'develop'
+        //             expression { return params.DeployAndRunToAzure }
+        //         }
+        //     }
+        //     steps {
+        //         echo "DeployAndRunToAzure project:${env.PROJECT_NAME}, DeployAndRunToAzure:${params.DeployAndRunToAzure}"
+        //     }
+        // }
     }
 }
