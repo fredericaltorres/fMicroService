@@ -135,9 +135,7 @@ switch($action) {
         cd ..\..
         docker build -t $containerImage -f "$dockerFilName" .
         popd
-
         
-
         $exp = "docker images --filter=""reference=$containerImage`:latest"""
         Invoke-Expression $exp        
     }
@@ -145,7 +143,9 @@ switch($action) {
     # Tag the last image built of the container in the the local docker image repository 
     # Push the image into the Azure Container Registry
     push {
-
+        Write-Host-Color "AZ LOGIN - pw:$($env:azurePw)"
+        az login -u "fredericaltorres@live.com" -p "$($env:azurePw)"
+        
         Write-Host-Color "Login to azure registry $acrName"
         az acr login --name $acrName # Log in to container registry
 
