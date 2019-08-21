@@ -5,6 +5,9 @@ pipeline {
     agent any
     environment {
         PROJECT_NAME = "fMicroService Project"
+        AZURE_CRED_ID="jenkinsAzureCli2"
+        RES_GROUP="yourWebAppAzureResourceGroupName" // do not need that
+        WEB_APP="yourWebAppName" // do not need that
     }
     parameters {
         booleanParam (name: 'BuildPush_QueueProcessor', defaultValue: false, description: 'Build .NET core project and push container to Azure Registry')
@@ -13,6 +16,8 @@ pipeline {
         booleanParam (name: 'DeployAndRunInCurrentAzureKubernetesCluster', defaultValue: false, description: 'Deploy And Run In Current Azure Kubernetes Cluster')
 
         booleanParam (name: 'CleanCurrentAzureKubernetesCluster', defaultValue: false, description: 'Clean Current Azure Kubernetes Cluster')
+
+        booleanParam (name: 'TestMode', defaultValue: false, description: 'Test Mode')
 
         
 // 'all','Donation.QueueProcessor.Console','Donation.RestApi.Entrance','Donation.PersonSimulator.Console'
@@ -52,6 +57,12 @@ pipeline {
                 powershell(".\\build.ps1 -a deleteDeployment -app Donation.RestApi.Entrance")
                 powershell(".\\build.ps1 -a deleteDeployment -app Donation.PersonSimulator.Console")
                 powershell(".\\build.ps1 -a initData -app all")
+            }
+        }
+        stage('TestMode') {
+            when { anyOf { expression { return params.TestMode } } }
+            steps {
+                sh 'dir'
             }
         }
 

@@ -135,7 +135,7 @@ switch($action) {
         cd ..\..
         docker build -t $containerImage -f "$dockerFilName" .
         popd
-        
+
         $exp = "docker images --filter=""reference=$containerImage`:latest"""
         Invoke-Expression $exp        
     }
@@ -143,6 +143,23 @@ switch($action) {
     # Tag the last image built of the container in the the local docker image repository 
     # Push the image into the Azure Container Registry
     push {
+        <#
+            Jenkins credentials plug in https://plugins.jenkins.io/azure-credentials
+            Create an Azure service principal with Azure CLI https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
+                C:\>  az ad sp create-for-rbac --name ServicePrincipalName
+                c:\>az ad sp list
+            https://docs.microsoft.com/en-us/azure/jenkins/execute-cli-jenkins-pipeline
+
+            how to create service principal portal
+            https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal
+
+            https://stackoverflow.com/questions/45979852/using-azure-cli-in-jenkins-pipeline
+
+            Try this: https://docs.microsoft.com/en-us/azure/jenkins/tutorial-jenkins-deploy-web-app-azure-app-service
+
+
+          #>
+        
         Write-Host-Color "AZ LOGIN - pw:$($env:azurePw)"
         az login -u "fredericaltorres@live.com" -p "$($env:azurePw)"
         
