@@ -19,7 +19,7 @@ Set-Location ".\DonationMicroServices\Source"
 function restoreFile([string]$file, [string]$sourceFile) {
     if(-not (Test-Path $file)) {
         Write-Output "Restore file $file"
-        copy $sourceFile $file
+        Copy-Item $sourceFile $file
     }
 }
 # Restorer appsettings.json file for Donation.PersonSimulator.Console
