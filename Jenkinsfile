@@ -62,7 +62,7 @@ pipeline {
         stage('TestMode') {
             when { anyOf { expression { return params.TestMode } } }
             steps {
-                sh 'dir'
+                echo " YESSSSSSSSSSSSSSSSS "
             }
         }
 
