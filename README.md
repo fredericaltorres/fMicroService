@@ -198,5 +198,5 @@ Linux Azure VMs.
 | 3 VM of type Standard_D4_v3 (4 CPU, 17 Gb Ram) 65% CPU used  	| 8 containers. 622 donations/S  	| 8 containers. xxx donations/S  	| 8 containers. 556 donations/S  	|
 | 3 VM of type Standard_D4_v3 (4 CPU, 17 Gb Ram) 65% CPU used  	| 10 containers. 689 donations/S  	| 10 containers. xxx donations/S  	| 10 containers. 532 donations/S  	|
 
-Continue test 3 vm 8 container in each process
+
 
